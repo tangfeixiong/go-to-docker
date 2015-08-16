@@ -1,69 +1,68 @@
-#Create a basic go 1.4.2 runtime container from Ubuntu 14.04
+# Create a basic go 1.4.2 runtime container from Ubuntu 14.04
 
 the container is most skeleton to meet with go application production
 
 its Dockerfile is from [Docker-library golang repo resided in Github](https://github.com/docker-library/golang/tree/master/1.4)
 
-##Get Dockerfile
+## Get Dockerfile
 
 *Use __git__ client to clone into local repository
 
 First create local repository dir, for example in my lab
 
->#cd /opt/tfx/docker
+>`# cd /opt/tfx/docker`
 
->#mkdir -p github.com/docker-library
+>`# mkdir -p github.com/docker-library`
 
->#cd github.com/docker-library
+>`# cd github.com/docker-library`
 
 Then run `git clone` command
 
->#git clone https://github.com/docker-library/golang.git
+>`# git clone https://github.com/docker-library/golang.git`
 
 *Use edit tool to create a file copy
 
 Like following
 
->#mkdir -p golang-Dockerfile-exercise/1.4/onbuild
+>`# mkdir -p golang-Dockerfile-exercise/1.4/onbuild`
 
->#cd golang-Dockerfile-exercise/1.4
+>`# cd golang-Dockerfile-exercise/1.4`
 
 On broswer, copy content from golang/1.4/onbuild/Dockerfile, open edit tool to paste into
 
->#vi onbuild/Dockerfile
+>`# vi onbuild/Dockerfile`
 
 >in editor, press __i__ switching into edit mode, press __ctrl-insert__ to copy, press __Esc__ switching into command mode, press __:wq__ save and quit
 
 As well as to
 
->#vi go-wrapper
+>`# vi go-wrapper`
 
 *Use download tool 
 
 For example, asume current work dir is golang-Dockerfile-exercise/1.4 according previous command
 
->#wget -O onbuild/Dockerfile https://raw.githubusercontent.com/docker-library/golang/master/1.4/onbuild/Dockerfile
+>`# wget -O onbuild/Dockerfile https://raw.githubusercontent.com/docker-library/golang/master/1.4/onbuild/Dockerfile`
 
->#wget https://raw.githubusercontent.com/docker-library/golang/master/1.4/go-wrapper
+>`# wget https://raw.githubusercontent.com/docker-library/golang/master/1.4/go-wrapper`
 
-##Build image
+## Build image
 
 Please refer to [Dockerfile reference](https://docs.docker.com/reference/builder/) for full knowledge
 
 For example, in my lab
 
->#docker build onbuild/
+>`# docker build onbuild/`
 
 >or omit tag
 
->#docker build -t tangfeixiong/ubuntu-go-runtime-exercise onbuild/
+>`# docker build -t tangfeixiong/ubuntu-go-runtime-exercise onbuild/`
 
 >the image can be tagged laterly, here the tag is composed with my Docker Hub account and expected repository name, for how to sign up a Docker Hub account, show in this link [Your docker Hub account](https://docs.docker.com/docker-hub/accounts/)
 
 *Waiting builder download base image from Hub
 
-As first line in Dockfile show __FROM golang:1.4.2__
-the golang repository is created as Docker official, the tag 1.4.2 means go binary version
+As first line in Dockfile show __FROM golang:1.4.2__, the golang repository is created as Docker official, the tag 1.4.2 means go binary version
 
 *Then initialize container
 
@@ -75,7 +74,7 @@ The fourth __CMD__ instruction line to set a default exection environment for fi
 
 *The __onbuild__ instruction
 
-##Image information
+## Image information
 
 After created, use docker command to understand new image
 
@@ -83,11 +82,11 @@ After created, use docker command to understand new image
 
 Like following
 
->#docker images
+>`# docker images`
 
 >or if already have more, use pipe (grep, head, less ...)
 
->#docker images | head
+>`# docker images | head`
 
 >REPOSITORY                                               TAG                 IMAGE ID            CREATED             VIRTUAL SIZE
 
@@ -98,7 +97,7 @@ Like following
 
 Like
 
->#docker history 
+>`# docker history` 
 
 >IMAGE               CREATED             CREATED BY                                      SIZE                COMMENT
 
@@ -146,13 +145,13 @@ Like
 
 Like
 
->#docker inspect da07533394f8
+>`# docker inspect da07533394f8`
 
 ## Run container with image
 
 Like
 
->#docker run -ti da07533394f8 /bin/bash
+>`# docker run -ti da07533394f8 /bin/bash`
 
 Prompt indicate now is in container 
 
@@ -188,7 +187,7 @@ The container stopped when exit, because it has not been running a daemon
 
 Want to access again, first get container id
 
->#docker ps -l
+>`# docker ps -l`
 
 >CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS                      PORTS               NAMES
 
@@ -196,8 +195,8 @@ Want to access again, first get container id
 
 Start it
 
->#docker start ae56fe85c270
+>`# docker start ae56fe85c270`
 
 Execute bash for enter container
 
->#docker exec -ti ae56fe85c270 /bin/bash
+>`# docker exec -ti ae56fe85c270 /bin/bash`
