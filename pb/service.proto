@@ -1,0 +1,38 @@
+// Inspired from https://github.com/philips/grpc-gateway-example
+
+syntax = "proto3";
+package pb;
+
+import "google/api/annotations.proto";
+
+import "pb/moby/api.proto";
+
+message EchoMessage {
+ string value = 1;
+}
+
+service EchoService {
+  rpc Echo(EchoMessage) returns (EchoMessage) {
+    option (google.api.http) = {
+      get: "/v1/echo/{value}"
+    };
+  }
+
+  // Like 'docker run' command
+  rpc RunContainer(DockerRunData) returns (DockerRunData) {
+    option (google.api.http) = {
+        post: "/v1/containers"
+        body: "*"
+    };
+  }
+}
+
+message DockerRunData {
+    moby.Config config = 1;
+    moby.HostConfig host_config = 2;
+    moby.NetworkingConfig network_config = 3;
+    string container_name = 4;
+    int32 state_code = 5;
+    string state_message = 6;
+    string container_id = 7;
+}

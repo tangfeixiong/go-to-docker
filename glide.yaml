@@ -1,0 +1,51 @@
+package: github.com/tangfeixiong/go-to-docker
+import:
+- package: github.com/docker/distribution
+  subpackages:
+  - reference
+- package: github.com/docker/docker
+  subpackages:
+  - api/types
+  - api/types/blkiodev
+  - api/types/container
+  - api/types/mount
+  - api/types/network
+  - api/types/strslice
+  - client
+- package: github.com/docker/engine-api
+  subpackages:
+  - client
+  - types
+- package: github.com/docker/go-connections
+  subpackages:
+  - nat
+- package: github.com/docker/go-units
+- package: github.com/fsouza/go-dockerclient
+- package: github.com/gogo/protobuf
+  version: v0.4-3-gc0656edd
+- package: github.com/golang/glog
+  version: 44145f04b68cf362d9c4df2182967c2275eaefed
+- package: github.com/golang/protobuf
+  version: 4bd1920723d7b7c925de087aa32e2187708897f7
+  subpackages:
+  - proto
+- package: github.com/grpc-ecosystem/grpc-gateway
+  version: v1.1.0-25-g84398b9
+  subpackages:
+  - runtime
+  - third_party/googleapis/google/api
+  - utilities
+- package: github.com/spf13/cobra
+- package: github.com/spf13/pflag
+- package: golang.org/x/net
+  subpackages:
+  - context
+- package: google.golang.org/grpc
+  version: v1.0.4
+  subpackages:
+  - codes
+  - grpclog
+- package: k8s.io/kubernetes
+  version: v1.4.12
+  subpackages:
+  - pkg/util/parsers
