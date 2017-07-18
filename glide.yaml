@@ -35,6 +35,8 @@ import:
   - runtime
   - third_party/googleapis/google/api
   - utilities
+- package: github.com/pkg/errors
+  version: a22138067af1c4942683050411a841ade67fe1eb
 - package: github.com/spf13/cobra
 - package: github.com/spf13/pflag
 - package: golang.org/x/net
