@@ -2,6 +2,8 @@ package server
 
 import (
 	"fmt"
+	"io"
+	"mime"
 	"net"
 	"net/http"
 	"os"
@@ -10,10 +12,13 @@ import (
 
 	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/philips/go-bindata-assetfs"
+
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	"github.com/tangfeixiong/go-to-docker/pb"
+	"github.com/tangfeixiong/go-to-docker/pkg/ui/data/swagger"
 )
 
 type myService struct {
@@ -24,7 +29,40 @@ func newServer() *myService {
 }
 
 func (m *myService) RunContainer(ctx context.Context, in *pb.DockerRunData) (*pb.DockerRunData, error) {
+	if glog.V(2) {
+		glog.V(2).Infoln("[gRPC] run container!")
+	} else {
+		glog.Infoln("[gRPC] run container.")
+	}
 	return m.runContainer(in)
+}
+
+func (m *myService) RemoveContainer(ctx context.Context, in *pb.DockerRunData) (*pb.DockerRunData, error) {
+	return m.removeContainer(in)
+}
+
+func (m *myService) GetImageFromRegistry(ctx context.Context, in *pb.ImageRegistryData) (*pb.ImageRegistryData, error) {
+	return nil, fmt.Errorf("not ready")
+}
+
+func (m *myService) PullImage(ctx context.Context, in *pb.ImageRegistryData) (*pb.ImageRegistryData, error) {
+	return nil, fmt.Errorf("not ready")
+}
+
+func (m *myService) rmiArchived(ctx context.Context, in *pb.ImageArchiveData) (*pb.ImageArchiveData, error) {
+	return nil, fmt.Errorf("not ready")
+}
+
+func (m *myService) InspectImage(ctx context.Context, in *pb.ImageArchiveData) (*pb.ImageArchiveData, error) {
+	return nil, fmt.Errorf("not ready")
+}
+
+func (m *myService) DefineImageCatalog(ctx context.Context, in *pb.ImageCatalogData) (*pb.ImageCatalogData, error) {
+	return nil, fmt.Errorf("not ready")
+}
+
+func (m *myService) UndefineImageCatalog(ctx context.Context, in *pb.ImageCatalogData) (*pb.ImageCatalogData, error) {
+	return nil, fmt.Errorf("not ready")
 }
 
 func (m *myService) Echo(c context.Context, s *pb.EchoMessage) (*pb.EchoMessage, error) {
@@ -71,7 +109,10 @@ func StartGateway(gRPCHost string) {
 	defer cancel()
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/swagger/", serveSwagger2)
+	// mux.HandleFunc("/swagger/", serveSwagger2)
+	mux.HandleFunc("/swagger.json", func(w http.ResponseWriter, req *http.Request) {
+		io.Copy(w, strings.NewReader(pb.Swagger))
+	})
 
 	dopts := []grpc.DialOption{grpc.WithInsecure()}
 
@@ -83,7 +124,7 @@ func StartGateway(gRPCHost string) {
 	}
 
 	mux.Handle("/", gwmux)
-
+	serveSwagger(mux)
 	//	fmt.Printf("Start HTTP")
 	//	if err := http.ListenAndServe(host, allowCORS(mux)); nil != err {
 	//		fmt.Fprintf(os.Stderr, "Server died: %s\n", err)
@@ -102,6 +143,19 @@ func StartGateway(gRPCHost string) {
 	if err := srv.Serve(lstn); nil != err {
 		fmt.Fprintln(os.Stderr, "Server died.", err.Error())
 	}
+}
+
+func serveSwagger(mux *http.ServeMux) {
+	mime.AddExtensionType(".svg", "image/svg+xml")
+
+	// Expose files in third_party/swagger-ui/ on <host>/swagger-ui
+	fileServer := http.FileServer(&assetfs.AssetFS{
+		Asset:    swagger.Asset,
+		AssetDir: swagger.AssetDir,
+		Prefix:   "third_party/swagger-ui",
+	})
+	prefix := "/swagger-ui/"
+	mux.Handle(prefix, http.StripPrefix(prefix, fileServer))
 }
 
 // allowCORS allows Cross Origin Resoruce Sharing from any origin.

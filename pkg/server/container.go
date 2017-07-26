@@ -3,11 +3,11 @@ package server
 import (
 	"fmt"
 
-	"github.com/docker/docker/api/types/blkiodev"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/api/types/network"
-	"github.com/docker/docker/api/types/strslice"
+	"github.com/docker/engine-api/types/blkiodev"
+	"github.com/docker/engine-api/types/container"
+	// "github.com/docker/engine-api/types/mount"
+	"github.com/docker/engine-api/types/network"
+	"github.com/docker/engine-api/types/strslice"
 	"github.com/docker/go-connections/nat"
 	"github.com/docker/go-units"
 
@@ -55,8 +55,8 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 		OnBuild:         make([]string, 0),
 		Labels:          make(map[string]string),
 		StopSignal:      req.Config.StopSignal,
-		StopTimeout:     new(int),
-		Shell:           make(strslice.StrSlice, 0),
+		// StopTimeout:     new(int),
+		// Shell:           make(strslice.StrSlice, 0),
 	}
 	for k, _ := range req.Config.ExposedPorts.Value {
 		cc.ExposedPorts[nat.Port(k)] = struct{}{}
@@ -67,8 +67,8 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 	for k, v := range req.Config.Labels {
 		cc.Labels[k] = v
 	}
-	*(cc.StopTimeout) = int(req.Config.StopTimeout)
-	cc.Shell = append(cc.Shell, req.Config.Shell...)
+	// *(cc.StopTimeout) = int(req.Config.StopTimeout)
+	// cc.Shell = append(cc.Shell, req.Config.Shell...)
 
 	chc := &container.HostConfig{
 		Binds:           make([]string, 0),
@@ -106,43 +106,51 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 		UsernsMode:      "",
 		ShmSize:         0,
 		Sysctls:         make(map[string]string),
-		Runtime:         req.HostConfig.Runtime,
-		ConsoleSize:     [2]uint{},
-		Isolation:       "",
+		// Runtime:         req.HostConfig.Runtime,
+		// ConsoleSize:     [2]uint{},
+		ConsoleSize: [2]int{},
+		Isolation:   "",
 		Resources: container.Resources{
-			CPUShares:            req.HostConfig.Resources.CpuShares,
-			Memory:               req.HostConfig.Resources.Memory,
-			NanoCPUs:             req.HostConfig.Resources.NanoCpus,
-			CgroupParent:         "",
-			BlkioWeight:          uint16(req.HostConfig.Resources.BlkioWeight),
+			// CPUShares:            req.HostConfig.Resources.CpuShares,
+			// Memory:               req.HostConfig.Resources.Memory,
+			// NanoCPUs:             req.HostConfig.Resources.NanoCpus,
+			CgroupParent: "",
+			// BlkioWeight:          uint16(req.HostConfig.Resources.BlkioWeight),
 			BlkioWeightDevice:    make([]*blkiodev.WeightDevice, 0),
 			BlkioDeviceReadBps:   make([]*blkiodev.ThrottleDevice, 0),
 			BlkioDeviceWriteBps:  make([]*blkiodev.ThrottleDevice, 0),
 			BlkioDeviceReadIOps:  make([]*blkiodev.ThrottleDevice, 0),
 			BlkioDeviceWriteIOps: make([]*blkiodev.ThrottleDevice, 0),
-			CPUPeriod:            req.HostConfig.Resources.CpuPeriod,
-			CPUQuota:             req.HostConfig.Resources.CpuQuota,
-			CPURealtimePeriod:    req.HostConfig.Resources.CpuRealtimePeriod,
-			CPURealtimeRuntime:   req.HostConfig.Resources.CpuRealtimeRuntime,
-			CpusetCpus:           "",
-			CpusetMems:           "",
-			Devices:              make([]container.DeviceMapping, 0),
-			DeviceCgroupRules:    make([]string, 0),
-			DiskQuota:            0,
-			KernelMemory:         0,
-			MemoryReservation:    0,
-			MemorySwap:           0,
-			MemorySwappiness:     new(int64),
-			OomKillDisable:       new(bool),
-			PidsLimit:            0,
-			Ulimits:              make([]*units.Ulimit, 0),
-			CPUCount:             0,
-			CPUPercent:           0,
-			IOMaximumIOps:        0,
-			IOMaximumBandwidth:   0,
+			// CPUPeriod:            req.HostConfig.Resources.CpuPeriod,
+			// CPUQuota:             req.HostConfig.Resources.CpuQuota,
+			// CPURealtimePeriod:    req.HostConfig.Resources.CpuRealtimePeriod,
+			// CPURealtimeRuntime:   req.HostConfig.Resources.CpuRealtimeRuntime,
+			CpusetCpus: "",
+			CpusetMems: "",
+			Devices:    make([]container.DeviceMapping, 0),
+			// DeviceCgroupRules:  make([]string, 0),
+			DiskQuota:          0,
+			KernelMemory:       0,
+			MemoryReservation:  0,
+			MemorySwap:         0,
+			MemorySwappiness:   new(int64),
+			OomKillDisable:     new(bool),
+			PidsLimit:          0,
+			Ulimits:            make([]*units.Ulimit, 0),
+			CPUCount:           0,
+			CPUPercent:         0,
+			IOMaximumIOps:      0,
+			IOMaximumBandwidth: 0,
 		},
-		Mounts: make([]mount.Mount, 0),
-		Init:   new(bool),
+		// Mounts: make([]mount.Mount, 0),
+		// Init:   new(bool),
+	}
+	for k, v := range req.HostConfig.PortBindings.Value {
+		chc.PortBindings[nat.Port(k)] = make([]nat.PortBinding, 0)
+		chc.PortBindings[nat.Port(k)] = append(chc.PortBindings[nat.Port(k)], nat.PortBinding{
+			HostIP:   v.HostIp,
+			HostPort: v.HostPort,
+		})
 	}
 
 	cnc := &network.NetworkingConfig{
@@ -151,9 +159,9 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 	for k, v := range req.NetworkConfig.EndpointsConfig {
 		cnc.EndpointsConfig[k] = &network.EndpointSettings{
 			IPAMConfig: &network.EndpointIPAMConfig{
-				IPv4Address:  v.IpamConfig.Ipv4Address,
-				IPv6Address:  v.IpamConfig.Ipv6Address,
-				LinkLocalIPs: make([]string, 0),
+				IPv4Address: v.IpamConfig.Ipv4Address,
+				IPv6Address: v.IpamConfig.Ipv6Address,
+				// LinkLocalIPs: make([]string, 0),
 			},
 			Links:               make([]string, 0),
 			Aliases:             make([]string, 0),
@@ -166,21 +174,40 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 			GlobalIPv6Address:   v.GlobalIpv6Address,
 			GlobalIPv6PrefixLen: int(v.GlobalIpv6PrefixLen),
 			MacAddress:          v.MacAddress,
-			DriverOpts:          make(map[string]string),
+			// DriverOpts:          make(map[string]string),
 		}
 	}
 
-	if result, err := dockerctl.NewMobyClient("1.12").CreateContainer(cc, chc, cnc, req.ContainerName); nil != err {
+	ctl := dockerctl.NewEngine1_12Client()
+	if result, err := ctl.CreateContainer(cc, chc, cnc, req.ContainerName); nil != err {
 		resp.StateCode = 100
 		resp.StateMessage = "Failed to create docker container. " + err.Error()
 		return resp, fmt.Errorf("Failed to create docker container. %v", err)
+	} else if err := ctl.StartContainer(result.ID); nil != err {
+		resp.StateCode = 101
+		resp.StateMessage = "Failed to start docker container. " + err.Error()
+		return resp, fmt.Errorf("Failed to start docker container. %v", err)
+
 	} else {
 		resp.ContainerId = result.ID
-		resp.Config = req.Config
-		resp.HostConfig = req.HostConfig
-		resp.NetworkConfig = req.NetworkConfig
-		return resp, nil
 	}
+	resp.Config = req.Config
+	resp.HostConfig = req.HostConfig
+	resp.NetworkConfig = req.NetworkConfig
+	return resp, nil
+}
+
+func (m *myService) removeContainer(req *pb.DockerRunData) (*pb.DockerRunData, error) {
+	resp := new(pb.DockerRunData)
+	if nil == req {
+		return resp, fmt.Errorf("Request required")
+	}
+
+	if err := dockerctl.NewMobyClient("").RemoveContainer(req.ContainerId); nil != err {
+		return resp, err
+	}
+
+	return resp, nil
 }
 
 func (m *myService) provisionTarget() {

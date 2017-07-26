@@ -327,3 +327,99 @@ message EndpointIPAMConfig {
 	string ipv6_address = 2;
 	repeated string link_local_ips = 3;
 }
+
+
+// ImageSummary image summary
+// swagger:model ImageSummary
+message ImageSummary {
+
+	// containers
+	// Required: true
+	int64 containers = 1;
+
+	// created
+	// Required: true
+	int64 created = 2;
+
+	// Id
+	// Required: true
+	string id = 3;
+
+	// labels
+	// Required: true
+	map<string, string> labels = 4;
+
+	// parent Id
+	// Required: true
+	string parent_id = 5;
+
+	// repo digests
+	// Required: true
+	repeated string repo_digests = 6;
+
+	// repo tags
+	// Required: true
+	repeated string repo_tags = 7;
+
+	// shared size
+	// Required: true
+	int64 shared_size = 8;
+
+	// size
+	// Required: true
+	int64 size = 9;
+
+	// virtual size
+	// Required: true
+	int64 virtual_size = 10;
+}
+
+// ImageInspect contains response of Engine API:
+// GET "/images/{name:.*}/json"
+message ImageInspect {
+	string id = 1;
+	repeated string repo_tags = 2;
+	repeated string repo_digests = 3;
+	string parent = 4;
+	string comment = 5;
+	string created = 6;
+	string container = 7;
+	Config container_config = 8; // *container.Config
+	string docker_version = 9;
+	string author = 10;
+	Config config = 11;          // *container.Config
+	string architecture = 12;
+	string os = 13;
+	string os_version = 14;
+	int64 size = 15;
+	int64 virtual_size = 16;
+	GraphDriverData graph_driver_data = 17;
+	RootFS root_fs = 18;
+	ImageMetadata metadata = 19;        
+}
+
+// RootFS returns Image's RootFS description including the layer IDs.
+message RootFS{
+	string fs_type = 1;
+	repeated string layers = 2;
+	string base_layer = 3;
+}
+
+// ImageMetadata contains engine-local data about the image
+message ImageMetadata {
+	string last_tag_time = 1;  // golang time.Time
+}
+
+// GraphDriverData Information about a container's graph driver.
+// swagger:model GraphDriverData
+// to see https://github.com/moby/moby/blob/master/api/types/graph_driver_data.go
+message GraphDriverData {
+
+	// data
+	// Required: true
+	map<string, string> data = 1;
+
+	// name
+	// Required: true
+	string name = 2;
+}

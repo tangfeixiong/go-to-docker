@@ -19,6 +19,42 @@ service EchoService {
   }
 
   // Like 'docker run' command
+  //
+  // Input/Output is a same protobuf/json object. For input:
+  // {
+  //   "config":
+  //     {
+  //       "image": "nginx",
+  //       "exposed_ports":
+  //         {
+  //           "value": "webui"
+  //         }
+  //     },
+  //   "host_config":
+  //     {
+  //       "port_bindings":
+  //         {
+  //           "value":
+  //             {
+  //               "80":
+  //                 {
+  //                   "host_port": "80"
+  //                 }
+  //             }
+  //         }
+  //     },
+  //   "network_config":
+  //     {
+  //  
+  //     },
+  //   "container_name": "nginx"
+  // }
+  // And returning information append this object for output:
+  // {
+  //   "state_code": 0,  // succeeded, otherwise none zero
+  //   "state_message": "if failed, provide error information",
+  //   "container_id": "regturned from docker engine"  
+  // }
   rpc RunContainer(DockerRunData) returns (DockerRunData) {
     option (google.api.http) = {
         post: "/v1/containers"
@@ -35,4 +71,41 @@ message DockerRunData {
     int32 state_code = 5;
     string state_message = 6;
     string container_id = 7;
+}
+
+message ImageRegistryData {
+    string id = 1;
+    moby.ImageSummary registration = 2;
+}
+
+message ImageArchiveData {
+    string id = 1;
+    moby.ImageInspect inspection = 2;
+}
+
+message ImageCatalogData {
+    string id = 1;
+    string name = 2;
+    string namespace = 3;
+    string category = 4;
+    string subject = 5;
+    string image = 6;
+    int32 state_code = 7;
+    string state_message = 8;
+}
+
+
+// SearchResult describes a search result returned from a registry
+// to see https://github.com/moby/moby/blob/master/api/types/registry/registry.go
+message SearchResult {
+	// StarCount indicates the number of stars this repository has
+	int32 star_count = 1;
+	// IsOfficial is true if the result is from an official repository.
+	bool is_rfficial = 2;
+	// Name is the name of the repository
+	string name = 3;
+	// IsAutomated indicates whether the result is automated
+	bool is_automated = 4;
+	// Description is a textual description of the repository
+	string description = 5;
 }
