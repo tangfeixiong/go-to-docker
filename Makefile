@@ -3,9 +3,9 @@
 GOPATHP:=/Users/fanhongling/Downloads/workspace
 GOPATHD:=/home/vagrant/go
 
-all: build-bin build-docker
+all: go-build docker-build
 
-protoc: moby
+protoc-grpc: protoc-moby
 	protoc -I/usr/local/include -I. \
 		-I${GOPATHP}/src \
 		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
@@ -23,20 +23,20 @@ protoc: moby
 		pb/service.proto
 	go generate ./pb
 
-moby:
+protoc-moby:
 	protoc -I/usr/local/include -I. \
 		-I${GOPATHP}/src \
 		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
 		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/api.proto=github.com/tangfeixiong/go-to-docker/pb/moby:. \
         pb/moby/api.proto
 
-build-bin: protoc
+go-build: protoc-grpc
 	@CGO_ENABLED=0 go build -v -o ./bin/gotodocker --installsuffix ./ 
 
-build-docker:
-	docker build -t docker.io/tangfeixiong/go-to-docker:0.1 ./
-
-install-bin:
+go-install:
 	go install -v ./
 
-.PHONY: all protoc moby build-bin build-docker install-bin
+docker-build:
+	docker build -t docker.io/tangfeixiong/go-to-docker:0.1 ./
+
+.PHONY: all protoc-grpc protoc-moby go-build docker-build go-install

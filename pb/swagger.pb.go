@@ -21,7 +21,7 @@ swagger = `{
     "/v1/containers": {
       "post": {
         "summary": "Like 'docker run' command",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"config\":\n    {\n      \"flavor_name\": \"m1.small\",\n      \"image_name\": \"cirros\",\n      \"min_count\": 2,\n      \"max_count\": 4,\n      \"secgroups_info\": [],\n      \"user_data\": [],\n      \"network_name\": \"private\",\n      \"floating_network_name\": \"public\",\n      \"personality\": [],\n      \"name_prefix\": \"awesome VM\"\n    },\n  \"host_config\":\n    {\n \n    },\n  \"network_config\":\n    {\n \n    },\n  \"container_name\": \"nginx\"\n}\nAnd returning information append this object for output:\n{\n  \"state_code\": 0,  // succeeded, otherwise none zero\n  \"state_message\": \"if failed, provide error information\",\n  \"container_id\": \"regturned from docker engine\"  \n}",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"config\":\n    {\n      \"image\": \"nginx\",\n      \"exposed_ports\":\n        {\n          \"value\": \"webui\"\n        }\n    },\n  \"host_config\":\n    {\n      \"port_bindings\":\n        {\n          \"value\":\n            {\n              \"80\":\n                {\n                  \"host_port\": \"80\"\n                }\n            }\n        }\n    },\n  \"network_config\":\n    {\n    },\n  \"container_name\": \"nginx\"\n}\nAnd returning information append this object for output:\n{\n  \"state_code\": 0,  // succeeded, otherwise none zero\n  \"state_message\": \"if failed, provide error information\",\n  \"container_id\": \"regturned from docker engine\"  \n}",
         "operationId": "RunContainer",
         "responses": {
           "200": {
@@ -70,9 +70,110 @@ swagger = `{
           "EchoService"
         ]
       }
+    },
+    "/v1/provisions": {
+      "post": {
+        "summary": "Run containers with same user namespace information",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"fighter and target\"\n  \"namespace\": \"default\"\n  \"metadata\":\n    {\n      \"categroy_name\": \"basic-web-security\",\n      \"class_name\": \"http-protocol\"\n      \"field_name\": \"http-method\"\n    },\n  \"provisionings\": [\n    list of DockerRunData type, see previous\n  ]\n}",
+        "operationId": "ProvisionContainers",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbProvisioningsData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbProvisioningsData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/pull": {
+      "post": {
+        "summary": "Like 'docker pull' command",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"tomcat:8\"\n}",
+        "operationId": "PullImage",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbDockerPullData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbDockerPullData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/terminations": {
+      "post": {
+        "summary": "Delete containers with same user namespace information",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"fighter and target\"\n  \"namespace\": \"default\"\n  \"metadata\":\n    {\n      \"categroy_name\": \"basic-web-security\",\n      \"class_name\": \"http-protocol\"\n      \"field_name\": \"http-method\"\n    },\n}\nAnd returning information append this object for output:\n{\n  \"provisionings\": [\n    list of DockerRunData type, see previous\n  ]\n}",
+        "operationId": "TerminationContainers",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbProvisioningsData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbProvisioningsData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
     }
   },
   "definitions": {
+    "ProvisioningsDataMetadata": {
+      "type": "object",
+      "properties": {
+        "category_name": {
+          "type": "string",
+          "format": "string"
+        },
+        "class_name": {
+          "type": "string",
+          "format": "string"
+        },
+        "field_name": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
     "mobyBindOptions": {
       "type": "object",
       "properties": {
@@ -901,6 +1002,31 @@ swagger = `{
       },
       "title": "WeightDevice is a structure that holds device:weight pair\nto see http://github.com/moby/moby/blob/master/api/types/blkiodev/blkio.go"
     },
+    "pbDockerPullData": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string",
+          "format": "string"
+        },
+        "image_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "progress_report": {
+          "type": "string",
+          "format": "string"
+        },
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
     "pbDockerRunData": {
       "type": "object",
       "properties": {
@@ -937,6 +1063,28 @@ swagger = `{
         "value": {
           "type": "string",
           "format": "string"
+        }
+      }
+    },
+    "pbProvisioningsData": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/ProvisioningsDataMetadata"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "namespace": {
+          "type": "string",
+          "format": "string"
+        },
+        "provisionings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/pbDockerRunData"
+          }
         }
       }
     }

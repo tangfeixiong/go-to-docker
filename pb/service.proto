@@ -18,6 +18,19 @@ service EchoService {
     };
   }
 
+  // Like 'docker pull' command
+  //
+  // Input/Output is a same protobuf/json object. For input:
+  // {
+  //   "name": "tomcat:8"
+  // }
+  rpc PullImage(DockerPullData) returns (DockerPullData) {
+    option (google.api.http) = {
+        post: "/v1/pull"
+        body: "*"
+    };
+  }
+
   // Like 'docker run' command
   //
   // Input/Output is a same protobuf/json object. For input:
@@ -45,7 +58,6 @@ service EchoService {
   //     },
   //   "network_config":
   //     {
-  //  
   //     },
   //   "container_name": "nginx"
   // }
@@ -61,6 +73,56 @@ service EchoService {
         body: "*"
     };
   }
+
+  // Run containers with same user namespace information
+  //
+  // Input/Output is a same protobuf/json object. For input:
+  // {
+  //   "name": "fighter and target"
+  //   "namespace": "default"
+  //   "metadata":
+  //     {
+  //       "categroy_name": "basic-web-security",
+  //       "class_name": "http-protocol"
+  //       "field_name": "http-method"
+  //     },
+  //   "provisionings": [
+  //     list of DockerRunData type, see previous
+  //   ]
+  // }
+  rpc ProvisionContainers(ProvisioningsData) returns (ProvisioningsData) {
+    option (google.api.http) = {
+        post: "/v1/provisions"
+        body: "*"
+    };
+  }
+
+  // Delete containers with same user namespace information
+  //
+  // Input/Output is a same protobuf/json object. For input:
+  // {
+  //   "name": "fighter and target"
+  //   "namespace": "default"
+  //   "metadata":
+  //     {
+  //       "categroy_name": "basic-web-security",
+  //       "class_name": "http-protocol"
+  //       "field_name": "http-method"
+  //     },
+  // }
+  // And returning information append this object for output:
+  // {
+  //   "provisionings": [
+  //     list of DockerRunData type, see previous
+  //   ]
+  // }
+  rpc TerminationContainers(ProvisioningsData) returns (ProvisioningsData) {
+    option (google.api.http) = {
+        post: "/v1/terminations"
+        body: "*"
+    };
+  }
+
 }
 
 message DockerRunData {
@@ -71,6 +133,30 @@ message DockerRunData {
     int32 state_code = 5;
     string state_message = 6;
     string container_id = 7;
+}
+
+message DockerPullData {
+    string image = 1;
+    int32 state_code = 2;
+    string state_message = 3;
+    string image_id = 4;
+    string progress_report = 5;
+}
+
+message ProvisioningsData {
+    message Metadata {
+        string category_name = 1;
+        string class_name = 2;
+        string field_name = 3;
+    }
+    string name = 1;
+    string namespace = 2;
+    Metadata metadata = 3;
+    repeated DockerRunData provisionings = 4;
+}
+
+message BatchProvisioningsData {
+    repeated ProvisioningsData provisions = 1;
 }
 
 message ImageRegistryData {
@@ -101,7 +187,7 @@ message SearchResult {
 	// StarCount indicates the number of stars this repository has
 	int32 star_count = 1;
 	// IsOfficial is true if the result is from an official repository.
-	bool is_rfficial = 2;
+	bool is_official = 2;
 	// Name is the name of the repository
 	string name = 3;
 	// IsAutomated indicates whether the result is automated

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	// "time"
+	"time"
 
 	// dockerdigest "github.com/docker/distribution/digest"
 	// dockerref "github.com/docker/distribution/reference"
@@ -19,9 +19,12 @@ import (
 )
 
 type Engine1_12Client struct {
+	version      string
+	dockerclient *client.Client
 }
 
 func NewEngine1_12Client() *Engine1_12Client {
+	var ver string = Default_docker_API_ver
 	var err error = nil
 	if v, ok := os.LookupEnv("DOCKER_API_VERSION"); !ok {
 		v := Default_docker_API_ver
@@ -35,7 +38,13 @@ func NewEngine1_12Client() *Engine1_12Client {
 	if err != nil {
 		fmt.Println("Failed to configure DOCKER_API_VERSION environment.", err.Error())
 	}
-	return &Engine1_12Client{}
+	return &Engine1_12Client{
+		version: ver,
+	}
+}
+
+func (mc *Engine1_12Client) DockerClient() (*client.Client, error) {
+	return client.NewEnvClient()
 }
 
 func (mc *Engine1_12Client) CreateContainer(config *container.Config, hostconfig *container.HostConfig, networkconfig *network.NetworkingConfig, containername string) (types.ContainerCreateResponse, error) {
@@ -43,8 +52,8 @@ func (mc *Engine1_12Client) CreateContainer(config *container.Config, hostconfig
 
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		glog.V(2).Infoln("Could not instantiate docker(v1.12):", err.Error())
-		return types.ContainerCreateResponse{}, fmt.Errorf("Failed to instantiate docker(v1.12). %v", err)
+		glog.V(2).Infof("Could not instantiate docker engine api(%s): %s", mc.version, err.Error())
+		return types.ContainerCreateResponse{}, fmt.Errorf("Failed to instantiate docker engine api(%s): %v", mc.version, err)
 	}
 
 	resp, err := cli.ContainerCreate(context.Background(), config, hostconfig, networkconfig, containername)
@@ -60,8 +69,8 @@ func (mc *Engine1_12Client) StartContainer(containerid string) error {
 
 	cli, err := client.NewEnvClient()
 	if err != nil {
-		glog.V(2).Infoln("Could not instance docker(v1.12):", err.Error())
-		return fmt.Errorf("Failed to instantiate docker(v1.12). %v", err)
+		glog.V(2).Infof("Could not instantiate docker engine api(%s): %s", mc.version, err.Error())
+		return fmt.Errorf("Failed to instantiate docker engine api(%s): %v", mc.version, err)
 	}
 
 	err = cli.ContainerStart(context.Background(), containerid)
@@ -70,4 +79,56 @@ func (mc *Engine1_12Client) StartContainer(containerid string) error {
 		return fmt.Errorf("Failed to start container. %v", err)
 	}
 	return nil
+}
+
+func (mc *Engine1_12Client) StopContainer(containerid string, timeout time.Duration) error {
+	glog.Infoln("Go to stop container:", containerid)
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		glog.V(2).Infof("Could not instantiate docker engine api(%s): %s", mc.version, err.Error())
+		return fmt.Errorf("Failed to instantiate docker engine api(%s): %v", mc.version, err)
+	}
+
+	err = cli.ContainerStop(context.Background(), containerid, int(timeout.Seconds()))
+	if nil != err {
+		glog.V(2).Infoln("Could not stop container:", err.Error())
+		return fmt.Errorf("Failed to stop container. %v", err)
+	}
+	return nil
+}
+
+func (mc *Engine1_12Client) RemoveContainer(containerid string) error {
+	glog.Infoln("Go to remove container:", containerid)
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		glog.V(2).Infof("Could not instantiate docker engine api(%s): %s", mc.version, err.Error())
+		return fmt.Errorf("Failed to instantiate docker engine api(%s): %v", mc.version, err)
+	}
+
+	opt := types.ContainerRemoveOptions{}
+	err = cli.ContainerRemove(context.Background(), containerid, opt)
+	if nil != err {
+		glog.V(2).Infoln("Could not remove container:", err.Error())
+		return fmt.Errorf("Failed to remove container. %v", err)
+	}
+	return nil
+}
+
+func (mc *Engine1_12Client) ProcessStatusContainers(opt types.ContainerListOptions) ([]types.Container, error) {
+	glog.Infoln("Go to list container:", opt)
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		glog.V(2).Infof("Could not instantiate docker engine api(%s): %s", mc.version, err.Error())
+		return nil, fmt.Errorf("Failed to instantiate docker engine api(%s): %v", mc.version, err)
+	}
+
+	result, err := cli.ContainerList(context.Background(), opt)
+	if nil != err {
+		glog.V(2).Infoln("Could not remove container:", err.Error())
+		return nil, fmt.Errorf("Failed to remove container. %v", err)
+	}
+	return result, nil
 }

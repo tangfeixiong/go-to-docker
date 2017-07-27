@@ -29,23 +29,14 @@ func newServer() *myService {
 }
 
 func (m *myService) RunContainer(ctx context.Context, in *pb.DockerRunData) (*pb.DockerRunData, error) {
-	if glog.V(2) {
-		glog.V(2).Infoln("[gRPC] run container!")
-	} else {
-		glog.Infoln("[gRPC] run container.")
-	}
 	return m.runContainer(in)
 }
 
-func (m *myService) RemoveContainer(ctx context.Context, in *pb.DockerRunData) (*pb.DockerRunData, error) {
-	return m.removeContainer(in)
+func (m *myService) PullImage(ctx context.Context, in *pb.DockerPullData) (*pb.DockerPullData, error) {
+	return m.pullImage(in)
 }
 
 func (m *myService) GetImageFromRegistry(ctx context.Context, in *pb.ImageRegistryData) (*pb.ImageRegistryData, error) {
-	return nil, fmt.Errorf("not ready")
-}
-
-func (m *myService) PullImage(ctx context.Context, in *pb.ImageRegistryData) (*pb.ImageRegistryData, error) {
 	return nil, fmt.Errorf("not ready")
 }
 
@@ -63,6 +54,14 @@ func (m *myService) DefineImageCatalog(ctx context.Context, in *pb.ImageCatalogD
 
 func (m *myService) UndefineImageCatalog(ctx context.Context, in *pb.ImageCatalogData) (*pb.ImageCatalogData, error) {
 	return nil, fmt.Errorf("not ready")
+}
+
+func (m *myService) ProvisionContainers(ctx context.Context, in *pb.ProvisioningsData) (*pb.ProvisioningsData, error) {
+	return m.containersProvisioning(in)
+}
+
+func (m *myService) TerminationContainers(ctx context.Context, in *pb.ProvisioningsData) (*pb.ProvisioningsData, error) {
+	return m.containersTerminating(in)
 }
 
 func (m *myService) Echo(c context.Context, s *pb.EchoMessage) (*pb.EchoMessage, error) {

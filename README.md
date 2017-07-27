@@ -24,10 +24,16 @@ Dockernized
 24be50de5ed082409ba98560cff37f3ba31e1eda82ace02b98ec83ea8cce680e
 ```
 
-## docker_client
+## Docker Client API
 
 Examples with docker client, engine-api, go-dockerclient, and native json api
 
 * docker client - https://github.com/docker/docker/tree/master/client
 * go-dockerclient - https://github.com/fsouza/go-dockerclient
 * engine-api - https://github.com/docker/engine-api
+
+## Inspired
+
+https://github.com/grpc-ecosystem/grpc-gateway
+
+https://github.com/philips/grpc-gateway-example
