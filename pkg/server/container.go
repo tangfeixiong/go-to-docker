@@ -6,9 +6,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strings"
 	"sync"
 	"time"
 
+	dockerref "github.com/docker/distribution/reference"
 	dockermessage "github.com/docker/docker/pkg/jsonmessage"
 	// dockerstdcopy "github.com/docker/docker/pkg/stdcopy"
 	// dockerapi "github.com/docker/engine-api/client"
@@ -24,6 +26,7 @@ import (
 	"github.com/golang/glog"
 
 	"golang.org/x/net/context"
+	"k8s.io/kubernetes/pkg/util/parsers"
 
 	"github.com/tangfeixiong/go-to-docker/pb"
 	"github.com/tangfeixiong/go-to-docker/pkg/dockerctl"
@@ -234,6 +237,9 @@ func (m *myService) containersProvisioning(req *pb.ProvisioningsData) (*pb.Provi
 	resp.Metadata = req.Metadata
 	resp.Provisionings = make([]*pb.DockerRunData, 0)
 	for _, item := range req.Provisionings {
+		if nil == item.Config.Labels {
+			item.Config.Labels = make(map[string]string)
+		}
 		item.Config.Labels["created-by"] = fmt.Sprintf(`{
   "category_name": %s,
   "class_name": %s,
@@ -252,7 +258,7 @@ func (m *myService) containersProvisioning(req *pb.ProvisioningsData) (*pb.Provi
 
 func (m *myService) containersTerminating(req *pb.ProvisioningsData) (*pb.ProvisioningsData, error) {
 	resp := new(pb.ProvisioningsData)
-	if nil == req || 0 == len(req.Provisionings) || 0 == len(req.Name) {
+	if nil == req || 0 == len(req.Name) {
 		return resp, fmt.Errorf("Request required")
 	}
 	if 0 == len(req.Metadata.FieldName) {
@@ -274,6 +280,11 @@ func (m *myService) containersTerminating(req *pb.ProvisioningsData) (*pb.Provis
 	resp.Metadata = req.Metadata
 	resp.Provisionings = make([]*pb.DockerRunData, 0)
 	for _, item := range resultcontainers {
+		if strings.Title(item.Status) != "Exited" {
+			if err := ctl.StopContainer(item.ID, time.Second*5); nil != err {
+				return resp, fmt.Errorf("Could not stop container: %s; %s", item.ID, err.Error())
+			}
+		}
 		if err := ctl.RemoveContainer(item.ID); nil != err {
 			resp.Provisionings = append(resp.Provisionings, &pb.DockerRunData{
 				StateCode:    102,
@@ -406,15 +417,43 @@ func (p *progressReporter) stop() {
 	close(p.stopCh)
 }
 
+// applyDefaultImageTag parses a docker image string, if it doesn't contain any tag or digest,
+// a default tag will be applied.
+// https://github.com/kubernetes/kubernetes/pkg/kubelet/dockertools/docker.go
+func applyDefaultImageTag(image string) (string, error) {
+	named, err := dockerref.ParseNamed(image)
+	if err != nil {
+		return "", fmt.Errorf("couldn't parse image reference %q: %v", image, err)
+	}
+	_, isTagged := named.(dockerref.Tagged)
+	_, isDigested := named.(dockerref.Digested)
+	if !isTagged && !isDigested {
+		named, err := dockerref.WithTag(named, parsers.DefaultImageTag)
+		if err != nil {
+			return "", fmt.Errorf("failed to apply default image tag %q: %v", image, err)
+		}
+		image = named.String()
+	}
+	return image, nil
+}
+
 /*
   Inspired from https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/dockertools/kube_docker_client.go
 */
 func (m *myService) pullImage(req *pb.DockerPullData) (*pb.DockerPullData, error) {
+	glog.Infoln("Go to pull image", req.Image)
 	resp := new(pb.DockerPullData)
 	if nil == req || 0 == len(req.Image) {
 		return resp, fmt.Errorf("Request required")
 	}
-	cli, err := dockerctl.NewEngine1_12Client().DockerClient()
+	if img, err := applyDefaultImageTag(req.Image); nil != err {
+		return resp, err
+	} else {
+		resp.Image = img
+	}
+
+	ctl := dockerctl.NewEngine1_12Client()
+	cli, err := ctl.DockerClient()
 	if nil != err {
 		resp.StateCode = 100
 		resp.StateMessage = err.Error()
@@ -430,6 +469,8 @@ func (m *myService) pullImage(req *pb.DockerPullData) (*pb.DockerPullData, error
 		// IdentityToken: "",
 		// RegistryToken: "",
 	}
+	auth = ctl.RegistryAuth(resp.Image)
+
 	// RegistryAuth is the base64 encoded credentials for the registry
 	base64Auth, err := base64EncodeAuth(auth)
 	if err != nil {
@@ -442,14 +483,14 @@ func (m *myService) pullImage(req *pb.DockerPullData) (*pb.DockerPullData, error
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	result, err := cli.ImagePull(ctx, req.Image, opts)
+	result, err := cli.ImagePull(ctx, resp.Image, opts)
 	if err != nil {
 		resp.StateCode = 102
 		resp.StateMessage = err.Error()
 		return resp, err
 	}
 	defer result.Close()
-	reporter := newProgressReporter(req.Image, cancel)
+	reporter := newProgressReporter(resp.Image, cancel)
 	reporter.start()
 	defer reporter.stop()
 	decoder := json.NewDecoder(result)
@@ -466,8 +507,8 @@ func (m *myService) pullImage(req *pb.DockerPullData) (*pb.DockerPullData, error
 		}
 		if msg.Error != nil {
 			resp.StateCode = 104
-			resp.StateMessage = err.Error()
-			return resp, msg.Error
+			resp.StateMessage = fmt.Sprintf("code: %d, message: %s, %s", msg.Error.Code, msg.Error.Message, msg.ErrorMessage)
+			return resp, fmt.Errorf("Failed to pull image %s; %s", resp.Image, resp.StateMessage)
 		}
 		reporter.set(&msg)
 	}

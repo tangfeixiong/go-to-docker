@@ -39,4 +39,7 @@ go-install:
 docker-build:
 	docker build -t docker.io/tangfeixiong/go-to-docker:0.1 ./
 
-.PHONY: all protoc-grpc protoc-moby go-build docker-build go-install
+docker-push: go-build docker-build
+	docker push docker.io/tangfeixiong/go-to-docker:0.1
+
+.PHONY: all protoc-grpc protoc-moby go-build docker-build docker-push go-install

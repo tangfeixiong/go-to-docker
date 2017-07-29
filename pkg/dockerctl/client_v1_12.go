@@ -2,8 +2,11 @@ package dockerctl
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	// dockerdigest "github.com/docker/distribution/digest"
@@ -18,9 +21,14 @@ import (
 	// "k8s.io/kubernetes/pkg/util/parsers"
 )
 
+type DockerConfigJSON struct {
+	Auths map[string]types.AuthConfig `json:"auths,omitempty"`
+}
+
 type Engine1_12Client struct {
-	version      string
-	dockerclient *client.Client
+	version          string
+	dockerclient     *client.Client
+	dockerconfigjson DockerConfigJSON
 }
 
 func NewEngine1_12Client() *Engine1_12Client {
@@ -38,13 +46,63 @@ func NewEngine1_12Client() *Engine1_12Client {
 	if err != nil {
 		fmt.Println("Failed to configure DOCKER_API_VERSION environment.", err.Error())
 	}
-	return &Engine1_12Client{
+	cli := &Engine1_12Client{
 		version: ver,
 	}
+
+	if v, ok := os.LookupEnv("DOCKER_CONFIG_JSON"); ok {
+		if err := json.Unmarshal([]byte(v), &cli.dockerconfigjson); nil != err {
+			fmt.Println("Invalid DOCKER_CONFIG_JSON environment.", err.Error())
+		}
+		if nil == cli.dockerconfigjson.Auths {
+			cli.dockerconfigjson.Auths = make(map[string]types.AuthConfig)
+		} else {
+			for k, v := range cli.dockerconfigjson.Auths {
+				// sDec, err := base64.StdEncoding.DecodeString(v.Auth)
+				sDec, err := base64.URLEncoding.DecodeString(v.Auth)
+				if err != nil {
+					fmt.Println("Invalid credential.", err.Error())
+				} else {
+					i := strings.Index(string(sDec), ":")
+					v.Username = string(sDec[:i])
+					v.Password = string(sDec[i+1:])
+					v.Auth = ""
+					cli.dockerconfigjson.Auths[k] = v
+				}
+			}
+		}
+	}
+	return cli
 }
 
 func (mc *Engine1_12Client) DockerClient() (*client.Client, error) {
 	return client.NewEnvClient()
+}
+
+func (mc *Engine1_12Client) RegistryAuth(image string) types.AuthConfig {
+	s := strings.Split(image, "/")
+	if len(s) == 1 || s[0] == "docker.io" {
+		if v, ok := mc.dockerconfigjson.Auths["docker.io"]; ok {
+			return v
+		} else {
+			for k, v := range mc.dockerconfigjson.Auths {
+				if strings.Contains(k, "docker.io") /* "https://idex.docker.io/v1/" */ {
+					return v
+				}
+			}
+			return types.AuthConfig{}
+		}
+	}
+	if v, ok := mc.dockerconfigjson.Auths[s[0]]; ok {
+		return v
+	} else {
+		for k, v := range mc.dockerconfigjson.Auths {
+			if strings.Contains(k, "docker.io") /* "https://idex.docker.io/v1/" */ {
+				return v
+			}
+		}
+	}
+	return types.AuthConfig{}
 }
 
 func (mc *Engine1_12Client) CreateContainer(config *container.Config, hostconfig *container.HostConfig, networkconfig *network.NetworkingConfig, containername string) (types.ContainerCreateResponse, error) {

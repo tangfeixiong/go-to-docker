@@ -467,7 +467,7 @@ type EchoServiceClient interface {
 	//
 	// Input/Output is a same protobuf/json object. For input:
 	// {
-	//   "name": "tomcat:8"
+	//   "image": "tomcat:8"
 	// }
 	PullImage(ctx context.Context, in *DockerPullData, opts ...grpc.CallOption) (*DockerPullData, error)
 	// Like 'docker run' command
@@ -607,7 +607,7 @@ type EchoServiceServer interface {
 	//
 	// Input/Output is a same protobuf/json object. For input:
 	// {
-	//   "name": "tomcat:8"
+	//   "image": "tomcat:8"
 	// }
 	PullImage(context.Context, *DockerPullData) (*DockerPullData, error)
 	// Like 'docker run' command

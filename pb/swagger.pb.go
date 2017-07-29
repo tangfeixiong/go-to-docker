@@ -102,7 +102,7 @@ swagger = `{
     "/v1/pull": {
       "post": {
         "summary": "Like 'docker pull' command",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"tomcat:8\"\n}",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"image\": \"tomcat:8\"\n}",
         "operationId": "PullImage",
         "responses": {
           "200": {

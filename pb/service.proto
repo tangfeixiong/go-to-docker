@@ -22,7 +22,7 @@ service EchoService {
   //
   // Input/Output is a same protobuf/json object. For input:
   // {
-  //   "name": "tomcat:8"
+  //   "image": "tomcat:8"
   // }
   rpc PullImage(DockerPullData) returns (DockerPullData) {
     option (google.api.http) = {
