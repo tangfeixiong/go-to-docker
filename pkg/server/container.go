@@ -241,9 +241,9 @@ func (m *myService) containersProvisioning(req *pb.ProvisioningsData) (*pb.Provi
 			item.Config.Labels = make(map[string]string)
 		}
 		item.Config.Labels["created-by"] = fmt.Sprintf(`{
-  "category_name": %s,
-  "class_name": %s,
-  "field_name": %s
+  "category_name": "%s",
+  "class_name": "%s",
+  "field_name": "%s"
 }`, req.Metadata.CategoryName, req.Metadata.ClassName, req.Metadata.FieldName)
 		item.Config.Labels["stackdocker.io"] = fmt.Sprintf("%s/%s", req.Namespace, req.Name)
 

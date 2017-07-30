@@ -64,10 +64,14 @@ func NewEngine1_12Client() *Engine1_12Client {
 					fmt.Println("Invalid credential.", err.Error())
 				} else {
 					i := strings.Index(string(sDec), ":")
-					v.Username = string(sDec[:i])
-					v.Password = string(sDec[i+1:])
-					v.Auth = ""
-					cli.dockerconfigjson.Auths[k] = v
+					if -1 == i {
+						fmt.Println("Invalid basicauth.")
+					} else {
+						v.Username = string(sDec[:i])
+						v.Password = string(sDec[i+1:])
+						v.Auth = ""
+						cli.dockerconfigjson.Auths[k] = v
+					}
 				}
 			}
 		}

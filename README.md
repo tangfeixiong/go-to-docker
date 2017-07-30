@@ -8,7 +8,7 @@ Support insecure gRPC and gRPC-Gateway
 
 How to
 ```
-[vagrant@localhost go-to-docker]$ make install-bin
+[vagrant@localhost go-to-docker]$ make go-install
 go install -v ./
 github.com/tangfeixiong/go-to-docker/pkg/ui/data/swagger
 github.com/tangfeixiong/go-to-docker/pkg/server

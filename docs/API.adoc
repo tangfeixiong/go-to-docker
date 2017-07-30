@@ -1,0 +1,24 @@
+= Instruction
+
+Batch run
+----
+fanhonglingdeMacBook-Pro:go-to-docker fanhongling$ curl -X POST http://172.17.4.50:10052/v1/provisions -d '{"name":"fighter1-and-target1","namespace":"default","metadata":{"categroy_name":"basic-web-security","class_name":"http-protocol","field_name":"http-method"},"provisionings":[{"config":{"image":"nginx","exposed_ports":{"value":{"80":"webui"}}},"host_config":{"port_bindings":{"value":{"80":{"host_port":"80"}}}},"network_config":{},"container_name":"nginx"}]}'
+{"name":"fighter1-and-target1","namespace":"default","metadata":{"category_name":"default","class_name":"http-protocol","field_name":"http-method"},"provisionings":[{"config":{"exposed_ports":{"value":{"80":"webui"}},"image":"nginx","labels":{"created-by":"{\n  \"category_name\": default,\n  \"class_name\": http-protocol,\n  \"field_name\": http-method\n}","stackdocker.io":"default/fighter1-and-target1"}},"host_config":{"port_bindings":{"value":{"80":{"host_port":"80"}}}},"network_config":{},"container_id":"0f6630f0c3bfbc0c1e0ab53a42edda52bdf3974590f6701f99cc44a4da63a744"}]}
+----
+
+Batch destroy
+----
+fanhonglingdeMacBook-Pro:go-to-docker fanhongling$ curl -X POST http://172.17.4.50:10052/v1/terminations -d '{"name":"fighter1-and-target1","namespace":"default","metadata":{"categroy_name":"basic-web-security","class_name":"http-protocol","field_name":"http-method"},"provisionings":[]}'
+{"name":"fighter1-and-target1","namespace":"default","metadata":{"class_name":"http-protocol","field_name":"http-method"},"provisionings":[{"container_id":"0f6630f0c3bfbc0c1e0ab53a42edda52bdf3974590f6701f99cc44a4da63a744"}]}
+----
+
+Pull image
+----
+curl -X POST http://172.17.4.50:10052/v1/pull -d '{"image": "docker.io/alpine"}'
+
+curl -X POST http://172.17.4.50:10052/v1/pull -d '{"image": "nginx"}'
+
+curl -X POST http://172.17.4.50:10052/v1/pull -d '{"image": "docker.io/tangfeixiong/netcat-hello-http"}'
+
+curl -X POST http://172.17.4.50:10052/v1/pull -d '{"image": "172.17.4.50:5000/gofileserver"}'
+----
