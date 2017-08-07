@@ -1,9 +1,13 @@
 # Inspired from https://github.com/philips/grpc-gateway-example
 
-GOPATHP:=/Users/fanhongling/Downloads/workspace
-GOPATHD:=/home/vagrant/go
+GOPATHP?=/Users/fanhongling/Downloads/workspace
+GOPATHD?=/home/vagrant/go
 
-all: go-build docker-build
+IMG_NS?=docker.io/tangfeixiong
+IMG_REPO?=go-to-docker
+IMG_TAG?=0.1
+
+all: protoc-grpc docker-push
 
 protoc-grpc: protoc-moby
 	protoc -I/usr/local/include -I. \
@@ -30,16 +34,19 @@ protoc-moby:
 		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/api.proto=github.com/tangfeixiong/go-to-docker/pb/moby:. \
         pb/moby/api.proto
 
-go-build: protoc-grpc
-	@CGO_ENABLED=0 go build -v -o ./bin/gotodocker --installsuffix ./ 
-
 go-install:
 	go install -v ./
 
-docker-build:
-	docker build -t docker.io/tangfeixiong/go-to-docker:0.1 ./
+go-build:
+	@CGO_ENABLED=0 go build -v -o ./bin/gotodocker --installsuffix ./ 
 
-docker-push: go-build docker-build
-	docker push docker.io/tangfeixiong/go-to-docker:0.1
+docker-build: go-build
+	docker build -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) ./
 
-.PHONY: all protoc-grpc protoc-moby go-build docker-build docker-push go-install
+docker-push: docker-build
+	docker push $(IMG_NS)/$(IMG_REPO):$(IMG_TAG)
+
+docker-run: docker-build
+	$(shell ./bootstrap.sh "172.17.4.50:5000" "/etc/docker/certs.d/172.17.4.50:5000/ca.crt")
+
+.PHONY: all protoc-grpc protoc-moby go-install go-build docker-build docker-push docker-run

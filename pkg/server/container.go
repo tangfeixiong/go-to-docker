@@ -29,6 +29,7 @@ import (
 	"k8s.io/kubernetes/pkg/util/parsers"
 
 	"github.com/tangfeixiong/go-to-docker/pb"
+	"github.com/tangfeixiong/go-to-docker/pb/moby"
 	"github.com/tangfeixiong/go-to-docker/pkg/dockerctl"
 )
 
@@ -261,8 +262,8 @@ func (m *myService) containersTerminating(req *pb.ProvisioningsData) (*pb.Provis
 	if nil == req || 0 == len(req.Name) {
 		return resp, fmt.Errorf("Request required")
 	}
-	if 0 == len(req.Metadata.FieldName) {
-		req.Metadata.FieldName = "default"
+	if 0 == len(req.Namespace) {
+		req.Namespace = "default"
 	}
 
 	ctl := dockerctl.NewEngine1_12Client()
@@ -295,6 +296,104 @@ func (m *myService) containersTerminating(req *pb.ProvisioningsData) (*pb.Provis
 		resp.Provisionings = append(resp.Provisionings, &pb.DockerRunData{
 			ContainerId: item.ID,
 		})
+	}
+	return resp, nil
+}
+
+func (m *myService) reapInstantiation(req *pb.InstantiationData) (*pb.InstantiationData, error) {
+	resp := new(pb.InstantiationData)
+	if nil == req || 0 == len(req.Name) {
+		resp.StateCode = 10
+		resp.StateMessage = "Request required"
+		return resp, fmt.Errorf("Request required")
+	}
+	if 0 == len(req.Namespace) {
+		req.Namespace = "default"
+	}
+
+	ctl := dockerctl.NewEngine1_12Client()
+	filter := filters.NewArgs()
+	filter.Add("label", fmt.Sprintf("stackdocker.io=%s/%s", req.Namespace, req.Name))
+	resultcontainers, err := ctl.ProcessStatusContainers(types.ContainerListOptions{
+		Filter: filter,
+	})
+	if nil != err {
+		resp.StateCode = 100
+		resp.StateMessage = err.Error()
+		return resp, fmt.Errorf("Failed to get containers status: %s", err.Error())
+	}
+
+	resp.Name = req.Name
+	resp.Namespace = req.Namespace
+	resp.Metadata = req.Metadata
+	resp.Instantiation = make([]*moby.Container, 0)
+	for _, item := range resultcontainers {
+		resp.Instantiation = append(resp.Instantiation, &moby.Container{
+			Id:         item.ID,
+			Names:      item.Names,
+			Image:      item.Image,
+			ImageId:    item.ImageID,
+			Command:    item.Command,
+			Created:    item.Created,
+			Ports:      make([]*moby.Port, len(item.Ports)),
+			SizeRw:     item.SizeRw,
+			SizeRootFs: item.SizeRootFs,
+			Labels:     item.Labels,
+			State:      item.State,
+			Status:     item.Status,
+			HostConfig: &moby.Container_HostConfig{},
+			NetworkSettings: &moby.SummaryNetworkSettings{
+				Networks: make(map[string]*moby.EndpointSettings),
+			},
+			Mounts: make([]*moby.MountPoint, len(item.Mounts)),
+		})
+		for _, v := range item.Ports {
+			resp.Instantiation[len(resp.Instantiation)-1].Ports = append(resp.Instantiation[len(resp.Instantiation)-1].Ports, &moby.Port{
+				Ip:          v.IP,
+				PrivatePort: int32(v.PrivatePort),
+				PublicPort:  int32(v.PublicPort),
+				Type:        v.Type,
+			})
+		}
+		if len(item.HostConfig.NetworkMode) > 0 {
+			resp.Instantiation[len(resp.Instantiation)-1].HostConfig.NetworkMode = item.HostConfig.NetworkMode
+		}
+		if len(item.NetworkSettings.Networks) > 0 {
+			for k, v := range item.NetworkSettings.Networks {
+				resp.Instantiation[len(resp.Instantiation)-1].NetworkSettings.Networks[k] = &moby.EndpointSettings{
+					IpamConfig: &moby.EndpointIPAMConfig{
+						Ipv4Address: v.IPAMConfig.IPv4Address,
+						Ipv6Address: v.IPAMConfig.IPv6Address,
+						// LinkLocalIps: v.IPAMConfig.LinkLoclIPs,
+					},
+					Links:               v.Links,
+					Aliases:             v.Aliases,
+					NetworkId:           v.NetworkID,
+					EndpointId:          v.EndpointID,
+					Gateway:             v.Gateway,
+					IpAddress:           v.IPAddress,
+					IpPrefixLen:         int32(v.IPPrefixLen),
+					Ipv6Gateway:         v.IPv6Gateway,
+					GlobalIpv6Address:   v.GlobalIPv6Address,
+					GlobalIpv6PrefixLen: int32(v.GlobalIPv6PrefixLen),
+					MacAddress:          v.MacAddress,
+					// DriverOpts:          v.DriverOpts,
+				}
+			}
+		}
+		if len(item.Mounts) > 0 {
+			for _, v := range item.Mounts {
+				resp.Instantiation[len(resp.Instantiation)-1].Mounts = append(resp.Instantiation[len(resp.Instantiation)-1].Mounts, &moby.MountPoint{
+					Name:        v.Name,
+					Source:      v.Source,
+					Destination: v.Destination,
+					Driver:      v.Driver,
+					Mode:        v.Mode,
+					Rw:          v.RW,
+					Propagation: v.Propagation,
+				})
+			}
+		}
 	}
 	return resp, nil
 }

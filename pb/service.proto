@@ -35,37 +35,37 @@ service EchoService {
   //
   // Input/Output is a same protobuf/json object. For input:
   // {
-  //   "config":
-  //     {
-  //       "image": "nginx",
-  //       "exposed_ports":
-  //         {
-  //           "value": "webui"
-  //         }
-  //     },
-  //   "host_config":
-  //     {
-  //       "port_bindings":
-  //         {
-  //           "value":
-  //             {
-  //               "80":
-  //                 {
-  //                   "host_port": "80"
-  //                 }
-  //             }
-  //         }
-  //     },
-  //   "network_config":
-  //     {
-  //     },
-  //   "container_name": "nginx"
+  // --"config":
+  // ----{
+  // ------"image": "nginx",
+  // ------"exposed_ports":
+  // --------{
+  // ----------"value": "webui"
+  // --------}
+  // ----},
+  // --"host_config":
+  // ----{
+  // ------"port_bindings":
+  // --------{
+  // ----------"value":
+  // ------------{
+  // --------------"80":
+  // ----------------{
+  // ------------------"host_port": "80"
+  // ----------------}
+  // ------------}
+  // --------}
+  // ----},
+  // --"network_config":
+  // ----{
+  // ----},
+  // --"container_name": "nginx"
   // }
   // And returning information append this object for output:
   // {
-  //   "state_code": 0,  // succeeded, otherwise none zero
-  //   "state_message": "if failed, provide error information",
-  //   "container_id": "regturned from docker engine"  
+  // --"state_code": 0,  // succeeded, otherwise none zero
+  // --"state_message": "if failed, provide error information",
+  // --"container_id": "regturned from docker engine"  
   // }
   rpc RunContainer(DockerRunData) returns (DockerRunData) {
     option (google.api.http) = {
@@ -74,7 +74,7 @@ service EchoService {
     };
   }
 
-  // Run containers with same user namespace information
+  // Run containers with a user namespace information
   //
   // Input/Output is a same protobuf/json object. For input:
   // {
@@ -87,7 +87,7 @@ service EchoService {
   //       "field_name": "http-method"
   //     },
   //   "provisionings": [
-  //     list of DockerRunData type, see previous
+  //     <list of DockerRunData type, see previous>
   //   ]
   // }
   rpc ProvisionContainers(ProvisioningsData) returns (ProvisioningsData) {
@@ -97,7 +97,7 @@ service EchoService {
     };
   }
 
-  // Delete containers with same user namespace information
+  // Delete containers with a user namespace information
   //
   // Input/Output is a same protobuf/json object. For input:
   // {
@@ -108,7 +108,7 @@ service EchoService {
   //       "categroy_name": "basic-web-security",
   //       "class_name": "http-protocol"
   //       "field_name": "http-method"
-  //     },
+  //     }
   // }
   // And returning information append this object for output:
   // {
@@ -123,6 +123,79 @@ service EchoService {
     };
   }
 
+  // Find containers with instantiating of a user namespace
+  //
+  // Input/Output is a same protobuf/json object. For input:
+  // {
+  // --"name": "fighter and target"
+  // --"namespace": "default"
+  // --"metadata":
+  // ----{
+  // ------"categroy_name": "default",
+  // ------"class_name": "default"
+  // ------"field_name": "default"
+  // ----}
+  // }
+  // For output, plus a returning object:
+  // {
+  // --// Objects copy of input
+  // --"instantiation": [
+  // ----{
+  // ------// List of Moby Container type
+  // ----}
+  // --]
+  // }
+  rpc ReapInstantiation(InstantiationData) returns (InstantiationData) {
+    option (google.api.http) = {
+        post: "/v1/reap-instantiation"
+        body: "*"
+    };
+  }
+
+  // List registry, include Docker Hub, or private registry (using .docker/config.json)
+  //
+  // Input/Output is a same protobuf/json object. For input:
+  // {
+  // --"repositories": [
+  // ----{
+  // ------name: "127.0.0.1:5000"
+  // ----}
+  // --]
+  // }
+  // For output, plus a returning object:
+  // {
+  // --// Objects copy of input
+  // --"repositories": [
+  // ----{
+  // ------name: "127.0.0.1:5000",
+  // ------catalogs: [
+  // --------{
+  // ----------"name": "nginx",
+  // ----------"tags": [
+  // ------------{
+  // --------------"name": "latest"
+  // ------------}
+  // ----------]
+  // --------}
+  // ------]
+  // ----}
+  // --],
+  // --"state_code": 0,  // Value greater than zero indicates error 
+  // --"state_message": "..." // Usually error message 
+  // }
+  rpc ReapRegistryForRepositories(RegistryRepositoryData) returns (RegistryRepositoryData) {
+    option (google.api.http) = {
+        post: "/v1/reap-registry"
+        body: "*"
+    };
+  }
+
+}
+
+message InstrumentMetadata {
+    string category_name = 1;
+    string class_name = 2;
+    string field_name = 3;
 }
 
 message DockerRunData {
@@ -155,8 +228,31 @@ message ProvisioningsData {
     repeated DockerRunData provisionings = 4;
 }
 
-message BatchProvisioningsData {
-    repeated ProvisioningsData provisions = 1;
+message InstantiationData {
+    string name = 1;
+    string namespace = 2;
+    InstrumentMetadata metadata = 3;
+    repeated moby.Container instantiation = 4;
+    int32 state_code = 5;
+    string state_message = 6;
+}
+
+message RegistryRepositoryData {
+    message Tag {
+        string name = 1;
+    }
+    message Catalog {
+        string name = 1;
+        repeated Tag tags = 2;
+    }
+    message Registry {
+        string name = 1;
+        repeated Catalog catalogs = 2;
+        bool tls_disabled = 3;
+    }
+    repeated Registry registries = 1;
+    int32 state_code = 2;
+    string state_message = 3;
 }
 
 message ImageRegistryData {
@@ -167,17 +263,6 @@ message ImageRegistryData {
 message ImageArchiveData {
     string id = 1;
     moby.ImageInspect inspection = 2;
-}
-
-message ImageCatalogData {
-    string id = 1;
-    string name = 2;
-    string namespace = 3;
-    string category = 4;
-    string subject = 5;
-    string image = 6;
-    int32 state_code = 7;
-    string state_message = 8;
 }
 
 

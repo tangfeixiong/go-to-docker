@@ -21,11 +21,23 @@ import (
 	"github.com/tangfeixiong/go-to-docker/pkg/ui/data/swagger"
 )
 
+type Certificates struct {
+	CA                   string `json:"ca_base64,omitempty"`
+	Crt                  string `json:"crt_base64,omitempty"`
+	Key                  string `json:"key_base64,omitempty"`
+	CertificateAuthority []byte `json:"-"`
+	ClientCertificate    []byte `json:"-"`
+	ClientKey            []byte `json:"-"`
+}
+
 type myService struct {
+	certs map[string]Certificates
+	err   error
 }
 
 func newServer() *myService {
-	return &myService{}
+	certs, err := gainCerts()
+	return &myService{certs, err}
 }
 
 func (m *myService) RunContainer(ctx context.Context, in *pb.DockerRunData) (*pb.DockerRunData, error) {
@@ -36,8 +48,8 @@ func (m *myService) PullImage(ctx context.Context, in *pb.DockerPullData) (*pb.D
 	return m.pullImage(in)
 }
 
-func (m *myService) GetImageFromRegistry(ctx context.Context, in *pb.ImageRegistryData) (*pb.ImageRegistryData, error) {
-	return nil, fmt.Errorf("not ready")
+func (m *myService) ReapRegistryForRepositories(ctx context.Context, in *pb.RegistryRepositoryData) (*pb.RegistryRepositoryData, error) {
+	return m.reapRegistryForRepositories(in)
 }
 
 func (m *myService) rmiArchived(ctx context.Context, in *pb.ImageArchiveData) (*pb.ImageArchiveData, error) {
@@ -48,11 +60,7 @@ func (m *myService) InspectImage(ctx context.Context, in *pb.ImageArchiveData) (
 	return nil, fmt.Errorf("not ready")
 }
 
-func (m *myService) DefineImageCatalog(ctx context.Context, in *pb.ImageCatalogData) (*pb.ImageCatalogData, error) {
-	return nil, fmt.Errorf("not ready")
-}
-
-func (m *myService) UndefineImageCatalog(ctx context.Context, in *pb.ImageCatalogData) (*pb.ImageCatalogData, error) {
+func (m *myService) DefineImageCatalog(ctx context.Context, in *pb.ImageArchiveData) (*pb.ImageArchiveData, error) {
 	return nil, fmt.Errorf("not ready")
 }
 
@@ -62,6 +70,10 @@ func (m *myService) ProvisionContainers(ctx context.Context, in *pb.Provisioning
 
 func (m *myService) TerminationContainers(ctx context.Context, in *pb.ProvisioningsData) (*pb.ProvisioningsData, error) {
 	return m.containersTerminating(in)
+}
+
+func (m *myService) ReapInstantiation(ctx context.Context, req *pb.InstantiationData) (*pb.InstantiationData, error) {
+	return m.reapInstantiation(req)
 }
 
 func (m *myService) Echo(c context.Context, s *pb.EchoMessage) (*pb.EchoMessage, error) {

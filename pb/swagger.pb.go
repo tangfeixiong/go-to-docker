@@ -21,7 +21,7 @@ swagger = `{
     "/v1/containers": {
       "post": {
         "summary": "Like 'docker run' command",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"config\":\n    {\n      \"image\": \"nginx\",\n      \"exposed_ports\":\n        {\n          \"value\": \"webui\"\n        }\n    },\n  \"host_config\":\n    {\n      \"port_bindings\":\n        {\n          \"value\":\n            {\n              \"80\":\n                {\n                  \"host_port\": \"80\"\n                }\n            }\n        }\n    },\n  \"network_config\":\n    {\n    },\n  \"container_name\": \"nginx\"\n}\nAnd returning information append this object for output:\n{\n  \"state_code\": 0,  // succeeded, otherwise none zero\n  \"state_message\": \"if failed, provide error information\",\n  \"container_id\": \"regturned from docker engine\"  \n}",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n--\"config\":\n----{\n------\"image\": \"nginx\",\n------\"exposed_ports\":\n--------{\n----------\"value\": \"webui\"\n--------}\n----},\n--\"host_config\":\n----{\n------\"port_bindings\":\n--------{\n----------\"value\":\n------------{\n--------------\"80\":\n----------------{\n------------------\"host_port\": \"80\"\n----------------}\n------------}\n--------}\n----},\n--\"network_config\":\n----{\n----},\n--\"container_name\": \"nginx\"\n}\nAnd returning information append this object for output:\n{\n--\"state_code\": 0,  // succeeded, otherwise none zero\n--\"state_message\": \"if failed, provide error information\",\n--\"container_id\": \"regturned from docker engine\"  \n}",
         "operationId": "RunContainer",
         "responses": {
           "200": {
@@ -73,8 +73,8 @@ swagger = `{
     },
     "/v1/provisions": {
       "post": {
-        "summary": "Run containers with same user namespace information",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"fighter and target\"\n  \"namespace\": \"default\"\n  \"metadata\":\n    {\n      \"categroy_name\": \"basic-web-security\",\n      \"class_name\": \"http-protocol\"\n      \"field_name\": \"http-method\"\n    },\n  \"provisionings\": [\n    list of DockerRunData type, see previous\n  ]\n}",
+        "summary": "Run containers with a user namespace information",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"fighter and target\"\n  \"namespace\": \"default\"\n  \"metadata\":\n    {\n      \"categroy_name\": \"basic-web-security\",\n      \"class_name\": \"http-protocol\"\n      \"field_name\": \"http-method\"\n    },\n  \"provisionings\": [\n    \u003clist of DockerRunData type, see previous\u003e\n  ]\n}",
         "operationId": "ProvisionContainers",
         "responses": {
           "200": {
@@ -127,10 +127,66 @@ swagger = `{
         ]
       }
     },
+    "/v1/reap-instantiation": {
+      "post": {
+        "summary": "Find containers with instantiating of a user namespace",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"fighter and target\"\n  \"namespace\": \"default\"\n  \"metadata\":\n    {\n      \"categroy_name\": \"default\",\n      \"class_name\": \"default\"\n      \"field_name\": \"default\"\n    }\n}\nAnd returning information append this object for output:\n{\n  \"instantiation\": [\n    {\n      list of Moby Container type\n    }\n  ]\n}",
+        "operationId": "ReapInstantiation",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbInstantiationData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbInstantiationData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/reap-registry": {
+      "post": {
+        "summary": "List registry, include Docker Hub, or private registry (using .docker/config.json)",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"repositories\": [\n    {\n      name: \"127.0.0.1:5000\"\n    }\n  ]\n}\nAnd returning information append this object for output:\n{\n  \"repositories\": [\n    {\n      name: \"127.0.0.1:5000\",\n      catalogs: [\n        {\n          \"name\": \"nginx\",\n          \"tags\": [\n            {\n              \"name\": \"latest\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"state_code\": 0,\n  \"state_message\": \"...\"\"\n}",
+        "operationId": "ReapRegistryForRepositories",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbRegistryRepositoryData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbRegistryRepositoryData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
     "/v1/terminations": {
       "post": {
-        "summary": "Delete containers with same user namespace information",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"fighter and target\"\n  \"namespace\": \"default\"\n  \"metadata\":\n    {\n      \"categroy_name\": \"basic-web-security\",\n      \"class_name\": \"http-protocol\"\n      \"field_name\": \"http-method\"\n    },\n}\nAnd returning information append this object for output:\n{\n  \"provisionings\": [\n    list of DockerRunData type, see previous\n  ]\n}",
+        "summary": "Delete containers with a user namespace information",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"fighter and target\"\n  \"namespace\": \"default\"\n  \"metadata\":\n    {\n      \"categroy_name\": \"basic-web-security\",\n      \"class_name\": \"http-protocol\"\n      \"field_name\": \"http-method\"\n    }\n}\nAnd returning information append this object for output:\n{\n  \"provisionings\": [\n    list of DockerRunData type, see previous\n  ]\n}",
         "operationId": "TerminationContainers",
         "responses": {
           "200": {
@@ -169,6 +225,49 @@ swagger = `{
           "format": "string"
         },
         "field_name": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "RegistryRepositoryDataCatalog": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RegistryRepositoryDataTag"
+          }
+        }
+      }
+    },
+    "RegistryRepositoryDataRegistry": {
+      "type": "object",
+      "properties": {
+        "catalogs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RegistryRepositoryDataCatalog"
+          }
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "tls_disabled": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "RegistryRepositoryDataTag": {
+      "type": "object",
+      "properties": {
+        "name": {
           "type": "string",
           "format": "string"
         }
@@ -307,6 +406,89 @@ swagger = `{
         }
       },
       "title": "Config contains the configuration data about a container.\nIt should hold only portable information about the container.\nHere, \"portable\" means \"independent from the host we are running on\".\nNon-portable information *should* appear in HostConfig.\nAll fields added to this struct must be marked 'omitempty' to keep getting\npredictable hashes from the old 'v1Compatibility' configuration.\nto see https://github.com/moby/moby/blob/master/api/types/container/config.go"
+    },
+    "mobyContainer": {
+      "type": "object",
+      "properties": {
+        "Ports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyPort"
+          }
+        },
+        "command": {
+          "type": "string",
+          "format": "string"
+        },
+        "created": {
+          "type": "string",
+          "format": "int64"
+        },
+        "host_config": {
+          "$ref": "#/definitions/mobyContainerHostConfig"
+        },
+        "id": {
+          "type": "string",
+          "format": "string"
+        },
+        "image": {
+          "type": "string",
+          "format": "string"
+        },
+        "image_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "mounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyMountPoint"
+          }
+        },
+        "names": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "network_settings": {
+          "$ref": "#/definitions/mobySummaryNetworkSettings"
+        },
+        "size_root_fs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "size_rw": {
+          "type": "string",
+          "format": "int64"
+        },
+        "state": {
+          "type": "string",
+          "format": "string"
+        },
+        "status": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "title": "Container contains response of Remote API:\nGET  \"/containers/json\""
+    },
+    "mobyContainerHostConfig": {
+      "type": "object",
+      "properties": {
+        "network_mode": {
+          "type": "string",
+          "format": "string"
+        }
+      }
     },
     "mobyDeviceMapping": {
       "type": "object",
@@ -687,6 +869,40 @@ swagger = `{
       },
       "title": "LogConfig represents the logging configuration of the container.\nto see https://github.com/moby/moby/blob/master/api/types/container/host_config.go"
     },
+    "mobyMountPoint": {
+      "type": "object",
+      "properties": {
+        "destination": {
+          "type": "string",
+          "format": "string"
+        },
+        "driver": {
+          "type": "string",
+          "format": "string"
+        },
+        "mode": {
+          "type": "string",
+          "format": "string"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "propagation": {
+          "type": "string",
+          "format": "string"
+        },
+        "rw": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "source": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "description": "MountPoint represents a mount point configuration inside the container."
+    },
     "mobyNetworkingConfig": {
       "type": "object",
       "properties": {
@@ -698,6 +914,28 @@ swagger = `{
         }
       },
       "title": "NetworkingConfig represents the container's networking configuration for each of its interfaces\nCarries the networking configs specified in the 'docker run' and 'docker network connect' commands\nto see https://github.com/moby/moby/blob/master/api/types/network/network.go"
+    },
+    "mobyPort": {
+      "type": "object",
+      "properties": {
+        "ip": {
+          "type": "string",
+          "format": "string"
+        },
+        "private_port": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "public_port": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "title": "Port stores open ports info of container\ne.g. {\"PrivatePort\": 8080, \"PublicPort\": 80, \"Type\": \"tcp\"}"
     },
     "mobyPortBinding": {
       "type": "object",
@@ -884,6 +1122,18 @@ swagger = `{
       },
       "description": "RestartPolicy represents the restart policies of the container."
     },
+    "mobySummaryNetworkSettings": {
+      "type": "object",
+      "properties": {
+        "networks": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/mobyEndpointSettings"
+          }
+        }
+      },
+      "title": "SummaryNetworkSettings provides a summary of container's networks\nin /containers/json"
+    },
     "mobyThrottleDevice": {
       "type": "object",
       "properties": {
@@ -1066,6 +1316,53 @@ swagger = `{
         }
       }
     },
+    "pbInstantiationData": {
+      "type": "object",
+      "properties": {
+        "instantiation": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyContainer"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/pbInstrumentMetadata"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "namespace": {
+          "type": "string",
+          "format": "string"
+        },
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "pbInstrumentMetadata": {
+      "type": "object",
+      "properties": {
+        "category_name": {
+          "type": "string",
+          "format": "string"
+        },
+        "class_name": {
+          "type": "string",
+          "format": "string"
+        },
+        "field_name": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
     "pbProvisioningsData": {
       "type": "object",
       "properties": {
@@ -1085,6 +1382,25 @@ swagger = `{
           "items": {
             "$ref": "#/definitions/pbDockerRunData"
           }
+        }
+      }
+    },
+    "pbRegistryRepositoryData": {
+      "type": "object",
+      "properties": {
+        "registries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/RegistryRepositoryDataRegistry"
+          }
+        },
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
         }
       }
     }

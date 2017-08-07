@@ -2,6 +2,9 @@ bin/
 temp*
 tmp*
 *.txt
+*.cert
+*.crt
+*.key
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o

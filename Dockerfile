@@ -8,7 +8,8 @@ LABEL "maintainer"="tangfeixiong <tangfx128@gmail.com>" \
 COPY bin/gotodocker /
 
 ENV DOCKER_API_VERSION='1.12' \
-  DOCKER_CONFIG_JSON='{"auths": {"127.0.0.1:5000": {"auth": "","email": ""}}}' \
+  DOCKER_CONFIG_JSON='{"auths": {"localhost:5000": {"auth": "","email": ""}}}' \
+  REGISTRY_CERTS_JSON='{"localhost:5000": {"ca_base64": "", "crt_base64": "", "key_base64": ""}}' \
   STREAMING_HOST='FAKEHOST'
 
 EXPOSE 10051 10052

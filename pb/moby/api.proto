@@ -393,7 +393,7 @@ message ImageInspect {
 	string os_version = 14;
 	int64 size = 15;
 	int64 virtual_size = 16;
-	GraphDriverData graph_driver_data = 17;
+	GraphDriverData graph_driver = 17;
 	RootFS root_fs = 18;
 	ImageMetadata metadata = 19;        
 }
@@ -422,4 +422,160 @@ message GraphDriverData {
 	// name
 	// Required: true
 	string name = 2;
+}
+
+
+
+// Port stores open ports info of container
+// e.g. {"PrivatePort": 8080, "PublicPort": 80, "Type": "tcp"}
+message Port {
+	string ip = 1;
+	int32 private_port = 2;
+	int32 public_port = 3;
+	string type = 4;
+}
+
+// NetworkSettings exposes the network settings in the api
+message NetworkSettings {
+	NetworkSettingsBase network_settings_base = 1;
+	DefaultNetworkSettings default_network_settings = 2;
+	map<string, EndpointSettings> networks = 3;
+}
+
+// SummaryNetworkSettings provides a summary of container's networks
+// in /containers/json
+message SummaryNetworkSettings {
+	map<string, EndpointSettings> networks = 1;
+}
+
+// Address represents an IP address
+message Address {
+	string addr = 1;
+	int32 prefix_len = 2;
+}
+
+// NetworkSettingsBase holds basic information about networks
+message NetworkSettingsBase {
+	string bridge = 1;
+	string sandbox_id = 2;
+	bool hairpin_mode = 3;
+	string link_local_ipv6_address = 4;
+	int32 link_local_ipv6_prefix_len = 5;
+	PortMap ports = 6;
+	string sandbox_key = 7;
+	repeated Address secondary_ip_addresses = 8;
+	repeated Address secondary_ipv6_addresses = 9;
+}
+
+// DefaultNetworkSettings holds network information
+// during the 2 release deprecation period.
+// It will be removed in Docker 1.11.
+message DefaultNetworkSettings {
+	string endpoint_id = 1;
+	string gateway = 2;
+	string global_ipv6_address = 3;
+	int32 global_ipv6_prefix_len = 4;
+	string ip_address = 5;
+	int32 ip_prefix_len = 6;
+	string ipv6_gateway = 7;
+	string mac_address = 8;
+}
+
+// MountPoint represents a mount point configuration inside the container.
+message MountPoint {
+	string name = 1;
+	string source = 2;
+	string destination = 3;
+	string driver = 4;
+	string mode = 5;
+	bool rw = 6;
+	string propagation = 7;
+}
+
+// Container contains response of Remote API:
+// GET  "/containers/json"
+message Container {
+    message HostConfig {
+        string network_mode = 1;
+    }
+	string id = 1;
+	repeated string names = 2;
+	string image = 3;
+	string image_id = 4;
+	string command = 5;
+	int64 created = 6;
+	repeated Port Ports = 7;
+	int64 size_rw = 8;
+	int64 size_root_fs = 9;
+	map<string, string> labels = 10;
+	string state = 11;
+	string status = 12;
+	HostConfig host_config = 13;
+	SummaryNetworkSettings network_settings = 14;
+	repeated MountPoint mounts = 15;
+}
+
+
+
+// ContainerState stores container's running state
+// it's part of ContainerJSONBase and will return by "inspect" command
+message ContainerState {
+	string status     string
+	bool running = 1;
+	bool paused = 2;
+	bool restarting = 3;
+	bool oom_Killed = 4;
+	bool dead = 5;
+	int32 pid = 6;
+	int32 exit_code = 7;
+	string error = 8;
+	string started_at = 9;
+	string finished_at = 10;
+}
+
+// ContainerNode stores information about the node that a container
+// is running on.  It's only available in Docker Swarm
+message ContainerNode {
+	string id = 1;
+	string ip_address = 2;
+	string addr = 3;
+	string name = 4;
+	int32 cpus = 5;
+	int32 memory = 6;
+	map<string, string> labels = 7;
+}
+
+// ContainerJSONBase contains response of Remote API:
+// GET "/containers/{name:.*}/json"
+message ContainerJSONBase {
+	string id = 1;
+	string created = 2;
+	string path = 3;
+	repeated string args = 4;
+	ContainerState state = 5;
+	string image = 6;
+	string resolv_conf_path = 7;
+	string hostname_path = 8;
+	string hosts_path = 9;
+	string log_path = 10;
+	ContainerNode node = 11;
+	string name = 12;
+	int32 restart_count = 13;
+	string driver = 14;
+	string mount_label = 15;
+	string orocess_label = 16;
+	string app_armor_profile = 17;
+	repeated string exec_ids = 18;
+	HostConfig host_config= 19;
+	GraphDriverData graph_driver = 20;
+	int64 size_rw =21;         
+	int64 size_root_fs = 22;
+}
+
+// ContainerJSON is newly used struct along with MountPoint
+message ContainerJSON {
+	ContainerJSONBase container_json_base = 1;
+	repeated MountPoint mounts = 2;
+	Config config = 3;
+	NetworkSettings network_settings = 4;
 }
