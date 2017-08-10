@@ -127,10 +127,36 @@ swagger = `{
         ]
       }
     },
+    "/v1/reap-brns": {
+      "post": {
+        "operationId": "ReapBridgedNetworkLandscape",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbBridgedNetworkingData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbBridgedNetworkingData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
     "/v1/reap-instantiation": {
       "post": {
         "summary": "Find containers with instantiating of a user namespace",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"fighter and target\"\n  \"namespace\": \"default\"\n  \"metadata\":\n    {\n      \"categroy_name\": \"default\",\n      \"class_name\": \"default\"\n      \"field_name\": \"default\"\n    }\n}\nAnd returning information append this object for output:\n{\n  \"instantiation\": [\n    {\n      list of Moby Container type\n    }\n  ]\n}",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n--\"name\": \"fighter and target\"\n--\"namespace\": \"default\"\n--\"metadata\":\n----{\n------\"categroy_name\": \"default\",\n------\"class_name\": \"default\"\n------\"field_name\": \"default\"\n----}\n}\nFor output, plus a returning object:\n{\n--// Objects copy of input\n--\"instantiation\": [\n----{\n------// List of Moby Container type\n----}\n--]\n}",
         "operationId": "ReapInstantiation",
         "responses": {
           "200": {
@@ -158,7 +184,7 @@ swagger = `{
     "/v1/reap-registry": {
       "post": {
         "summary": "List registry, include Docker Hub, or private registry (using .docker/config.json)",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"repositories\": [\n    {\n      name: \"127.0.0.1:5000\"\n    }\n  ]\n}\nAnd returning information append this object for output:\n{\n  \"repositories\": [\n    {\n      name: \"127.0.0.1:5000\",\n      catalogs: [\n        {\n          \"name\": \"nginx\",\n          \"tags\": [\n            {\n              \"name\": \"latest\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"state_code\": 0,\n  \"state_message\": \"...\"\"\n}",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n--\"repositories\": [\n----{\n------name: \"127.0.0.1:5000\"\n----}\n--]\n}\nFor output, plus a returning object:\n{\n--// Objects copy of input\n--\"repositories\": [\n----{\n------name: \"127.0.0.1:5000\",\n------catalogs: [\n--------{\n----------\"name\": \"nginx\",\n----------\"tags\": [\n------------{\n--------------\"name\": \"latest\"\n------------}\n----------]\n--------}\n------]\n----}\n--],\n--\"state_code\": 0,  // Value greater than zero indicates error \n--\"state_message\": \"...\" // Usually error message \n}",
         "operationId": "ReapRegistryForRepositories",
         "responses": {
           "200": {
@@ -213,6 +239,192 @@ swagger = `{
     }
   },
   "definitions": {
+    "BridgedNetworkingDataContainersNetworkingInfo": {
+      "type": "object",
+      "properties": {
+        "addresses_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BridgedNetworkingDataIPAddressInfo"
+          }
+        },
+        "containers_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyContainerJSON"
+          }
+        },
+        "network_resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyNetworkResource"
+          }
+        }
+      }
+    },
+    "BridgedNetworkingDataIPAddressInfo": {
+      "type": "object",
+      "properties": {
+        "ipv4": {
+          "type": "string",
+          "format": "string"
+        },
+        "ipv6": {
+          "type": "string",
+          "format": "string"
+        },
+        "link_info": {
+          "$ref": "#/definitions/BridgedNetworkingDataLinkLayerInfo"
+        },
+        "v4_info": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "v4_lifetime": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "v4_mask": {
+          "type": "string",
+          "format": "string"
+        },
+        "v6_info": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "v6_lifetime": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "v6_mask": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "BridgedNetworkingDataLinkLayerInfo": {
+      "type": "object",
+      "properties": {
+        "data_link_conf": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "data_link_ether_brd": {
+          "type": "string",
+          "format": "string"
+        },
+        "data_link_ether_mac": {
+          "type": "string",
+          "format": "string"
+        },
+        "data_link_frame": {
+          "type": "string",
+          "format": "string"
+        },
+        "data_link_netns_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "data_link_status": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "index": {
+          "type": "string",
+          "format": "string"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "BridgedNetworkingDataLinuxBridgeInfo": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "string"
+        },
+        "interfaces": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "ip_addresses_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BridgedNetworkingDataIPAddressInfo"
+          }
+        },
+        "mac_info": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BridgedNetworkingDataLinuxBridgeLearnedMac"
+          }
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "stp_enabled": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "BridgedNetworkingDataLinuxBridgeLearnedMac": {
+      "type": "object",
+      "properties": {
+        "ageing_timer": {
+          "type": "string",
+          "format": "string"
+        },
+        "is_local": {
+          "type": "string",
+          "format": "string"
+        },
+        "mac_addr": {
+          "type": "string",
+          "format": "string"
+        },
+        "port_no": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "PortMapPortBindings": {
+      "type": "object",
+      "properties": {
+        "port_bindings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyPortBinding"
+          }
+        }
+      }
+    },
     "ProvisioningsDataMetadata": {
       "type": "object",
       "properties": {
@@ -272,6 +484,20 @@ swagger = `{
           "format": "string"
         }
       }
+    },
+    "mobyAddress": {
+      "type": "object",
+      "properties": {
+        "addr": {
+          "type": "string",
+          "format": "string"
+        },
+        "prefix_len": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "Address represents an IP address"
     },
     "mobyBindOptions": {
       "type": "object",
@@ -397,7 +623,8 @@ swagger = `{
         "volumes": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/mobyVolumeMount"
+            "type": "string",
+            "format": "string"
           }
         },
         "working_dir": {
@@ -490,6 +717,248 @@ swagger = `{
         }
       }
     },
+    "mobyContainerJSON": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "$ref": "#/definitions/mobyConfig"
+        },
+        "container_json_base": {
+          "$ref": "#/definitions/mobyContainerJSONBase"
+        },
+        "mounts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyMountPoint"
+          }
+        },
+        "network_settings": {
+          "$ref": "#/definitions/mobyNetworkSettings"
+        }
+      },
+      "title": "ContainerJSON is newly used struct along with MountPoint"
+    },
+    "mobyContainerJSONBase": {
+      "type": "object",
+      "properties": {
+        "app_armor_profile": {
+          "type": "string",
+          "format": "string"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "created": {
+          "type": "string",
+          "format": "string"
+        },
+        "driver": {
+          "type": "string",
+          "format": "string"
+        },
+        "exec_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "graph_driver": {
+          "$ref": "#/definitions/mobyGraphDriverData"
+        },
+        "host_config": {
+          "$ref": "#/definitions/mobyHostConfig"
+        },
+        "hostname_path": {
+          "type": "string",
+          "format": "string"
+        },
+        "hosts_path": {
+          "type": "string",
+          "format": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "string"
+        },
+        "image": {
+          "type": "string",
+          "format": "string"
+        },
+        "log_path": {
+          "type": "string",
+          "format": "string"
+        },
+        "mount_label": {
+          "type": "string",
+          "format": "string"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "node": {
+          "$ref": "#/definitions/mobyContainerNode"
+        },
+        "path": {
+          "type": "string",
+          "format": "string"
+        },
+        "process_label": {
+          "type": "string",
+          "format": "string"
+        },
+        "resolv_conf_path": {
+          "type": "string",
+          "format": "string"
+        },
+        "restart_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size_root_fs": {
+          "type": "string",
+          "format": "int64"
+        },
+        "size_rw": {
+          "type": "string",
+          "format": "int64"
+        },
+        "state": {
+          "$ref": "#/definitions/mobyContainerState"
+        }
+      },
+      "title": "ContainerJSONBase contains response of Remote API:\nGET \"/containers/{name:.*}/json\""
+    },
+    "mobyContainerNode": {
+      "type": "object",
+      "properties": {
+        "addr": {
+          "type": "string",
+          "format": "string"
+        },
+        "cpus": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "id": {
+          "type": "string",
+          "format": "string"
+        },
+        "ip_address": {
+          "type": "string",
+          "format": "string"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "memory": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "title": "ContainerNode stores information about the node that a container\nis running on.  It's only available in Docker Swarm"
+    },
+    "mobyContainerState": {
+      "type": "object",
+      "properties": {
+        "dead": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "error": {
+          "type": "string",
+          "format": "string"
+        },
+        "exit_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "finished_at": {
+          "type": "string",
+          "format": "string"
+        },
+        "oom_killed": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "paused": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "pid": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "restarting": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "running": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "string"
+        },
+        "status": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "title": "ContainerState stores container's running state\nit's part of ContainerJSONBase and will return by \"inspect\" command"
+    },
+    "mobyDefaultNetworkSettings": {
+      "type": "object",
+      "properties": {
+        "endpoint_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "gateway": {
+          "type": "string",
+          "format": "string"
+        },
+        "global_ipv6_address": {
+          "type": "string",
+          "format": "string"
+        },
+        "global_ipv6_prefix_len": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ip_address": {
+          "type": "string",
+          "format": "string"
+        },
+        "ip_prefix_len": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ipv6_gateway": {
+          "type": "string",
+          "format": "string"
+        },
+        "mac_address": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "description": "DefaultNetworkSettings holds network information\nduring the 2 release deprecation period.\nIt will be removed in Docker 1.11."
+    },
     "mobyDeviceMapping": {
       "type": "object",
       "properties": {
@@ -545,6 +1014,32 @@ swagger = `{
         }
       },
       "title": "EndpointIPAMConfig represents IPAM configurations for the endpoint"
+    },
+    "mobyEndpointResource": {
+      "type": "object",
+      "properties": {
+        "endpoint_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "ipv4_address": {
+          "type": "string",
+          "format": "string"
+        },
+        "ipv6_address": {
+          "type": "string",
+          "format": "string"
+        },
+        "mac_address": {
+          "type": "string",
+          "format": "string"
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "title": "EndpointResource contains network resources allocated and used for a container in a network"
     },
     "mobyEndpointSettings": {
       "type": "object",
@@ -613,6 +1108,25 @@ swagger = `{
         }
       },
       "title": "EndpointSettings stores the network endpoint details"
+    },
+    "mobyGraphDriverData": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          },
+          "title": "data\nRequired: true"
+        },
+        "name": {
+          "type": "string",
+          "format": "string",
+          "title": "name\nRequired: true"
+        }
+      },
+      "title": "GraphDriverData Information about a container's graph driver.\nswagger:model GraphDriverData\nto see https://github.com/moby/moby/blob/master/api/types/graph_driver_data.go"
     },
     "mobyHealthConfig": {
       "type": "object",
@@ -852,6 +1366,54 @@ swagger = `{
       },
       "title": "HostConfig the non-portable Config structure of a container.\nHere, \"non-portable\" means \"dependent of the host we are running on\".\nPortable information *should* appear in Config.\nto see https://github.com/moby/moby/blob/master/api/types/container/host_config.go"
     },
+    "mobyIPAM": {
+      "type": "object",
+      "properties": {
+        "config": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyIPAMConfig"
+          }
+        },
+        "driver": {
+          "type": "string",
+          "format": "string"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        }
+      },
+      "title": "IPAM represents IP Address Management"
+    },
+    "mobyIPAMConfig": {
+      "type": "object",
+      "properties": {
+        "aux_address": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "gateway": {
+          "type": "string",
+          "format": "string"
+        },
+        "ip_range": {
+          "type": "string",
+          "format": "string"
+        },
+        "subnet": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "title": "IPAMConfig represents IPAM configurations"
+    },
     "mobyLogConfig": {
       "type": "object",
       "properties": {
@@ -862,7 +1424,7 @@ swagger = `{
             "format": "string"
           }
         },
-        "config_type": {
+        "type": {
           "type": "string",
           "format": "string"
         }
@@ -902,6 +1464,122 @@ swagger = `{
         }
       },
       "description": "MountPoint represents a mount point configuration inside the container."
+    },
+    "mobyNetworkResource": {
+      "type": "object",
+      "properties": {
+        "containers": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/mobyEndpointResource"
+          }
+        },
+        "driver": {
+          "type": "string",
+          "format": "string"
+        },
+        "enable_ipv6": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "id": {
+          "type": "string",
+          "format": "string"
+        },
+        "internal": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "ipam": {
+          "$ref": "#/definitions/mobyIPAM"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "name": {
+          "type": "string",
+          "format": "string"
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "scope": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "title": "NetworkResource is the body of the \"get network\" http response message"
+    },
+    "mobyNetworkSettings": {
+      "type": "object",
+      "properties": {
+        "default_network_settings": {
+          "$ref": "#/definitions/mobyDefaultNetworkSettings"
+        },
+        "network_settings_base": {
+          "$ref": "#/definitions/mobyNetworkSettingsBase"
+        },
+        "networks": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/mobyEndpointSettings"
+          }
+        }
+      },
+      "title": "NetworkSettings exposes the network settings in the api"
+    },
+    "mobyNetworkSettingsBase": {
+      "type": "object",
+      "properties": {
+        "bridge": {
+          "type": "string",
+          "format": "string"
+        },
+        "hairpin_mode": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "link_local_ipv6_address": {
+          "type": "string",
+          "format": "string"
+        },
+        "link_local_ipv6_prefix_len": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "ports": {
+          "$ref": "#/definitions/mobyPortMap"
+        },
+        "sandbox_id": {
+          "type": "string",
+          "format": "string"
+        },
+        "sandbox_key": {
+          "type": "string",
+          "format": "string"
+        },
+        "secondary_ip_addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyAddress"
+          }
+        },
+        "secondary_ipv6_addresses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyAddress"
+          }
+        }
+      },
+      "title": "NetworkSettingsBase holds basic information about networks"
     },
     "mobyNetworkingConfig": {
       "type": "object",
@@ -958,7 +1636,7 @@ swagger = `{
         "value": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/mobyPortBinding"
+            "$ref": "#/definitions/PortMapPortBindings"
           }
         }
       },
@@ -981,23 +1659,38 @@ swagger = `{
       "type": "object",
       "properties": {
         "blkio_device_read_bps": {
-          "$ref": "#/definitions/mobyThrottleDevice"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyThrottleDevice"
+          }
         },
         "blkio_device_read_iops": {
-          "$ref": "#/definitions/mobyThrottleDevice"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyThrottleDevice"
+          }
         },
         "blkio_device_write_bps": {
-          "$ref": "#/definitions/mobyThrottleDevice"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyThrottleDevice"
+          }
         },
         "blkio_device_write_iops": {
-          "$ref": "#/definitions/mobyThrottleDevice"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyThrottleDevice"
+          }
         },
         "blkio_weight": {
           "type": "integer",
           "format": "int32"
         },
         "blkio_weight_device": {
-          "$ref": "#/definitions/mobyWeightDevice"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyWeightDevice"
+          }
         },
         "cgroup_parent": {
           "type": "string",
@@ -1092,8 +1785,8 @@ swagger = `{
           "format": "int64"
         },
         "oom_kill_disable": {
-          "type": "string",
-          "format": "int64"
+          "type": "boolean",
+          "format": "boolean"
         },
         "pids_limit": {
           "type": "string",
@@ -1251,6 +1944,35 @@ swagger = `{
         }
       },
       "title": "WeightDevice is a structure that holds device:weight pair\nto see http://github.com/moby/moby/blob/master/api/types/blkiodev/blkio.go"
+    },
+    "pbBridgedNetworkingData": {
+      "type": "object",
+      "properties": {
+        "containers_networking": {
+          "$ref": "#/definitions/BridgedNetworkingDataContainersNetworkingInfo"
+        },
+        "linux_bridges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/BridgedNetworkingDataLinuxBridgeInfo"
+          }
+        },
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
+        },
+        "veth_pairs": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        }
+      }
     },
     "pbDockerPullData": {
       "type": "object",

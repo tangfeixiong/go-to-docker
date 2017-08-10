@@ -190,6 +190,12 @@ service EchoService {
     };
   }
 
+  rpc ReapBridgedNetworkLandscape(BridgedNetworkingData) returns (BridgedNetworkingData) {
+    option (google.api.http) = {
+        post: "/v1/reap-brns"
+        body: "*"
+    };
+  }
 }
 
 message InstrumentMetadata {
@@ -214,6 +220,12 @@ message DockerPullData {
     string state_message = 3;
     string image_id = 4;
     string progress_report = 5;
+}
+
+message DockerContainerInspection {
+    moby.ContainerJSON container_info = 1;
+    int32 state_code = 2;
+    string state_message = 3;
 }
 
 message ProvisioningsData {
@@ -279,4 +291,63 @@ message SearchResult {
 	bool is_automated = 4;
 	// Description is a textual description of the repository
 	string description = 5;
+}
+
+message DockerNetworkData {
+    repeated moby.NetworkResource network_resources = 1;
+    int32 state_code = 2;
+    string state_message = 3;
+}
+
+message BridgedNetworkingData {
+    message LinkLayerInfo {
+        string index = 1; 
+        string name = 2;
+        repeated string data_link_status = 3;
+        repeated string data_link_conf = 4;
+    	    string data_link_frame = 5;
+        string data_link_ether_mac = 6;
+        string data_link_ether_brd = 7;
+        string data_link_netns_id = 8;
+    }
+
+    message IPAddressInfo {
+        	LinkLayerInfo link_info = 1;
+    	    string ipv4 = 2;
+        string v4_mask = 3;
+        repeated string v4_info = 4;
+        repeated string v4_lifetime = 5;
+        string ipv6 = 6;
+    	    string v6_mask = 7;
+        repeated string v6_info = 8;
+    	    repeated string v6_lifetime = 9;
+    }
+
+    message LinuxBridgeLearnedMac {
+	    string port_no = 1;
+	    string mac_addr = 2;
+	    string is_local = 3;
+	    string ageing_timer = 4;
+    }
+
+    message LinuxBridgeInfo {
+	    string id = 1;
+	    string name = 2;
+	    string stp_enabled = 3;
+	    repeated string interfaces = 4;
+	    repeated LinuxBridgeLearnedMac mac_info = 5;
+        repeated IPAddressInfo ip_addresses_info = 6;
+    }
+
+    message ContainersNetworkingInfo {
+        repeated moby.NetworkResource network_resources = 1;
+        repeated moby.ContainerJSON containers_info = 2;
+        repeated IPAddressInfo addresses_info = 3;
+    }
+
+    repeated LinuxBridgeInfo linux_bridges = 1;
+    ContainersNetworkingInfo containers_networking = 2;
+    map<string, string> veth_pairs = 3;
+    int32 state_code = 4;
+    string state_message = 5;
 }

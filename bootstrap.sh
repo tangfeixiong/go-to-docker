@@ -9,7 +9,7 @@ if [[ $# < 2 ]]; then
 	exit 1
 fi
 
-inst=$(docker ps -qf name=go-to-docker)
+inst=$(docker ps -qaf name=go-to-docker)
 if [[ ! -z $inst ]]; then
     docker stop $inst
 	docker rm $inst

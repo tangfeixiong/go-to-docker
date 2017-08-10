@@ -1,17 +1,10 @@
 package server
 
 import (
-	"bytes"
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
-	"io"
 	"strings"
-	"sync"
 	"time"
 
-	dockerref "github.com/docker/distribution/reference"
-	dockermessage "github.com/docker/docker/pkg/jsonmessage"
 	// dockerstdcopy "github.com/docker/docker/pkg/stdcopy"
 	// dockerapi "github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
@@ -23,10 +16,6 @@ import (
 	"github.com/docker/engine-api/types/strslice"
 	"github.com/docker/go-connections/nat"
 	"github.com/docker/go-units"
-	"github.com/golang/glog"
-
-	"golang.org/x/net/context"
-	"k8s.io/kubernetes/pkg/util/parsers"
 
 	"github.com/tangfeixiong/go-to-docker/pb"
 	"github.com/tangfeixiong/go-to-docker/pb/moby"
@@ -165,10 +154,12 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 	}
 	for k, v := range req.HostConfig.PortBindings.Value {
 		chc.PortBindings[nat.Port(k)] = make([]nat.PortBinding, 0)
-		chc.PortBindings[nat.Port(k)] = append(chc.PortBindings[nat.Port(k)], nat.PortBinding{
-			HostIP:   v.HostIp,
-			HostPort: v.HostPort,
-		})
+		for _, item := range v.PortBindings {
+			chc.PortBindings[nat.Port(k)] = append(chc.PortBindings[nat.Port(k)], nat.PortBinding{
+				HostIP:   item.HostIp,
+				HostPort: item.HostPort,
+			})
+		}
 	}
 
 	cnc := &network.NetworkingConfig{
@@ -177,9 +168,7 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 	for k, v := range req.NetworkConfig.EndpointsConfig {
 		cnc.EndpointsConfig[k] = &network.EndpointSettings{
 			IPAMConfig: &network.EndpointIPAMConfig{
-				IPv4Address: v.IpamConfig.Ipv4Address,
-				IPv6Address: v.IpamConfig.Ipv6Address,
-				// LinkLocalIPs: make([]string, 0),
+			// LinkLocalIPs: make([]string, 0),
 			},
 			Links:               make([]string, 0),
 			Aliases:             make([]string, 0),
@@ -193,6 +182,10 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 			GlobalIPv6PrefixLen: int(v.GlobalIpv6PrefixLen),
 			MacAddress:          v.MacAddress,
 			// DriverOpts:          make(map[string]string),
+		}
+		if v.IpamConfig != nil {
+			cnc.EndpointsConfig[k].IPAMConfig.IPv4Address = v.IpamConfig.Ipv4Address
+			cnc.EndpointsConfig[k].IPAMConfig.IPv6Address = v.IpamConfig.Ipv6Address
 		}
 	}
 
@@ -211,6 +204,333 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 	resp.Config = req.Config
 	resp.HostConfig = req.HostConfig
 	resp.NetworkConfig = req.NetworkConfig
+	return resp, nil
+}
+
+func (m *myService) inspectContainer(req *pb.DockerContainerInspection) (*pb.DockerContainerInspection, error) {
+	resp := new(pb.DockerContainerInspection)
+	if nil == req || nil == req.ContainerInfo || nil == req.ContainerInfo.ContainerJsonBase || "" == req.ContainerInfo.ContainerJsonBase.Id {
+		return resp, fmt.Errorf("Request required")
+	}
+
+	ctl := dockerctl.NewEngine1_12Client()
+	result, err := ctl.InspectContainer(req.ContainerInfo.ContainerJsonBase.Id)
+	if nil != err {
+		return resp, err
+	}
+
+	resp.ContainerInfo = &moby.ContainerJSON{
+		ContainerJsonBase: &moby.ContainerJSONBase{
+			Id:      result.ContainerJSONBase.ID,
+			Created: result.ContainerJSONBase.Created,
+			Path:    result.ContainerJSONBase.Path,
+			Args:    result.ContainerJSONBase.Args,
+			State: &moby.ContainerState{
+				Status:     result.ContainerJSONBase.State.Status,
+				Running:    result.ContainerJSONBase.State.Running,
+				Paused:     result.ContainerJSONBase.State.Paused,
+				Restarting: result.ContainerJSONBase.State.Restarting,
+				OomKilled:  result.ContainerJSONBase.State.OOMKilled,
+				Dead:       result.ContainerJSONBase.State.Dead,
+				Pid:        int32(result.ContainerJSONBase.State.Pid),
+				ExitCode:   int32(result.ContainerJSONBase.State.ExitCode),
+				Error:      result.ContainerJSONBase.State.Error,
+				StartedAt:  result.ContainerJSONBase.State.StartedAt,
+				FinishedAt: result.ContainerJSONBase.State.FinishedAt,
+			},
+			Image:           result.ContainerJSONBase.Image,
+			ResolvConfPath:  result.ContainerJSONBase.ResolvConfPath,
+			HostnamePath:    result.ContainerJSONBase.HostnamePath,
+			HostsPath:       result.ContainerJSONBase.HostsPath,
+			LogPath:         result.ContainerJSONBase.LogPath,
+			Node:            &moby.ContainerNode{},
+			Name:            result.ContainerJSONBase.Name,
+			RestartCount:    int32(result.ContainerJSONBase.RestartCount),
+			Driver:          result.ContainerJSONBase.Driver,
+			MountLabel:      result.ContainerJSONBase.MountLabel,
+			ProcessLabel:    result.ContainerJSONBase.ProcessLabel,
+			AppArmorProfile: result.ContainerJSONBase.AppArmorProfile,
+			ExecIds:         result.ContainerJSONBase.ExecIDs,
+			HostConfig: &moby.HostConfig{
+				Binds:           result.ContainerJSONBase.HostConfig.Binds,
+				ContainerIdFile: result.ContainerJSONBase.HostConfig.ContainerIDFile,
+				LogConfig: &moby.LogConfig{
+					Type:   result.ContainerJSONBase.HostConfig.LogConfig.Type,
+					Config: result.ContainerJSONBase.HostConfig.LogConfig.Config,
+				},
+				NetworkMode: string(result.ContainerJSONBase.HostConfig.NetworkMode),
+				PortBindings: &moby.PortMap{
+					Value: make(map[string]*moby.PortMap_PortBindings, len(result.ContainerJSONBase.HostConfig.PortBindings)),
+				},
+				RestartPolicy: &moby.RestartPolicy{
+					Name:              result.ContainerJSONBase.HostConfig.RestartPolicy.Name,
+					MaximumRetryCount: int32(result.ContainerJSONBase.HostConfig.RestartPolicy.MaximumRetryCount),
+				},
+				AutoRemove:   result.ContainerJSONBase.HostConfig.AutoRemove,
+				VolumeDriver: result.ContainerJSONBase.HostConfig.VolumeDriver,
+				VolumesFrom:  result.ContainerJSONBase.HostConfig.VolumesFrom,
+
+				CapAdd:          result.ContainerJSONBase.HostConfig.CapAdd[:],
+				CapDrop:         result.ContainerJSONBase.HostConfig.CapDrop[:],
+				Dns:             result.ContainerJSONBase.HostConfig.DNS,
+				DnsOptions:      result.ContainerJSONBase.HostConfig.DNSOptions,
+				DnsSearch:       result.ContainerJSONBase.HostConfig.DNSSearch,
+				ExtraHosts:      result.ContainerJSONBase.HostConfig.ExtraHosts,
+				GroupAdd:        result.ContainerJSONBase.HostConfig.GroupAdd,
+				IpcMode:         string(result.ContainerJSONBase.HostConfig.IpcMode),
+				Cgroup:          string(result.ContainerJSONBase.HostConfig.Cgroup),
+				Links:           result.ContainerJSONBase.HostConfig.Links,
+				OomScoreAdj:     int32(result.ContainerJSONBase.HostConfig.OomScoreAdj),
+				PidMode:         string(result.ContainerJSONBase.HostConfig.PidMode),
+				Privileged:      result.ContainerJSONBase.HostConfig.Privileged,
+				PublishAllPorts: result.ContainerJSONBase.HostConfig.PublishAllPorts,
+				ReadonlyRootfs:  result.ContainerJSONBase.HostConfig.ReadonlyRootfs,
+				SecurityOpt:     result.ContainerJSONBase.HostConfig.SecurityOpt,
+				StorageOpt:      result.ContainerJSONBase.HostConfig.StorageOpt,
+				Tmpfs:           result.ContainerJSONBase.HostConfig.Tmpfs,
+				UtsMode:         string(result.ContainerJSONBase.HostConfig.UTSMode),
+				UsernsMode:      string(result.ContainerJSONBase.HostConfig.UsernsMode),
+				ShmSize:         result.ContainerJSONBase.HostConfig.ShmSize,
+				Sysctls:         result.ContainerJSONBase.HostConfig.Sysctls,
+				// Runtime:         result.ContainerJSONBase.HostConfig.Runtime,
+				// ConsoleSize:     [2]uint32{},
+				ConsoleSizeHeight: uint32(result.ContainerJSONBase.HostConfig.ConsoleSize[0]),
+				ConsoleSizeWidth:  uint32(result.ContainerJSONBase.HostConfig.ConsoleSize[1]),
+				Isolation:         string(result.ContainerJSONBase.HostConfig.Isolation),
+				Resources: &moby.Resources{
+					// CPUShares:            result.ContainerJSONBase.HostConfig.Resources.CpuShares,
+					// Memory:               result.ContainerJSONBase.HostConfig.Resources.Memory,
+					// NanoCPUs:             result.ContainerJSONBase.HostConfig.Resources.NanoCpus,
+					CgroupParent: result.ContainerJSONBase.HostConfig.Resources.CgroupParent,
+					// BlkioWeight:          uint16(result.ContainerJSONBase.HostConfig.Resources.BlkioWeight),
+					BlkioWeightDevice:    make([]*moby.WeightDevice, len(result.ContainerJSONBase.HostConfig.Resources.BlkioWeightDevice)),
+					BlkioDeviceReadBps:   make([]*moby.ThrottleDevice, len(result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceReadBps)),
+					BlkioDeviceWriteBps:  make([]*moby.ThrottleDevice, len(result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceWriteBps)),
+					BlkioDeviceReadIops:  make([]*moby.ThrottleDevice, len(result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceReadIOps)),
+					BlkioDeviceWriteIops: make([]*moby.ThrottleDevice, len(result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceWriteIOps)),
+					// CPUPeriod:            result.ContainerJSONBase.HostConfig.Resources.CpuPeriod,
+					// CPUQuota:             result.ContainerJSONBase.HostConfig.Resources.CpuQuota,
+					// CPURealtimePeriod:    result.ContainerJSONBase.HostConfig.Resources.CpuRealtimePeriod,
+					// CPURealtimeRuntime:   result.ContainerJSONBase.HostConfig.Resources.CpuRealtimeRuntime,
+					CpusetCpus: result.ContainerJSONBase.HostConfig.Resources.CpusetCpus,
+					CpusetMems: result.ContainerJSONBase.HostConfig.Resources.CpusetMems,
+					Devices:    make([]*moby.DeviceMapping, len(result.ContainerJSONBase.HostConfig.Resources.Devices)),
+					// DeviceCgroupRules:  result.ContainerJSONBase.HostConfig.Resources.DeviceCgroupRules,
+					DiskQuota:          result.ContainerJSONBase.HostConfig.Resources.DiskQuota,
+					KernelMemory:       result.ContainerJSONBase.HostConfig.Resources.KernelMemory,
+					MemoryReservation:  result.ContainerJSONBase.HostConfig.Resources.MemoryReservation,
+					MemorySwap:         result.ContainerJSONBase.HostConfig.Resources.MemorySwap,
+					MemorySwappiness:   *result.ContainerJSONBase.HostConfig.Resources.MemorySwappiness,
+					OomKillDisable:     *result.ContainerJSONBase.HostConfig.Resources.OomKillDisable,
+					PidsLimit:          result.ContainerJSONBase.HostConfig.Resources.PidsLimit,
+					Ulimits:            make([]*moby.Ulimit, len(result.ContainerJSONBase.HostConfig.Resources.Ulimits)),
+					CpuCount:           result.ContainerJSONBase.HostConfig.Resources.CPUCount,
+					CpuPercent:         result.ContainerJSONBase.HostConfig.Resources.CPUPercent,
+					IoMaximumIops:      result.ContainerJSONBase.HostConfig.Resources.IOMaximumIOps,
+					IoMaximumBandwidth: result.ContainerJSONBase.HostConfig.Resources.IOMaximumBandwidth,
+				},
+				// Mounts: make([]*moby.Mount, len(result.ContainerJSONBase.HostConfig.Mounts)),
+				// Init:   &result.ContainerJSONBase.HostConfig.Init,
+
+			},
+			GraphDriver: &moby.GraphDriverData{
+				Name: result.ContainerJSONBase.GraphDriver.Name,
+				Data: result.ContainerJSONBase.GraphDriver.Data,
+			},
+			SizeRw:     0,
+			SizeRootFs: 0,
+		},
+		Mounts: make([]*moby.MountPoint, len(result.Mounts)),
+		Config: &moby.Config{
+			Hostname:     result.Config.Hostname,
+			Domainname:   result.Config.Domainname,
+			User:         result.Config.User,
+			AttachStdin:  result.Config.AttachStdin,
+			AttachStdout: result.Config.AttachStdout,
+			AttachStderr: result.Config.AttachStderr,
+			ExposedPorts: &moby.PortSet{
+				Value: make(map[string]string, len(result.Config.ExposedPorts)),
+			},
+			Tty:             result.Config.Tty,
+			OpenStdin:       result.Config.OpenStdin,
+			StdinOnce:       result.Config.StdinOnce,
+			Env:             result.Config.Env,
+			Cmd:             result.Config.Cmd[:],
+			ArgsEscaped:     result.Config.ArgsEscaped,
+			Image:           result.Config.Image,
+			Volumes:         make(map[string]string, len(result.Config.Volumes)),
+			WorkingDir:      result.Config.WorkingDir,
+			Entrypoint:      result.Config.Entrypoint[:],
+			NetworkDisabled: result.Config.NetworkDisabled,
+			MacAddress:      result.Config.MacAddress,
+			OnBuild:         result.Config.OnBuild,
+			Labels:          result.Config.Labels,
+			StopSignal:      result.Config.StopSignal,
+		},
+		NetworkSettings: &moby.NetworkSettings{
+			NetworkSettingsBase: &moby.NetworkSettingsBase{
+				Bridge:                 result.NetworkSettings.NetworkSettingsBase.Bridge,
+				SandboxId:              result.NetworkSettings.NetworkSettingsBase.SandboxID,
+				HairpinMode:            result.NetworkSettings.NetworkSettingsBase.HairpinMode,
+				LinkLocalIpv6Address:   result.NetworkSettings.NetworkSettingsBase.LinkLocalIPv6Address,
+				LinkLocalIpv6PrefixLen: int32(result.NetworkSettings.NetworkSettingsBase.LinkLocalIPv6PrefixLen),
+				Ports: &moby.PortMap{
+					Value: make(map[string]*moby.PortMap_PortBindings, len(result.NetworkSettings.NetworkSettingsBase.Ports)),
+				},
+				SandboxKey:             result.NetworkSettings.NetworkSettingsBase.SandboxKey,
+				SecondaryIpAddresses:   make([]*moby.Address, len(result.NetworkSettings.NetworkSettingsBase.SecondaryIPAddresses)),
+				SecondaryIpv6Addresses: make([]*moby.Address, len(result.NetworkSettings.NetworkSettingsBase.SecondaryIPv6Addresses)),
+			},
+			DefaultNetworkSettings: &moby.DefaultNetworkSettings{
+				EndpointId:          result.NetworkSettings.DefaultNetworkSettings.EndpointID,
+				Gateway:             result.NetworkSettings.DefaultNetworkSettings.Gateway,
+				GlobalIpv6Address:   result.NetworkSettings.DefaultNetworkSettings.GlobalIPv6Address,
+				GlobalIpv6PrefixLen: int32(result.NetworkSettings.DefaultNetworkSettings.GlobalIPv6PrefixLen),
+				IpAddress:           result.NetworkSettings.DefaultNetworkSettings.IPAddress,
+				IpPrefixLen:         int32(result.NetworkSettings.DefaultNetworkSettings.IPPrefixLen),
+				Ipv6Gateway:         result.NetworkSettings.DefaultNetworkSettings.IPv6Gateway,
+				MacAddress:          result.NetworkSettings.DefaultNetworkSettings.MacAddress,
+			},
+			Networks: make(map[string]*moby.EndpointSettings, len(result.NetworkSettings.Networks)),
+		},
+	}
+
+	if result.ContainerJSONBase.Node != nil {
+		resp.ContainerInfo.ContainerJsonBase.Node = &moby.ContainerNode{
+			Id:        result.ContainerJSONBase.Node.ID,
+			IpAddress: result.ContainerJSONBase.Node.IPAddress,
+			Addr:      result.ContainerJSONBase.Node.Addr,
+			Name:      result.ContainerJSONBase.Node.Name,
+			Cpus:      int32(result.ContainerJSONBase.Node.Cpus),
+			Memory:    int32(result.ContainerJSONBase.Node.Memory),
+			Labels:    result.ContainerJSONBase.Node.Labels,
+		}
+	}
+	if result.ContainerJSONBase.SizeRw != nil {
+		resp.ContainerInfo.ContainerJsonBase.SizeRw = *result.ContainerJSONBase.SizeRw
+	}
+	if result.ContainerJSONBase.SizeRootFs != nil {
+		resp.ContainerInfo.ContainerJsonBase.SizeRootFs = *result.ContainerJSONBase.SizeRootFs
+	}
+
+	for k, v := range result.ContainerJSONBase.HostConfig.PortBindings {
+		bs := make([]*moby.PortBinding, len(v))
+		for i := 0; i < len(v); i++ {
+			bs[i] = &moby.PortBinding{
+				HostIp:   v[i].HostIP,
+				HostPort: v[i].HostPort,
+			}
+		}
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.PortBindings.Value[string(k)] = &moby.PortMap_PortBindings{
+			PortBindings: bs,
+		}
+	}
+	for i := 0; i < len(result.ContainerJSONBase.HostConfig.Resources.BlkioWeightDevice); i++ {
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.Resources.BlkioWeightDevice[i] = &moby.WeightDevice{
+			Path:   result.ContainerJSONBase.HostConfig.Resources.BlkioWeightDevice[i].Path,
+			Weight: int32(result.ContainerJSONBase.HostConfig.Resources.BlkioWeightDevice[i].Weight),
+		}
+	}
+	for i := 0; i < len(result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceReadBps); i++ {
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.Resources.BlkioDeviceReadBps[i] = &moby.ThrottleDevice{
+			Path: result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceReadBps[i].Path,
+			Rate: result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceReadBps[i].Rate,
+		}
+	}
+	for i := 0; i < len(result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceWriteBps); i++ {
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.Resources.BlkioDeviceWriteBps[i] = &moby.ThrottleDevice{
+			Path: result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceWriteBps[i].Path,
+			Rate: result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceWriteBps[i].Rate,
+		}
+	}
+	for i := 0; i < len(result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceReadIOps); i++ {
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.Resources.BlkioDeviceReadIops[i] = &moby.ThrottleDevice{
+			Path: result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceReadIOps[i].Path,
+			Rate: result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceReadIOps[i].Rate,
+		}
+	}
+	for i := 0; i < len(result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceWriteIOps); i++ {
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.Resources.BlkioDeviceWriteIops[i] = &moby.ThrottleDevice{
+			Path: result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceWriteIOps[i].Path,
+			Rate: result.ContainerJSONBase.HostConfig.Resources.BlkioDeviceWriteIOps[i].Rate,
+		}
+	}
+	for i := 0; i < len(result.ContainerJSONBase.HostConfig.Resources.Devices); i++ {
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.Resources.Devices[i] = &moby.DeviceMapping{
+			PathOnHost:        result.ContainerJSONBase.HostConfig.Resources.Devices[i].PathOnHost,
+			PathInContainer:   result.ContainerJSONBase.HostConfig.Resources.Devices[i].PathInContainer,
+			CgroupPermissions: result.ContainerJSONBase.HostConfig.Resources.Devices[i].CgroupPermissions,
+		}
+	}
+	for i := 0; i < len(result.ContainerJSONBase.HostConfig.Resources.Ulimits); i++ {
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.Resources.Ulimits[i] = &moby.Ulimit{
+			Name: result.ContainerJSONBase.HostConfig.Resources.Ulimits[i].Name,
+			Hard: result.ContainerJSONBase.HostConfig.Resources.Ulimits[i].Hard,
+			Soft: result.ContainerJSONBase.HostConfig.Resources.Ulimits[i].Soft,
+		}
+	}
+	for i := 0; i < len(result.Mounts); i++ {
+		resp.ContainerInfo.Mounts[i] = &moby.MountPoint{
+			Name:        result.Mounts[i].Name,
+			Source:      result.Mounts[i].Source,
+			Destination: result.Mounts[i].Destination,
+			Driver:      result.Mounts[i].Driver,
+			Mode:        result.Mounts[i].Mode,
+			Rw:          result.Mounts[i].RW,
+			Propagation: result.Mounts[i].Propagation,
+		}
+	}
+	for k, _ := range result.Config.ExposedPorts {
+		resp.ContainerInfo.Config.ExposedPorts.Value[string(k)] = string(k)
+	}
+	for k, _ := range result.Config.Volumes {
+		resp.ContainerInfo.Config.Volumes[string(k)] = string(k)
+	}
+
+	for k, v := range result.NetworkSettings.NetworkSettingsBase.Ports {
+		bs := make([]*moby.PortBinding, len(v))
+		for i := 0; i < len(v); i++ {
+			bs[i] = &moby.PortBinding{
+				HostIp:   v[i].HostIP,
+				HostPort: v[i].HostPort,
+			}
+		}
+		resp.ContainerInfo.NetworkSettings.NetworkSettingsBase.Ports.Value[string(k)] = &moby.PortMap_PortBindings{
+			PortBindings: bs,
+		}
+	}
+	for i := 0; i < len(result.NetworkSettings.NetworkSettingsBase.SecondaryIPAddresses); i++ {
+		resp.ContainerInfo.NetworkSettings.NetworkSettingsBase.SecondaryIpAddresses[i] = &moby.Address{
+			Addr:      result.NetworkSettings.NetworkSettingsBase.SecondaryIPAddresses[i].Addr,
+			PrefixLen: int32(result.NetworkSettings.NetworkSettingsBase.SecondaryIPAddresses[i].PrefixLen),
+		}
+	}
+	for i := 0; i < len(result.NetworkSettings.NetworkSettingsBase.SecondaryIPv6Addresses); i++ {
+		resp.ContainerInfo.NetworkSettings.NetworkSettingsBase.SecondaryIpv6Addresses[i] = &moby.Address{
+			Addr:      result.NetworkSettings.NetworkSettingsBase.SecondaryIPv6Addresses[i].Addr,
+			PrefixLen: int32(result.NetworkSettings.NetworkSettingsBase.SecondaryIPv6Addresses[i].PrefixLen),
+		}
+	}
+	for k, v := range result.NetworkSettings.Networks {
+		resp.ContainerInfo.NetworkSettings.Networks[k] = &moby.EndpointSettings{
+			IpamConfig: &moby.EndpointIPAMConfig{
+				Ipv4Address: v.IPAMConfig.IPv4Address,
+				Ipv6Address: v.IPAMConfig.IPv6Address,
+			},
+			Links:               v.Links,
+			Aliases:             v.Aliases,
+			NetworkId:           v.NetworkID,
+			EndpointId:          v.EndpointID,
+			Gateway:             v.Gateway,
+			IpAddress:           v.IPAddress,
+			IpPrefixLen:         int32(v.IPPrefixLen),
+			Ipv6Gateway:         v.IPv6Gateway,
+			GlobalIpv6Address:   v.GlobalIPv6Address,
+			GlobalIpv6PrefixLen: int32(v.GlobalIPv6PrefixLen),
+			MacAddress:          v.MacAddress,
+		}
+	}
+
 	return resp, nil
 }
 
@@ -347,13 +667,15 @@ func (m *myService) reapInstantiation(req *pb.InstantiationData) (*pb.Instantiat
 			},
 			Mounts: make([]*moby.MountPoint, len(item.Mounts)),
 		})
-		for _, v := range item.Ports {
-			resp.Instantiation[len(resp.Instantiation)-1].Ports = append(resp.Instantiation[len(resp.Instantiation)-1].Ports, &moby.Port{
-				Ip:          v.IP,
-				PrivatePort: int32(v.PrivatePort),
-				PublicPort:  int32(v.PublicPort),
-				Type:        v.Type,
-			})
+		// for _, v := range item.Ports {
+		for i := 0; i < len(item.Ports); i++ {
+			// resp.Instantiation[len(resp.Instantiation)-1].Ports = append(resp.Instantiation[len(resp.Instantiation)-1].Ports, &moby.Port{
+			resp.Instantiation[len(resp.Instantiation)-1].Ports[i] = &moby.Port{
+				Ip:          item.Ports[i].IP,
+				PrivatePort: int32(item.Ports[i].PrivatePort),
+				PublicPort:  int32(item.Ports[i].PublicPort),
+				Type:        item.Ports[i].Type,
+			}
 		}
 		if len(item.HostConfig.NetworkMode) > 0 {
 			resp.Instantiation[len(resp.Instantiation)-1].HostConfig.NetworkMode = item.HostConfig.NetworkMode
@@ -362,9 +684,7 @@ func (m *myService) reapInstantiation(req *pb.InstantiationData) (*pb.Instantiat
 			for k, v := range item.NetworkSettings.Networks {
 				resp.Instantiation[len(resp.Instantiation)-1].NetworkSettings.Networks[k] = &moby.EndpointSettings{
 					IpamConfig: &moby.EndpointIPAMConfig{
-						Ipv4Address: v.IPAMConfig.IPv4Address,
-						Ipv6Address: v.IPAMConfig.IPv6Address,
-						// LinkLocalIps: v.IPAMConfig.LinkLoclIPs,
+					// LinkLocalIps: v.IPAMConfig.LinkLoclIPs,
 					},
 					Links:               v.Links,
 					Aliases:             v.Aliases,
@@ -378,6 +698,10 @@ func (m *myService) reapInstantiation(req *pb.InstantiationData) (*pb.Instantiat
 					GlobalIpv6PrefixLen: int32(v.GlobalIPv6PrefixLen),
 					MacAddress:          v.MacAddress,
 					// DriverOpts:          v.DriverOpts,
+				}
+				if v.IPAMConfig != nil {
+					resp.Instantiation[len(resp.Instantiation)-1].NetworkSettings.Networks[k].IpamConfig.Ipv4Address = v.IPAMConfig.IPv4Address
+					resp.Instantiation[len(resp.Instantiation)-1].NetworkSettings.Networks[k].IpamConfig.Ipv6Address = v.IPAMConfig.IPv6Address
 				}
 			}
 		}
@@ -395,222 +719,5 @@ func (m *myService) reapInstantiation(req *pb.InstantiationData) (*pb.Instantiat
 			}
 		}
 	}
-	return resp, nil
-}
-
-// There are 2 kinds of docker operations categorized by running time:
-// * Long running operation: The long running operation could run for arbitrary long time, and the running time
-// usually depends on some uncontrollable factors. These operations include: PullImage, Logs, StartExec, AttachToContainer.
-// * Non-long running operation: Given the maximum load of the system, the non-long running operation should finish
-// in expected and usually short time. These include all other operations.
-// kubeDockerClient only applies timeout on non-long running operations.
-const (
-	// defaultTimeout is the default timeout of short running docker operations.
-	defaultTimeout = 2 * time.Minute
-
-	// defaultShmSize is the default ShmSize to use (in bytes) if not specified.
-	defaultShmSize = int64(1024 * 1024 * 64)
-
-	// defaultImagePullingProgressReportInterval is the default interval of image pulling progress reporting.
-	defaultImagePullingProgressReportInterval = 10 * time.Second
-
-	// defaultImagePullingStuckTimeout is the default timeout for image pulling stuck. If no progress
-	// is made for defaultImagePullingStuckTimeout, the image pulling will be cancelled.
-	// Docker reports image progress for every 512kB block, so normally there shouldn't be too long interval
-	// between progress updates.
-	// TODO(random-liu): Make this configurable
-	defaultImagePullingStuckTimeout = 1 * time.Minute
-)
-
-func base64EncodeAuth(auth types.AuthConfig) (string, error) {
-	var buf bytes.Buffer
-	if err := json.NewEncoder(&buf).Encode(auth); err != nil {
-		return "", err
-	}
-	return base64.URLEncoding.EncodeToString(buf.Bytes()), nil
-}
-
-// progress is a wrapper of dockermessage.JSONMessage with a lock protecting it.
-type progress struct {
-	sync.RWMutex
-	// message stores the latest docker json message.
-	message *dockermessage.JSONMessage
-	// timestamp of the latest update.
-	timestamp time.Time
-}
-
-func newProgress() *progress {
-	return &progress{timestamp: time.Now()}
-}
-
-func (p *progress) set(msg *dockermessage.JSONMessage) {
-	p.Lock()
-	defer p.Unlock()
-	p.message = msg
-	p.timestamp = time.Now()
-}
-
-func (p *progress) get() (string, time.Time) {
-	p.RLock()
-	defer p.RUnlock()
-	if p.message == nil {
-		return "No progress", p.timestamp
-	}
-	// The following code is based on JSONMessage.Display
-	var prefix string
-	if p.message.ID != "" {
-		prefix = fmt.Sprintf("%s: ", p.message.ID)
-	}
-	if p.message.Progress == nil {
-		return fmt.Sprintf("%s%s", prefix, p.message.Status), p.timestamp
-	}
-	return fmt.Sprintf("%s%s %s", prefix, p.message.Status, p.message.Progress.String()), p.timestamp
-}
-
-// progressReporter keeps the newest image pulling progress and periodically report the newest progress.
-type progressReporter struct {
-	*progress
-	image  string
-	cancel context.CancelFunc
-	stopCh chan struct{}
-}
-
-// newProgressReporter creates a new progressReporter for specific image with specified reporting interval
-func newProgressReporter(image string, cancel context.CancelFunc) *progressReporter {
-	return &progressReporter{
-		progress: newProgress(),
-		image:    image,
-		cancel:   cancel,
-		stopCh:   make(chan struct{}),
-	}
-}
-
-// start starts the progressReporter
-func (p *progressReporter) start() {
-	go func() {
-		ticker := time.NewTicker(defaultImagePullingProgressReportInterval)
-		defer ticker.Stop()
-		for {
-			// TODO(random-liu): Report as events.
-			select {
-			case <-ticker.C:
-				progress, timestamp := p.progress.get()
-				// If there is no progress for defaultImagePullingStuckTimeout, cancel the operation.
-				if time.Now().Sub(timestamp) > defaultImagePullingStuckTimeout {
-					glog.Errorf("Cancel pulling image %q because of no progress for %v, latest progress: %q", p.image, defaultImagePullingStuckTimeout, progress)
-					p.cancel()
-					return
-				}
-				glog.V(2).Infof("Pulling image %q: %q", p.image, progress)
-			case <-p.stopCh:
-				progress, _ := p.progress.get()
-				glog.V(2).Infof("Stop pulling image %q: %q", p.image, progress)
-				return
-			}
-		}
-	}()
-}
-
-// stop stops the progressReporter
-func (p *progressReporter) stop() {
-	close(p.stopCh)
-}
-
-// applyDefaultImageTag parses a docker image string, if it doesn't contain any tag or digest,
-// a default tag will be applied.
-// https://github.com/kubernetes/kubernetes/pkg/kubelet/dockertools/docker.go
-func applyDefaultImageTag(image string) (string, error) {
-	named, err := dockerref.ParseNamed(image)
-	if err != nil {
-		return "", fmt.Errorf("couldn't parse image reference %q: %v", image, err)
-	}
-	_, isTagged := named.(dockerref.Tagged)
-	_, isDigested := named.(dockerref.Digested)
-	if !isTagged && !isDigested {
-		named, err := dockerref.WithTag(named, parsers.DefaultImageTag)
-		if err != nil {
-			return "", fmt.Errorf("failed to apply default image tag %q: %v", image, err)
-		}
-		image = named.String()
-	}
-	return image, nil
-}
-
-/*
-  Inspired from https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/dockertools/kube_docker_client.go
-*/
-func (m *myService) pullImage(req *pb.DockerPullData) (*pb.DockerPullData, error) {
-	glog.Infoln("Go to pull image", req.Image)
-	resp := new(pb.DockerPullData)
-	if nil == req || 0 == len(req.Image) {
-		return resp, fmt.Errorf("Request required")
-	}
-	if img, err := applyDefaultImageTag(req.Image); nil != err {
-		return resp, err
-	} else {
-		resp.Image = img
-	}
-
-	ctl := dockerctl.NewEngine1_12Client()
-	cli, err := ctl.DockerClient()
-	if nil != err {
-		resp.StateCode = 100
-		resp.StateMessage = err.Error()
-		return resp, err
-	}
-
-	auth := types.AuthConfig{
-		// Username: "",
-		// Password: "",
-		Auth:          "",
-		Email:         "",
-		ServerAddress: "127.0.0.1:5000",
-		// IdentityToken: "",
-		// RegistryToken: "",
-	}
-	auth = ctl.RegistryAuth(resp.Image)
-
-	// RegistryAuth is the base64 encoded credentials for the registry
-	base64Auth, err := base64EncodeAuth(auth)
-	if err != nil {
-		resp.StateCode = 101
-		resp.StateMessage = err.Error()
-		return resp, err
-	}
-	opts := types.ImagePullOptions{
-		RegistryAuth: base64Auth,
-	}
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-	result, err := cli.ImagePull(ctx, resp.Image, opts)
-	if err != nil {
-		resp.StateCode = 102
-		resp.StateMessage = err.Error()
-		return resp, err
-	}
-	defer result.Close()
-	reporter := newProgressReporter(resp.Image, cancel)
-	reporter.start()
-	defer reporter.stop()
-	decoder := json.NewDecoder(result)
-	for {
-		var msg dockermessage.JSONMessage
-		err := decoder.Decode(&msg)
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			resp.StateCode = 103
-			resp.StateMessage = err.Error()
-			return resp, err
-		}
-		if msg.Error != nil {
-			resp.StateCode = 104
-			resp.StateMessage = fmt.Sprintf("code: %d, message: %s, %s", msg.Error.Code, msg.Error.Message, msg.ErrorMessage)
-			return resp, fmt.Errorf("Failed to pull image %s; %s", resp.Image, resp.StateMessage)
-		}
-		reporter.set(&msg)
-	}
-	resp.ProgressReport, _ = reporter.get()
 	return resp, nil
 }

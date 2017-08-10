@@ -85,7 +85,7 @@ func (mc *Engine1_12Client) DockerClient() (*client.Client, error) {
 
 func (mc *Engine1_12Client) RegistryAuth(image string) types.AuthConfig {
 	s := strings.Split(image, "/")
-	if len(s) == 1 || s[0] == "docker.io" {
+	if len(s) == 1 && s[0] == "docker.io" {
 		if v, ok := mc.dockerconfigjson.Auths["docker.io"]; ok {
 			return v
 		} else {
@@ -193,4 +193,55 @@ func (mc *Engine1_12Client) ProcessStatusContainers(opt types.ContainerListOptio
 		return nil, fmt.Errorf("Failed to remove container. %v", err)
 	}
 	return result, nil
+}
+
+func (mc *Engine1_12Client) InspectContainer(containerid string) (types.ContainerJSON, error) {
+	glog.Infoln("Go to inspect container:", containerid)
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		glog.V(2).Infoln("Could not instantiate docker engine api:", err.Error())
+		return types.ContainerJSON{}, fmt.Errorf("Failed to instantiate moby. %v", err)
+	}
+
+	resp, err := cli.ContainerInspect(context.Background(), containerid)
+	if err != nil {
+		glog.V(2).Infoln("Could not inspect container:", err.Error())
+		return types.ContainerJSON{}, fmt.Errorf("Failed to inspect container. %v", err)
+	}
+	return resp, nil
+}
+
+func (mc *Engine1_12Client) ListNetwork() ([]types.NetworkResource, error) {
+	glog.Infoln("Go to list network:")
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		glog.V(2).Infoln("Could not instantiate docker engine api:", err.Error())
+		return []types.NetworkResource{}, fmt.Errorf("Failed to instantiate moby. %v", err)
+	}
+
+	resp, err := cli.NetworkList(context.Background(), types.NetworkListOptions{ /*filters.NewArgs()}*/ })
+	if err != nil {
+		glog.V(2).Infoln("Could not list network:", err.Error())
+		return []types.NetworkResource{}, fmt.Errorf("Failed to list network. %v", err)
+	}
+	return resp, nil
+}
+
+func (mc *Engine1_12Client) InspectNetwork(networkid string) (types.NetworkResource, error) {
+	glog.Infoln("Go to inspect network:")
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		glog.V(2).Infoln("Could not instantiate docker engine api:", err.Error())
+		return types.NetworkResource{}, fmt.Errorf("Failed to instantiate moby. %v", err)
+	}
+
+	resp, err := cli.NetworkInspect(context.Background(), networkid)
+	if err != nil {
+		glog.V(2).Infoln("Could not list network:", err.Error())
+		return types.NetworkResource{}, fmt.Errorf("Failed to list network. %v", err)
+	}
+	return resp, nil
 }

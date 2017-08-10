@@ -19,6 +19,7 @@ import (
 
 	"github.com/tangfeixiong/go-to-docker/pb"
 	"github.com/tangfeixiong/go-to-docker/pkg/ui/data/swagger"
+	// "github.com/tangfeixiong/go-to-docker/pkg/util"
 )
 
 type Certificates struct {
@@ -52,10 +53,6 @@ func (m *myService) ReapRegistryForRepositories(ctx context.Context, in *pb.Regi
 	return m.reapRegistryForRepositories(in)
 }
 
-func (m *myService) rmiArchived(ctx context.Context, in *pb.ImageArchiveData) (*pb.ImageArchiveData, error) {
-	return nil, fmt.Errorf("not ready")
-}
-
 func (m *myService) InspectImage(ctx context.Context, in *pb.ImageArchiveData) (*pb.ImageArchiveData, error) {
 	return nil, fmt.Errorf("not ready")
 }
@@ -74,6 +71,10 @@ func (m *myService) TerminationContainers(ctx context.Context, in *pb.Provisioni
 
 func (m *myService) ReapInstantiation(ctx context.Context, req *pb.InstantiationData) (*pb.InstantiationData, error) {
 	return m.reapInstantiation(req)
+}
+
+func (m *myService) ReapBridgedNetworkLandscape(ctx context.Context, req *pb.BridgedNetworkingData) (*pb.BridgedNetworkingData, error) {
+	return m.reapBridgedNetworkLandscape(req)
 }
 
 func (m *myService) Echo(c context.Context, s *pb.EchoMessage) (*pb.EchoMessage, error) {

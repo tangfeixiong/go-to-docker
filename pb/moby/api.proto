@@ -54,7 +54,7 @@ message Config {
 	HealthConfig healthcheck = 13;          // Healthcheck describes how to check the container is healthy
 	bool args_escaped = 14;                 // True if command is already escaped (Windows specific)
 	string image = 15;                      // Name of the image as it was passed by the operator (e.g. could be symbolic)
-	map<string, VolumeMount> volumes = 16;  // List of volumes (mounts) used for the container
+	map<string, string> volumes = 16;       // List of volumes (mounts) used for the container
 	string working_dir = 17;                // Current directory (PWD) in the command will be launched
 	repeated string entrypoint = 18;        // Entrypoint to run when starting the container
 	bool network_disabled = 19;             // Is network disabled
@@ -69,7 +69,7 @@ message Config {
 // LogConfig represents the logging configuration of the container.
 // to see https://github.com/moby/moby/blob/master/api/types/container/host_config.go
 message LogConfig {
-	string config_type = 1;          // "", "blocking", "non-blocking"
+	string type = 1;          // "", "blocking", "non-blocking"
 	map<string, string> config = 2;
 }
 
@@ -90,11 +90,11 @@ message Resources {
 	// Applicable to UNIX platforms
 	string cgroup_parent = 4;  // Parent cgroup.
 	int32 blkio_weight = 5;    // Block IO weight (relative weight vs. other containers)
-	WeightDevice blkio_weight_device = 6;        // []*blkiodev.WeightDevice
-	ThrottleDevice blkio_device_read_bps = 7;    // []*blkiodev.ThrottleDevice
-	ThrottleDevice blkio_device_write_bps = 8;   // []*blkiodev.ThrottleDevice
-	ThrottleDevice blkio_device_read_iops = 9;   // []*blkiodev.ThrottleDevice
-	ThrottleDevice blkio_device_write_iops = 10; // []*blkiodev.ThrottleDevice
+	repeated WeightDevice blkio_weight_device = 6;        // []*blkiodev.WeightDevice
+	repeated ThrottleDevice blkio_device_read_bps = 7;    // []*blkiodev.ThrottleDevice
+	repeated ThrottleDevice blkio_device_write_bps = 8;   // []*blkiodev.ThrottleDevice
+	repeated ThrottleDevice blkio_device_read_iops = 9;   // []*blkiodev.ThrottleDevice
+	repeated ThrottleDevice blkio_device_write_iops = 10; // []*blkiodev.ThrottleDevice
 	int64 cpu_period = 11;                       // CPU CFS (Completely Fair Scheduler) period
 	int64 cpu_quota = 12;                        // CPU CFS (Completely Fair Scheduler) quota
 	int64 cpu_realtime_period = 13;              // CPU real-time period
@@ -108,7 +108,7 @@ message Resources {
 	int64 memory_reservation = 21;               // Memory soft limit (in bytes)
 	int64 memory_swap = 22;                      // Total memory usage (memory + swap); set `-1` to enable unlimited swap
 	int64 memory_swappiness = 23;                // Tuning container memory swappiness behaviour
-	int64 oom_kill_disable = 24;                 // Whether to disable OOM Killer or not
+	bool oom_kill_disable = 24;                 // Whether to disable OOM Killer or not
 	int64 pids_limit = 25;                       // Setting pids limit for a container
 	repeated Ulimit ulimits = 26;                // List of ulimits to be set in the container
 
@@ -193,7 +193,10 @@ message PortBinding {
 // PortMap is a collection of PortBinding indexed by Port
 // to see https://github.com/docker/go-connections/blob/master/nat/nat.go
 message PortMap {
-    map<string, PortBinding> value = 1;
+    message PortBindings {
+        repeated PortBinding port_bindings = 1;
+    }
+    map<string, PortBindings> value = 1;
 }
 
 // PortSet is a collection of structs indexed by Port
@@ -520,17 +523,17 @@ message Container {
 // ContainerState stores container's running state
 // it's part of ContainerJSONBase and will return by "inspect" command
 message ContainerState {
-	string status     string
-	bool running = 1;
-	bool paused = 2;
-	bool restarting = 3;
-	bool oom_Killed = 4;
-	bool dead = 5;
-	int32 pid = 6;
-	int32 exit_code = 7;
-	string error = 8;
-	string started_at = 9;
-	string finished_at = 10;
+	string status = 1;
+	bool running = 2;
+	bool paused = 3;
+	bool restarting = 4;
+	bool oom_killed = 5;
+	bool dead = 6;
+	int32 pid = 7;
+	int32 exit_code = 8;
+	string error = 9;
+	string started_at = 10;
+	string finished_at = 11;
 }
 
 // ContainerNode stores information about the node that a container
@@ -563,7 +566,7 @@ message ContainerJSONBase {
 	int32 restart_count = 13;
 	string driver = 14;
 	string mount_label = 15;
-	string orocess_label = 16;
+	string process_label = 16;
 	string app_armor_profile = 17;
 	repeated string exec_ids = 18;
 	HostConfig host_config= 19;
@@ -578,4 +581,44 @@ message ContainerJSON {
 	repeated MountPoint mounts = 2;
 	Config config = 3;
 	NetworkSettings network_settings = 4;
+}
+
+
+
+// NetworkResource is the body of the "get network" http response message
+message NetworkResource {
+	string name = 1;
+	string id = 2;
+	string scope = 3;
+	string driver = 4;
+	bool enable_ipv6 = 5;
+	IPAM ipam = 6;
+	bool internal = 7;
+	map<string, EndpointResource> containers = 8; 
+	map<string, string> options = 9;   
+	map<string, string> labels = 10;    
+}
+
+// IPAM represents IP Address Management
+message IPAM {
+	string driver = 1;
+	map<string, string> options = 2; //Per network IPAM driver options
+	repeated IPAMConfig config = 3;
+}
+
+// IPAMConfig represents IPAM configurations
+message IPAMConfig {
+	string subnet = 1;
+	string ip_range = 2;
+	string gateway = 3;
+	map<string, string> aux_address = 4;
+}
+
+// EndpointResource contains network resources allocated and used for a container in a network
+message EndpointResource {
+	string name = 1;
+	string endpoint_id = 2;
+	string mac_address = 3;
+	string ipv4_address = 4;
+	string ipv6_address = 5;
 }

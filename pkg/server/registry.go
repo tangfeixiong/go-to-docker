@@ -117,7 +117,7 @@ func (m *myService) reapRegistryForRepositories(req *pb.RegistryRepositoryData) 
 			}
 			for _, t := range tags {
 				fmt.Println(r + ":" + t)
-				resp.Registries[len(resp.Registries)-1].Catalogs[len(resp.Registries[len(resp.Registries)-1].Catalogs)].Tags = append(resp.Registries[len(resp.Registries)-1].Catalogs[len(resp.Registries[len(resp.Registries)-1].Catalogs)].Tags, &pb.RegistryRepositoryData_Tag{
+				resp.Registries[len(resp.Registries)-1].Catalogs[len(resp.Registries[len(resp.Registries)-1].Catalogs)-1].Tags = append(resp.Registries[len(resp.Registries)-1].Catalogs[len(resp.Registries[len(resp.Registries)-1].Catalogs)-1].Tags, &pb.RegistryRepositoryData_Tag{
 					Name: t,
 				})
 			}

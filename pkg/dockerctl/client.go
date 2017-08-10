@@ -149,6 +149,23 @@ func (mc *MobyClient) CommitContainer(container string, options types.ContainerC
 	return resp, nil
 }
 
+func (mc *MobyClient) InspectContainer(container string) (types.ContainerJSON, error) {
+	glog.Infoln("Go to inspect container:", container)
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		glog.V(2).Infoln("Could not instantiate moby:", err.Error())
+		return types.ContainerJSON{}, fmt.Errorf("Failed to instantiate moby. %v", err)
+	}
+
+	resp, err := cli.ContainerInspect(context.Background(), container)
+	if err != nil {
+		glog.V(2).Infoln("Could not inspect container:", err.Error())
+		return types.ContainerJSON{}, fmt.Errorf("Failed to inspect container. %v", err)
+	}
+	return resp, nil
+}
+
 func (mc *MobyClient) SearchImages(term string, options types.ImageSearchOptions) ([]registry.SearchResult, error) {
 	glog.Infoln("Go to search images into registry:", term)
 
