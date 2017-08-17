@@ -127,32 +127,6 @@ swagger = `{
         ]
       }
     },
-    "/v1/reap-brns": {
-      "post": {
-        "operationId": "ReapBridgedNetworkLandscape",
-        "responses": {
-          "200": {
-            "description": "",
-            "schema": {
-              "$ref": "#/definitions/pbBridgedNetworkingData"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/pbBridgedNetworkingData"
-            }
-          }
-        ],
-        "tags": [
-          "EchoService"
-        ]
-      }
-    },
     "/v1/reap-instantiation": {
       "post": {
         "summary": "Find containers with instantiating of a user namespace",
@@ -201,6 +175,58 @@ swagger = `{
             "required": true,
             "schema": {
               "$ref": "#/definitions/pbRegistryRepositoryData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/sniffing-brns": {
+      "post": {
+        "operationId": "SniffEtherNetworking",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbEthernetSniffingData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbEthernetSniffingData"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/snooping-brns": {
+      "post": {
+        "operationId": "SnoopBridgedNetworkLandscape",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbBridgedNetworkingData"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbBridgedNetworkingData"
             }
           }
         ],
@@ -2035,6 +2061,30 @@ swagger = `{
         "value": {
           "type": "string",
           "format": "string"
+        }
+      }
+    },
+    "pbEthernetSniffingData": {
+      "type": "object",
+      "properties": {
+        "iface": {
+          "type": "string",
+          "format": "string"
+        },
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
+        },
+        "stats_and_packets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "string"
+          }
         }
       }
     },

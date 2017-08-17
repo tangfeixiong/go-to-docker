@@ -1,3 +1,9 @@
+/*
+  Inspired by:
+    https://github.com/heroku/docker-registry-client/blob/master/registry/registry.go
+    https://github.com/jcbsmpsn/golang-https-example/blob/master/https_client.go
+*/
+
 package server
 
 import (

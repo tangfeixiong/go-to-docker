@@ -20,7 +20,7 @@ import (
 	"github.com/tangfeixiong/go-to-openstack-bootcamp/kopos/kopit/pkg/netutils"
 )
 
-func (m *myService) reapBridgedNetworkLandscape(req *pb.BridgedNetworkingData) (*pb.BridgedNetworkingData, error) {
+func (m *myService) snoopBridgedNetworkLandscape(req *pb.BridgedNetworkingData) (*pb.BridgedNetworkingData, error) {
 	resp := new(pb.BridgedNetworkingData)
 	resp.LinuxBridges = make([]*pb.BridgedNetworkingData_LinuxBridgeInfo, 0)
 	resp.ContainersNetworking = &pb.BridgedNetworkingData_ContainersNetworkingInfo{

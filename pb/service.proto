@@ -190,12 +190,20 @@ service EchoService {
     };
   }
 
-  rpc ReapBridgedNetworkLandscape(BridgedNetworkingData) returns (BridgedNetworkingData) {
+  rpc SnoopBridgedNetworkLandscape(BridgedNetworkingData) returns (BridgedNetworkingData) {
     option (google.api.http) = {
-        post: "/v1/reap-brns"
+        post: "/v1/snooping-brns"
         body: "*"
     };
   }
+
+  rpc SniffEtherNetworking(EthernetSniffingData) returns (EthernetSniffingData) {
+    option (google.api.http) = {
+        post: "/v1/sniffing-brns"
+        body: "*"
+    };
+  }
+
 }
 
 message InstrumentMetadata {
@@ -350,4 +358,11 @@ message BridgedNetworkingData {
     map<string, string> veth_pairs = 3;
     int32 state_code = 4;
     string state_message = 5;
+}
+
+message EthernetSniffingData {
+    string iface = 1;
+    repeated string stats_and_packets = 2;
+    int32 state_code = 3;
+    string state_message = 4;
 }

@@ -57,10 +57,6 @@ func (m *myService) InspectImage(ctx context.Context, in *pb.ImageArchiveData) (
 	return nil, fmt.Errorf("not ready")
 }
 
-func (m *myService) DefineImageCatalog(ctx context.Context, in *pb.ImageArchiveData) (*pb.ImageArchiveData, error) {
-	return nil, fmt.Errorf("not ready")
-}
-
 func (m *myService) ProvisionContainers(ctx context.Context, in *pb.ProvisioningsData) (*pb.ProvisioningsData, error) {
 	return m.containersProvisioning(in)
 }
@@ -73,8 +69,12 @@ func (m *myService) ReapInstantiation(ctx context.Context, req *pb.Instantiation
 	return m.reapInstantiation(req)
 }
 
-func (m *myService) ReapBridgedNetworkLandscape(ctx context.Context, req *pb.BridgedNetworkingData) (*pb.BridgedNetworkingData, error) {
-	return m.reapBridgedNetworkLandscape(req)
+func (m *myService) SnoopBridgedNetworkLandscape(ctx context.Context, req *pb.BridgedNetworkingData) (*pb.BridgedNetworkingData, error) {
+	return m.snoopBridgedNetworkLandscape(req)
+}
+
+func (m *myService) SniffEtherNetworking(ctx context.Context, req *pb.EthernetSniffingData) (*pb.EthernetSniffingData, error) {
+	return m.sniffEtherNetworking(req)
 }
 
 func (m *myService) Echo(c context.Context, s *pb.EchoMessage) (*pb.EchoMessage, error) {

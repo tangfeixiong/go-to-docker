@@ -6,7 +6,7 @@ import (
 
 func commandSnoop() *cobra.Command {
 	command := &cobra.Command{
-		Use: "snoop",
+		Use: "sniff",
 	}
 	command.AddCommand(commandNetwork())
 	return command
