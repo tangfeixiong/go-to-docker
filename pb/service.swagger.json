@@ -18,7 +18,7 @@
     "/v1/containers": {
       "post": {
         "summary": "Like 'docker run' command",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n--\"config\":\n----{\n------\"image\": \"nginx\",\n------\"exposed_ports\":\n--------{\n----------\"value\": \"webui\"\n--------}\n----},\n--\"host_config\":\n----{\n------\"port_bindings\":\n--------{\n----------\"value\":\n------------{\n--------------\"80\":\n----------------{\n------------------\"host_port\": \"80\"\n----------------}\n------------}\n--------}\n----},\n--\"network_config\":\n----{\n----},\n--\"container_name\": \"nginx\"\n}\nAnd returning information append this object for output:\n{\n--\"state_code\": 0,  // succeeded, otherwise none zero\n--\"state_message\": \"if failed, provide error information\",\n--\"container_id\": \"regturned from docker engine\"  \n}",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n--\"config\":\n----{\n------\"image\": \"nginx\",\n------\"exposed_ports\":\n--------{\n----------\"value\": \n------------{\n--------------\"80\": \"webui\"\n------------}\n--------}\n----},\n--\"host_config\":\n----{\n      \"binds\": [\n        \"/host/path/a:/etc/nginx/nginx.conf,Z\",\n        \"/host/paht/b:/etc/nginx/conf.d/default.conf:Z\",\n        \"/host/path/c:/usr/share/nginx/html:ro\"\n      ]\n------\"port_bindings\":\n--------{\n----------\"value\":\n------------{\n--------------\"80\":\n----------------{\n------------------\"host_port\": \"80\"\n----------------}\n------------}\n--------}\n----},\n--\"network_config\":\n----{\n----},\n--\"container_name\": \"nginx\"\n}\nAnd returning information append this object for output:\n{\n--\"state_code\": 0,  // succeeded, otherwise none zero\n--\"state_message\": \"if failed, provide error information\",\n--\"container_id\": \"regturned from docker engine\"  \n}",
         "operationId": "RunContainer",
         "responses": {
           "200": {
@@ -1656,10 +1656,16 @@
     "mobyPortMap": {
       "type": "object",
       "properties": {
-        "value": {
+        "mapping_info": {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/PortMapPortBindings"
+          }
+        },
+        "value": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/mobyPortBinding"
           }
         }
       },

@@ -132,7 +132,13 @@ func newRunContainerCommand(opt *Option) *cobra.Command {
 				},
 				HostConfig: &moby.HostConfig{
 					PortBindings: &moby.PortMap{
-						Value: map[string]*moby.PortMap_PortBindings{
+						Value: map[string]*moby.PortBinding{
+							"8761": &moby.PortBinding{
+								HostIp:   "",
+								HostPort: "8761",
+							},
+						},
+						MappingInfo: map[string]*moby.PortMap_PortBindings{
 							"8761": &moby.PortMap_PortBindings{
 								PortBindings: []*moby.PortBinding{
 									&moby.PortBinding{

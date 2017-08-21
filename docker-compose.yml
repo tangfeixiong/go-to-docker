@@ -18,6 +18,43 @@
 version: '2'
 
 services:
+  mysql:
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_USER=testuser
+    - MYSQL_PASSWORD=testpassword
+    - MYSQL_DATABASE=testdb
+    image: mysql:5.7
+    restart: unless-stopped
+    volumes:
+    - /srv/mysql/data:/var/lib/mysql
+
+  php-nginx:
+    environment:
+    - MYSQL_USER=testuser
+    - MYSQL_PASSWORD=testpassword
+    - MYSQL_DATABASE=testdb
+    - MYSQL_SERVER_ADDRESS=mysql:3306
+    - DOCKER_RESOURCE_PROVIDER=go-to-docker:10052
+    image: tangfeixiong/nginx-php-demo
+    ports:
+    - "80:80"
+    restart: on-failure    
+
+  go-to-docker:
+    depends_on:
+    - etcd
+    environment:
+    - DOCKER_CONFIG_JSON='{"auths":{}}'
+    - REGISTRY_CERTS_JSON='{}'
+    image: docker.io/tangfeixiong/go-to-docker:0.1
+    # ports:
+    # - "10052:10052"
+    privileged: true
+    restart: always
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+
   etcd:
     command: 
     - /usr/local/bin/etcd
@@ -42,17 +79,3 @@ services:
     volumes:
     - /srv/etcd/data:/etcd-data
 
-  go-to-docker:
-    depends_on:
-    - etcd
-    environment:
-    - DOCKER_CONFIG_JSON='{"auths":{}}'
-    - REGISTRY_CERTS_JSON='{}'
-    - ETCD_HOST=etcd
-    image: docker.io/tangfeixiong/go-to-docker:0.1.1
-    ports:
-    - "10052:10052"
-    privileged: true
-    restart: always
-    volumes:
-    - /var/run/docker.sock:/var/run/docker.sock:ro

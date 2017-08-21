@@ -22,6 +22,17 @@ import (
 	"github.com/tangfeixiong/go-to-docker/pkg/dockerctl"
 )
 
+const (
+	// Taken from lmctfy https://github.com/google/lmctfy/blob/master/lmctfy/controllers/cpu_controller.cc
+	minShares     = 2
+	sharesPerCPU  = 1024
+	milliCPUToCPU = 1000
+
+	// 100000 is equivalent to 100ms
+	quotaPeriod    = 100000
+	minQuotaPeriod = 1000
+)
+
 func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, error) {
 	resp := new(pb.DockerRunData)
 	if nil == req {
@@ -46,21 +57,21 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 		AttachStdout: req.Config.AttachStdout,
 		AttachStderr: req.Config.AttachStderr,
 		ExposedPorts: nat.PortSet{},
-		Tty:          req.Config.Tty,
-		OpenStdin:    req.Config.OpenStdin,
-		StdinOnce:    req.Config.StdinOnce,
-		Env:          make([]string, 0),
+		Tty:          req.Config.Tty,       // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
+		OpenStdin:    req.Config.OpenStdin, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
+		StdinOnce:    req.Config.StdinOnce, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
+		Env:          make([]string, 0),    // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 		Cmd:          make(strslice.StrSlice, 0),
 		// HealthCheck:     new(container.HealthCheck),
-		ArgsEscaped: req.Config.ArgsEscaped,
-		Image:       req.Config.Image,
-		// Volumes:         make(map[string]struct{}),
-		WorkingDir:      req.Config.WorkingDir,
+		ArgsEscaped:     req.Config.ArgsEscaped,
+		Image:           req.Config.Image, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
+		Volumes:         make(map[string]struct{}),
+		WorkingDir:      req.Config.WorkingDir, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 		Entrypoint:      req.Config.Entrypoint,
 		NetworkDisabled: req.Config.NetworkDisabled,
 		MacAddress:      req.Config.MacAddress,
 		OnBuild:         make([]string, 0),
-		Labels:          make(map[string]string),
+		Labels:          make(map[string]string), // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 		StopSignal:      req.Config.StopSignal,
 		// StopTimeout:     new(int),
 		// Shell:           make(strslice.StrSlice, 0),
@@ -70,6 +81,9 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 	}
 	cc.Env = append(cc.Env, req.Config.Env...)
 	cc.Cmd = append(cc.Cmd, req.Config.Cmd...)
+	for k, _ := range req.Config.Volumes {
+		cc.Volumes[k] = struct{}{}
+	}
 	cc.OnBuild = append(cc.OnBuild, req.Config.OnBuild...)
 	for k, v := range req.Config.Labels {
 		cc.Labels[k] = v
@@ -78,11 +92,11 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 	// cc.Shell = append(cc.Shell, req.Config.Shell...)
 
 	chc := &container.HostConfig{
-		Binds:           make([]string, 0),
+		Binds:           req.HostConfig.Binds, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func makeMountBindings)
 		ContainerIDFile: req.HostConfig.ContainerIdFile,
 		LogConfig:       container.LogConfig{},
-		NetworkMode:     "",
-		PortBindings:    nat.PortMap{},
+		NetworkMode:     "",            // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
+		PortBindings:    nat.PortMap{}, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func makePortsAndBindings)
 		RestartPolicy: container.RestartPolicy{
 			Name:              "none",
 			MaximumRetryCount: 3,
@@ -90,7 +104,7 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 		AutoRemove:   req.HostConfig.AutoRemove,
 		VolumeDriver: req.HostConfig.VolumeDriver,
 		VolumesFrom:  make([]string, 0),
-
+		// Applicable to UNIX platforms
 		CapAdd:          make(strslice.StrSlice, 0),
 		CapDrop:         make(strslice.StrSlice, 0),
 		DNS:             make([]string, 0),
@@ -98,48 +112,58 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 		DNSSearch:       make([]string, 0),
 		ExtraHosts:      make([]string, 0),
 		GroupAdd:        make([]string, 0),
-		IpcMode:         "",
+		IpcMode:         "", // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 		Cgroup:          "",
 		Links:           make([]string, 0),
-		OomScoreAdj:     0,
-		PidMode:         "",
+		OomScoreAdj:     0,  // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
+		PidMode:         "", // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 		Privileged:      req.HostConfig.Privileged,
 		PublishAllPorts: req.HostConfig.PublishAllPorts,
-		ReadonlyRootfs:  req.HostConfig.ReadonlyRootfs,
-		SecurityOpt:     make([]string, 0),
+		ReadonlyRootfs:  req.HostConfig.ReadonlyRootfs, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func readOnlyRootFilesystem)
+		SecurityOpt:     make([]string, 0),             // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method fmtDockerOpts)
 		StorageOpt:      make(map[string]string),
 		Tmpfs:           make(map[string]string),
-		UTSMode:         "",
+		UTSMode:         "", // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 		UsernsMode:      "",
 		ShmSize:         0,
-		Sysctls:         make(map[string]string),
+		Sysctls:         make(map[string]string), // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 		// Runtime:         req.HostConfig.Runtime,
-		// ConsoleSize:     [2]uint{},
-		ConsoleSize: [2]int{},
+
+		// Applicable to Windows
+		ConsoleSize: [2]int{}, // ConsoleSize:     [2]uint{},
 		Isolation:   "",
+
 		Resources: container.Resources{
-			// CPUShares:            req.HostConfig.Resources.CpuShares,
-			// Memory:               req.HostConfig.Resources.Memory,
+			// https://docs.docker.com/engine/reference/run/#cpu-share-constraint
+			//     To modify the proportion from the default of 1024, use the -c or --cpu-shares flag to set the weighting to 2 or higher. If 0 is set, the system will ignore the value and use the default of 1024.
+			// https://docs.docker.com/engine/reference/run/#user-memory-constraints
+			//     4 ways to set user memory usage
+			// https://docs.docker.com/engine/reference/run/#cpu-period-constraint
+			//     The default CPU CFS (Completely Fair Scheduler) period is 100ms. We can use --cpu-period to set the period of CPUs to limit the container’s CPU usage. And usually --cpu-period should work with --cpu-quota.
+			// https://docs.docker.com/engine/reference/run/#cpu-quota-constraint
+			//     The --cpu-quota flag limits the container’s CPU usage. The default 0 value allows the container to take 100% of a CPU resource (1 CPU).
+			CPUShares: 0, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
+			Memory:    0, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 			// NanoCPUs:             req.HostConfig.Resources.NanoCpus,
-			CgroupParent: "",
+			CgroupParent: "", // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 			// BlkioWeight:          uint16(req.HostConfig.Resources.BlkioWeight),
 			BlkioWeightDevice:    make([]*blkiodev.WeightDevice, 0),
 			BlkioDeviceReadBps:   make([]*blkiodev.ThrottleDevice, 0),
 			BlkioDeviceWriteBps:  make([]*blkiodev.ThrottleDevice, 0),
 			BlkioDeviceReadIOps:  make([]*blkiodev.ThrottleDevice, 0),
 			BlkioDeviceWriteIOps: make([]*blkiodev.ThrottleDevice, 0),
-			// CPUPeriod:            req.HostConfig.Resources.CpuPeriod,
-			// CPUQuota:             req.HostConfig.Resources.CpuQuota,
+			CPUPeriod:            0, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
+			CPUQuota:             0, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 			// CPURealtimePeriod:    req.HostConfig.Resources.CpuRealtimePeriod,
 			// CPURealtimeRuntime:   req.HostConfig.Resources.CpuRealtimeRuntime,
 			CpusetCpus: "",
 			CpusetMems: "",
-			Devices:    make([]container.DeviceMapping, 0),
+			Devices:    make([]container.DeviceMapping, 0), // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 			// DeviceCgroupRules:  make([]string, 0),
 			DiskQuota:          0,
 			KernelMemory:       0,
 			MemoryReservation:  0,
-			MemorySwap:         0,
+			MemorySwap:         -1, // refer: k8s.io/kubernetes/pkg/kubelet/dockertools/docker_manager.go (func-method runContainer)
 			MemorySwappiness:   new(int64),
 			OomKillDisable:     new(bool),
 			PidsLimit:          0,
@@ -152,7 +176,17 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 		// Mounts: make([]mount.Mount, 0),
 		// Init:   new(bool),
 	}
+	if 0 != len(req.HostConfig.NetworkMode) {
+		chc.NetworkMode = container.NetworkMode(req.HostConfig.NetworkMode)
+	}
 	for k, v := range req.HostConfig.PortBindings.Value {
+		chc.PortBindings[nat.Port(k)] = make([]nat.PortBinding, 0)
+		chc.PortBindings[nat.Port(k)] = append(chc.PortBindings[nat.Port(k)], nat.PortBinding{
+			HostIP:   v.HostIp,
+			HostPort: v.HostPort,
+		})
+	}
+	for k, v := range req.HostConfig.PortBindings.MappingInfo {
 		chc.PortBindings[nat.Port(k)] = make([]nat.PortBinding, 0)
 		for _, item := range v.PortBindings {
 			chc.PortBindings[nat.Port(k)] = append(chc.PortBindings[nat.Port(k)], nat.PortBinding{
@@ -160,6 +194,34 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 				HostPort: item.HostPort,
 			})
 		}
+	}
+	if 0 != len(req.HostConfig.IpcMode) {
+		chc.IpcMode = container.IpcMode(req.HostConfig.IpcMode)
+	}
+	if 0 < req.HostConfig.OomScoreAdj {
+		chc.OomScoreAdj = int(req.HostConfig.OomScoreAdj)
+	}
+	if 0 != len(req.HostConfig.PidMode) {
+		chc.PidMode = container.PidMode(req.HostConfig.PidMode)
+	}
+	if 0 != len(req.HostConfig.UtsMode) {
+		chc.UTSMode = container.UTSMode(req.HostConfig.UtsMode)
+	}
+	for k, v := range req.HostConfig.Sysctls {
+		chc.Sysctls[k] = v
+	}
+	if minShares < req.HostConfig.Resources.CpuShares {
+		chc.Resources.CPUShares = req.HostConfig.Resources.CpuShares
+	}
+	if 0 < req.HostConfig.Resources.Memory {
+		chc.Resources.Memory = req.HostConfig.Resources.Memory
+	}
+	if 0 != len(req.HostConfig.Resources.CgroupParent) {
+		chc.Resources.CgroupParent = req.HostConfig.Resources.CgroupParent
+	}
+	if 0 < req.HostConfig.Resources.CpuPeriod && 0 < req.HostConfig.Resources.CpuQuota {
+		chc.Resources.CPUPeriod = req.HostConfig.Resources.CpuPeriod
+		chc.Resources.CPUQuota = req.HostConfig.Resources.CpuQuota
 	}
 
 	cnc := &network.NetworkingConfig{
@@ -260,7 +322,8 @@ func (m *myService) inspectContainer(req *pb.DockerContainerInspection) (*pb.Doc
 				},
 				NetworkMode: string(result.ContainerJSONBase.HostConfig.NetworkMode),
 				PortBindings: &moby.PortMap{
-					Value: make(map[string]*moby.PortMap_PortBindings, len(result.ContainerJSONBase.HostConfig.PortBindings)),
+					Value:       make(map[string]*moby.PortBinding),
+					MappingInfo: make(map[string]*moby.PortMap_PortBindings, len(result.ContainerJSONBase.HostConfig.PortBindings)),
 				},
 				RestartPolicy: &moby.RestartPolicy{
 					Name:              result.ContainerJSONBase.HostConfig.RestartPolicy.Name,
@@ -375,7 +438,8 @@ func (m *myService) inspectContainer(req *pb.DockerContainerInspection) (*pb.Doc
 				LinkLocalIpv6Address:   result.NetworkSettings.NetworkSettingsBase.LinkLocalIPv6Address,
 				LinkLocalIpv6PrefixLen: int32(result.NetworkSettings.NetworkSettingsBase.LinkLocalIPv6PrefixLen),
 				Ports: &moby.PortMap{
-					Value: make(map[string]*moby.PortMap_PortBindings, len(result.NetworkSettings.NetworkSettingsBase.Ports)),
+					Value:       make(map[string]*moby.PortBinding),
+					MappingInfo: make(map[string]*moby.PortMap_PortBindings, len(result.NetworkSettings.NetworkSettingsBase.Ports)),
 				},
 				SandboxKey:             result.NetworkSettings.NetworkSettingsBase.SandboxKey,
 				SecondaryIpAddresses:   make([]*moby.Address, len(result.NetworkSettings.NetworkSettingsBase.SecondaryIPAddresses)),
@@ -421,9 +485,10 @@ func (m *myService) inspectContainer(req *pb.DockerContainerInspection) (*pb.Doc
 				HostPort: v[i].HostPort,
 			}
 		}
-		resp.ContainerInfo.ContainerJsonBase.HostConfig.PortBindings.Value[string(k)] = &moby.PortMap_PortBindings{
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.PortBindings.MappingInfo[string(k)] = &moby.PortMap_PortBindings{
 			PortBindings: bs,
 		}
+		resp.ContainerInfo.ContainerJsonBase.HostConfig.PortBindings.Value[string(k)] = bs[0]
 	}
 	for i := 0; i < len(result.ContainerJSONBase.HostConfig.Resources.BlkioWeightDevice); i++ {
 		resp.ContainerInfo.ContainerJsonBase.HostConfig.Resources.BlkioWeightDevice[i] = &moby.WeightDevice{
@@ -495,9 +560,10 @@ func (m *myService) inspectContainer(req *pb.DockerContainerInspection) (*pb.Doc
 				HostPort: v[i].HostPort,
 			}
 		}
-		resp.ContainerInfo.NetworkSettings.NetworkSettingsBase.Ports.Value[string(k)] = &moby.PortMap_PortBindings{
+		resp.ContainerInfo.NetworkSettings.NetworkSettingsBase.Ports.MappingInfo[string(k)] = &moby.PortMap_PortBindings{
 			PortBindings: bs,
 		}
+		resp.ContainerInfo.NetworkSettings.NetworkSettingsBase.Ports.Value[string(k)] = bs[0]
 	}
 	for i := 0; i < len(result.NetworkSettings.NetworkSettingsBase.SecondaryIPAddresses); i++ {
 		resp.ContainerInfo.NetworkSettings.NetworkSettingsBase.SecondaryIpAddresses[i] = &moby.Address{

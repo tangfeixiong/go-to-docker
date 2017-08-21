@@ -196,7 +196,8 @@ message PortMap {
     message PortBindings {
         repeated PortBinding port_bindings = 1;
     }
-    map<string, PortBindings> value = 1;
+    map<string, PortBinding> value = 1;
+    map<string, PortBindings> mapping_info = 2;
 }
 
 // PortSet is a collection of structs indexed by Port

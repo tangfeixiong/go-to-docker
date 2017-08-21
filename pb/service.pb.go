@@ -1057,11 +1057,19 @@ type EchoServiceClient interface {
 	// ------"image": "nginx",
 	// ------"exposed_ports":
 	// --------{
-	// ----------"value": "webui"
+	// ----------"value":
+	// ------------{
+	// --------------"80": "webui"
+	// ------------}
 	// --------}
 	// ----},
 	// --"host_config":
 	// ----{
+	//       "binds": [
+	//         "/host/path/a:/etc/nginx/nginx.conf,Z",
+	//         "/host/paht/b:/etc/nginx/conf.d/default.conf:Z",
+	//         "/host/path/c:/usr/share/nginx/html:ro"
+	//       ]
 	// ------"port_bindings":
 	// --------{
 	// ----------"value":
@@ -1290,11 +1298,19 @@ type EchoServiceServer interface {
 	// ------"image": "nginx",
 	// ------"exposed_ports":
 	// --------{
-	// ----------"value": "webui"
+	// ----------"value":
+	// ------------{
+	// --------------"80": "webui"
+	// ------------}
 	// --------}
 	// ----},
 	// --"host_config":
 	// ----{
+	//       "binds": [
+	//         "/host/path/a:/etc/nginx/nginx.conf,Z",
+	//         "/host/paht/b:/etc/nginx/conf.d/default.conf:Z",
+	//         "/host/path/c:/usr/share/nginx/html:ro"
+	//       ]
 	// ------"port_bindings":
 	// --------{
 	// ----------"value":
