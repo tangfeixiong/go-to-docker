@@ -41,6 +41,17 @@ services:
     - "80:80"
     restart: on-failure    
 
+  isc-flag:
+    environment:
+    - SPRING_DATASOURCE_URL='jdbc:mysql://mysql:3306/testdb'
+    - SPRING_DATASOURCE_USERNAME='testuser'
+    - SPRING_DATASOURCE_PASSWORD='testpassword' 
+    - SERVER_PORT='8082'
+    image: 172.17.4.50:5000/isc-flag
+    ports:
+    - "8082:8082"
+    restart: always    
+
   go-to-docker:
     depends_on:
     - etcd

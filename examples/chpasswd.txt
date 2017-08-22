@@ -1,0 +1,206 @@
+[vagrant@localhost go-to-docker]$ docker run -d -ti -v /etc/ssh:/etc/ssh --name=centos7trial centos:centos7 bash
+c6cbf015bd13c85a0e30f37aba312d527dc3b37c36227024c23644b4743fd677
+
+[vagrant@localhost go-to-docker]$ docker ps -l
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+c6cbf015bd13        centos:centos7      "bash"              5 seconds ago       Up 3 seconds                            centos7trial
+
+[vagrant@localhost go-to-docker]$ docker exec -ti centos7trial yum install -y -q openssh-server
+warning: /var/cache/yum/x86_64/7/base/packages/tcp_wrappers-libs-7.6-77.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID f4a80eb5: NOKEY
+Public key for tcp_wrappers-libs-7.6-77.el7.x86_64.rpm is not installed
+Public key for openssh-6.6.1p1-35.el7_3.x86_64.rpm is not installed
+Importing GPG key 0xF4A80EB5:
+ Userid     : "CentOS-7 Key (CentOS 7 Official Signing Key) <security@centos.org>"
+ Fingerprint: 6341 ab27 53d7 8a78 a7c2 7bb1 24c6 a8a7 f4a8 0eb5
+ Package    : centos-release-7-2.1511.el7.centos.2.10.x86_64 (@CentOS)
+ From       : /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+warning: /etc/ssh/moduli created as /etc/ssh/moduli.rpmnew
+warning: /etc/ssh/sshd_config created as /etc/ssh/sshd_config.rpmnew
+
+[vagrant@localhost go-to-docker]$ docker exec -ti centos7trial chmod -R 400 /etc/ssh/*
+
+[vagrant@localhost go-to-docker]$ docker exec -ti centos7trial bash -c 'echo "root:password"| chpasswd'
+
+[vagrant@localhost go-to-docker]$ docker exec -ti centos7trial /usr/sbin/sshd -dD
+debug1: sshd version OpenSSH_6.6.1, OpenSSL 1.0.1e-fips 11 Feb 2013
+debug1: key_parse_private2: missing begin marker
+debug1: read PEM private key done: type RSA
+debug1: private host key: #0 type 1 RSA
+debug1: key_parse_private2: missing begin marker
+debug1: read PEM private key done: type ECDSA
+debug1: private host key: #1 type 3 ECDSA
+debug1: private host key: #2 type 4 ED25519
+debug1: rexec_argv[0]='/usr/sbin/sshd'
+debug1: rexec_argv[1]='-dD'
+Set /proc/self/oom_score_adj from 0 to -1000
+debug1: Bind to port 22 on 0.0.0.0.
+Server listening on 0.0.0.0 port 22.
+debug1: Bind to port 22 on ::.
+Server listening on :: port 22.
+
+
+[vagrant@localhost ~]$ docker inspect -f {{.NetworkSettings.IPAddress}} centos7trial
+172.17.0.9
+[vagrant@localhost ~]$ ssh -vvv root@172.17.0.9
+OpenSSH_7.1p2, OpenSSL 1.0.2f-fips  28 Jan 2016
+debug2: ssh_connect: needpriv 0
+debug1: Connecting to 172.17.0.9 [172.17.0.9] port 22.
+debug1: Connection established.
+debug1: key_load_public: No such file or directory
+debug1: identity file /home/vagrant/.ssh/id_rsa type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /home/vagrant/.ssh/id_rsa-cert type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /home/vagrant/.ssh/id_dsa type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /home/vagrant/.ssh/id_dsa-cert type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /home/vagrant/.ssh/id_ecdsa type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /home/vagrant/.ssh/id_ecdsa-cert type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /home/vagrant/.ssh/id_ed25519 type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /home/vagrant/.ssh/id_ed25519-cert type -1
+debug1: Enabling compatibility mode for protocol 2.0
+debug1: Local version string SSH-2.0-OpenSSH_7.1
+debug1: Remote protocol version 2.0, remote software version OpenSSH_6.6.1
+debug1: match: OpenSSH_6.6.1 pat OpenSSH_6.6.1* compat 0x04000000
+debug2: fd 3 setting O_NONBLOCK
+debug1: Authenticating to 172.17.0.9:22 as 'root'
+debug3: hostkeys_foreach: reading file "/home/vagrant/.ssh/known_hosts"
+debug1: SSH2_MSG_KEXINIT sent
+debug1: SSH2_MSG_KEXINIT received
+debug2: kex_parse_kexinit: curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1
+debug2: kex_parse_kexinit: ecdsa-sha2-nistp256-cert-v01@openssh.com,ecdsa-sha2-nistp384-cert-v01@openssh.com,ecdsa-sha2-nistp521-cert-v01@openssh.com,ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,ssh-ed25519,ssh-rsa
+debug2: kex_parse_kexinit: chacha20-poly1305@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com,arcfour256,arcfour128,aes128-cbc,3des-cbc,blowfish-cbc,cast128-cbc,aes192-cbc,aes256-cbc,arcfour,rijndael-cbc@lysator.liu.se
+debug2: kex_parse_kexinit: chacha20-poly1305@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com,arcfour256,arcfour128,aes128-cbc,3des-cbc,blowfish-cbc,cast128-cbc,aes192-cbc,aes256-cbc,arcfour,rijndael-cbc@lysator.liu.se
+debug2: kex_parse_kexinit: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1,hmac-md5-etm@openssh.com,hmac-ripemd160-etm@openssh.com,hmac-sha1-96-etm@openssh.com,hmac-md5-96-etm@openssh.com,hmac-md5,hmac-ripemd160,hmac-ripemd160@openssh.com,hmac-sha1-96,hmac-md5-96
+debug2: kex_parse_kexinit: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1,hmac-md5-etm@openssh.com,hmac-ripemd160-etm@openssh.com,hmac-sha1-96-etm@openssh.com,hmac-md5-96-etm@openssh.com,hmac-md5,hmac-ripemd160,hmac-ripemd160@openssh.com,hmac-sha1-96,hmac-md5-96
+debug2: kex_parse_kexinit: none,zlib@openssh.com,zlib
+debug2: kex_parse_kexinit: none,zlib@openssh.com,zlib
+debug2: kex_parse_kexinit: 
+debug2: kex_parse_kexinit: 
+debug2: first_kex_follows 0 
+debug2: reserved 0 
+debug2: kex_parse_kexinit: curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha1,diffie-hellman-group1-sha1
+debug2: kex_parse_kexinit: ssh-rsa,ecdsa-sha2-nistp256,ssh-ed25519
+debug2: kex_parse_kexinit: aes128-ctr,aes192-ctr,aes256-ctr,arcfour256,arcfour128,aes128-gcm@openssh.com,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com,aes128-cbc,3des-cbc,blowfish-cbc,cast128-cbc,aes192-cbc,aes256-cbc,arcfour,rijndael-cbc@lysator.liu.se
+debug2: kex_parse_kexinit: aes128-ctr,aes192-ctr,aes256-ctr,arcfour256,arcfour128,aes128-gcm@openssh.com,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com,aes128-cbc,3des-cbc,blowfish-cbc,cast128-cbc,aes192-cbc,aes256-cbc,arcfour,rijndael-cbc@lysator.liu.se
+debug2: kex_parse_kexinit: hmac-md5-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-ripemd160-etm@openssh.com,hmac-sha1-96-etm@openssh.com,hmac-md5-96-etm@openssh.com,hmac-md5,hmac-sha1,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-ripemd160,hmac-ripemd160@openssh.com,hmac-sha1-96,hmac-md5-96
+debug2: kex_parse_kexinit: hmac-md5-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-ripemd160-etm@openssh.com,hmac-sha1-96-etm@openssh.com,hmac-md5-96-etm@openssh.com,hmac-md5,hmac-sha1,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-ripemd160,hmac-ripemd160@openssh.com,hmac-sha1-96,hmac-md5-96
+debug2: kex_parse_kexinit: none,zlib@openssh.com
+debug2: kex_parse_kexinit: none,zlib@openssh.com
+debug2: kex_parse_kexinit: 
+debug2: kex_parse_kexinit: 
+debug2: first_kex_follows 0 
+debug2: reserved 0 
+debug1: kex: server->client chacha20-poly1305@openssh.com <implicit> none
+debug1: kex: client->server chacha20-poly1305@openssh.com <implicit> none
+debug1: kex: curve25519-sha256@libssh.org need=64 dh_need=64
+debug1: kex: curve25519-sha256@libssh.org need=64 dh_need=64
+debug1: expecting SSH2_MSG_KEX_ECDH_REPLY
+debug1: Server host key: ecdsa-sha2-nistp256 SHA256:euFm4lELwwUdS98RQ42YVTGDFGqOr4K9l8yopDmpM7Q
+debug3: hostkeys_foreach: reading file "/home/vagrant/.ssh/known_hosts"
+The authenticity of host '172.17.0.9 (172.17.0.9)' can't be established.
+ECDSA key fingerprint is SHA256:euFm4lELwwUdS98RQ42YVTGDFGqOr4K9l8yopDmpM7Q.
+ECDSA key fingerprint is MD5:83:d3:05:c1:4b:44:93:af:4a:2d:05:35:b1:ef:50:fa.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '172.17.0.9' (ECDSA) to the list of known hosts.
+debug2: set_newkeys: mode 1
+debug1: SSH2_MSG_NEWKEYS sent
+debug1: expecting SSH2_MSG_NEWKEYS
+debug2: set_newkeys: mode 0
+debug1: SSH2_MSG_NEWKEYS received
+debug1: SSH2_MSG_SERVICE_REQUEST sent
+debug2: service_accept: ssh-userauth
+debug1: SSH2_MSG_SERVICE_ACCEPT received
+debug2: key: /home/vagrant/.ssh/id_rsa ((nil)),
+debug2: key: /home/vagrant/.ssh/id_dsa ((nil)),
+debug2: key: /home/vagrant/.ssh/id_ecdsa ((nil)),
+debug2: key: /home/vagrant/.ssh/id_ed25519 ((nil)),
+debug1: Authentications that can continue: publickey,password
+debug3: start over, passed a different list publickey,password
+debug3: preferred publickey,keyboard-interactive,password
+debug3: authmethod_lookup publickey
+debug3: remaining preferred: keyboard-interactive,password
+debug3: authmethod_is_enabled publickey
+debug1: Next authentication method: publickey
+debug1: Trying private key: /home/vagrant/.ssh/id_rsa
+debug3: no such identity: /home/vagrant/.ssh/id_rsa: No such file or directory
+debug1: Trying private key: /home/vagrant/.ssh/id_dsa
+debug3: no such identity: /home/vagrant/.ssh/id_dsa: No such file or directory
+debug1: Trying private key: /home/vagrant/.ssh/id_ecdsa
+debug3: no such identity: /home/vagrant/.ssh/id_ecdsa: No such file or directory
+debug1: Trying private key: /home/vagrant/.ssh/id_ed25519
+debug3: no such identity: /home/vagrant/.ssh/id_ed25519: No such file or directory
+debug2: we did not send a packet, disable method
+debug3: authmethod_lookup password
+debug3: remaining preferred: ,password
+debug3: authmethod_is_enabled password
+debug1: Next authentication method: password
+root@172.17.0.9's password: 
+debug2: we sent a password packet, wait for reply
+debug1: Authentication succeeded (password).
+Authenticated to 172.17.0.9 ([172.17.0.9]:22).
+debug1: channel 0: new [client-session]
+debug3: ssh_session2_open: channel_new: 0
+debug2: channel 0: send open
+debug1: Requesting no-more-sessions@openssh.com
+debug1: Entering interactive session.
+debug2: callback start
+debug2: fd 3 setting TCP_NODELAY
+debug3: ssh_packet_set_tos: set IP_TOS 0x10
+debug2: client_session2_setup: id 0
+debug2: channel 0: request pty-req confirm 1
+debug2: channel 0: request shell confirm 1
+debug2: callback done
+debug2: channel 0: open confirm rwindow 0 rmax 32768
+debug2: channel_input_status_confirm: type 99 id 0
+debug2: PTY allocation request accepted on channel 0
+debug2: channel 0: rcvd adjust 2097152
+debug2: channel_input_status_confirm: type 99 id 0
+debug2: shell request accepted on channel 0
+lastlog_openseek: Couldn't stat /var/log/lastlog: No such file or directory
+lastlog_openseek: Couldn't stat /var/log/lastlog: No such file or directory
+debug1: PAM: reinitializing credentials
+debug1: permanently_set_uid: 0/0
+Environment:
+  USER=root
+  LOGNAME=root
+  HOME=/root
+  PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+  MAIL=/var/mail/root
+  SHELL=/bin/bash
+  SSH_CLIENT=172.17.0.1 56744 22
+  SSH_CONNECTION=172.17.0.1 56744 172.17.0.9 22
+  SSH_TTY=/dev/pts/0
+  TERM=xterm-256color
+[root@c6cbf015bd13 ~]# exit
+logout
+debug2: channel 0: rcvd eof
+debug2: channel 0: output open -> drain
+debug2: channel 0: obuf empty
+debug2: channel 0: close_write
+debug2: channel 0: output drain -> closed
+debug1: client_input_channel_req: channel 0 rtype exit-status reply 0
+debug1: client_input_channel_req: channel 0 rtype eow@openssh.com reply 0
+debug2: channel 0: rcvd eow
+debug2: channel 0: close_read
+debug2: channel 0: input open -> closed
+debug2: channel 0: rcvd close
+debug3: channel 0: will not send data after close
+debug2: channel 0: almost dead
+debug2: channel 0: gc: notify user
+debug2: channel 0: gc: user detached
+debug2: channel 0: send close
+debug2: channel 0: is dead
+debug2: channel 0: garbage collecting
+debug1: channel 0: free: client-session, nchannels 1
+debug3: channel 0: status: The following connections are open:
+  #0 client-session (t4 r0 i3/0 o3/0 fd -1/-1 cc -1)
+
+Connection to 172.17.0.9 closed.
+Transferred: sent 2720, received 3000 bytes, in 23.2 seconds
+Bytes per second: sent 117.2, received 129.2
+debug1: Exit status 0

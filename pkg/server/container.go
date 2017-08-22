@@ -216,6 +216,9 @@ func (m *myService) runContainer(req *pb.DockerRunData) (*pb.DockerRunData, erro
 	if 0 < req.HostConfig.Resources.Memory {
 		chc.Resources.Memory = req.HostConfig.Resources.Memory
 	}
+	if 0 < req.HostConfig.Resources.MemorySwap && req.HostConfig.Resources.Memory <= req.HostConfig.Resources.MemorySwap {
+		chc.Resources.MemorySwap = req.HostConfig.Resources.MemorySwap
+	}
 	if 0 != len(req.HostConfig.Resources.CgroupParent) {
 		chc.Resources.CgroupParent = req.HostConfig.Resources.CgroupParent
 	}

@@ -1056,30 +1056,36 @@ type EchoServiceClient interface {
 	//     {
 	//       "image": "nginx",
 	//       "cmd": [
-	//         "to execute command and args, for example: /bin/bash -c ..."
+	//         "-c", "printenv && ls /usr/share/nginx/html && nginx -g \"daemon off;\""
 	//       ],
 	//       "entrypoint": [
-	//         "just like docker run --entrypoint=..."
+	//         "/bin/bash"
 	//       ],
 	//       "env": [
-	//         "GOAPTH=/opt/go",
-	//         "GOROOT=/usr/local/bin/go"
-	//       ]
+	//         "GOAPTH=/home/vagrant/go",
+	//         "JAVA_HOME=/opt/jdk1.8.0_112"
+	//       ],
 	//       "exposed_ports":
 	//         {
 	//           "value":
 	//             {
 	//               "80": "webui"
 	//             }
+	//         },
+	//       "volumes":
+	//         {
+	//           "/etc/nginx/nginx.conf": "sysconf",
+	//           "/etc/nginx/conf.d/default.conf": "usrconf",
+	//           "/usr/share/nginx/html/": "usrdata"
 	//         }
 	//     },
 	//   "host_config":
 	//     {
 	//       "binds": [
-	//         "/host/path/a:/etc/nginx/nginx.conf,Z",
-	//         "/host/paht/b:/etc/nginx/conf.d/default.conf:Z",
-	//         "/host/path/c:/usr/share/nginx/html:ro"
-	//       ]
+	//         "/home/vagrant/project-php/etc/nginx.conf:/etc/nginx/nginx.conf,Z",
+	//         "/home/vagrant/project-php/etc/default.conf:/etc/nginx/conf.d/default.conf:Z",
+	//         "/home/vagrant/project-php/src/:/usr/share/nginx/html/:ro"
+	//       ],
 	//       "port_bindings":
 	//         {
 	//           "value":
@@ -1089,7 +1095,7 @@ type EchoServiceClient interface {
 	//                   "host_port": "80"
 	//                 }
 	//             }
-	//         }
+	//         },
 	//       "resources":
 	//         {
 	//           "memory": 300000000
@@ -1311,30 +1317,36 @@ type EchoServiceServer interface {
 	//     {
 	//       "image": "nginx",
 	//       "cmd": [
-	//         "to execute command and args, for example: /bin/bash -c ..."
+	//         "-c", "printenv && ls /usr/share/nginx/html && nginx -g \"daemon off;\""
 	//       ],
 	//       "entrypoint": [
-	//         "just like docker run --entrypoint=..."
+	//         "/bin/bash"
 	//       ],
 	//       "env": [
-	//         "GOAPTH=/opt/go",
-	//         "GOROOT=/usr/local/bin/go"
-	//       ]
+	//         "GOAPTH=/home/vagrant/go",
+	//         "JAVA_HOME=/opt/jdk1.8.0_112"
+	//       ],
 	//       "exposed_ports":
 	//         {
 	//           "value":
 	//             {
 	//               "80": "webui"
 	//             }
+	//         },
+	//       "volumes":
+	//         {
+	//           "/etc/nginx/nginx.conf": "sysconf",
+	//           "/etc/nginx/conf.d/default.conf": "usrconf",
+	//           "/usr/share/nginx/html/": "usrdata"
 	//         }
 	//     },
 	//   "host_config":
 	//     {
 	//       "binds": [
-	//         "/host/path/a:/etc/nginx/nginx.conf,Z",
-	//         "/host/paht/b:/etc/nginx/conf.d/default.conf:Z",
-	//         "/host/path/c:/usr/share/nginx/html:ro"
-	//       ]
+	//         "/home/vagrant/project-php/etc/nginx.conf:/etc/nginx/nginx.conf,Z",
+	//         "/home/vagrant/project-php/etc/default.conf:/etc/nginx/conf.d/default.conf:Z",
+	//         "/home/vagrant/project-php/src/:/usr/share/nginx/html/:ro"
+	//       ],
 	//       "port_bindings":
 	//         {
 	//           "value":
@@ -1344,7 +1356,7 @@ type EchoServiceServer interface {
 	//                   "host_port": "80"
 	//                 }
 	//             }
-	//         }
+	//         },
 	//       "resources":
 	//         {
 	//           "memory": 300000000

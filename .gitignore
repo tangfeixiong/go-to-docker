@@ -1,7 +1,8 @@
 bin/
 temp*
 tmp*
-*.txt
+/*.txt
+docs/*.txt
 *.cert
 *.crt
 *.key
