@@ -38,7 +38,8 @@ go-install:
 	go install -v ./
 
 go-build:
-	@CGO_ENABLED=0 go build -v -o ./bin/gotodocker --installsuffix ./ 
+	@CGO_ENABLED=0 go build -a -v -o ./bin/gotodocker --installsuffix cgo -ldflags "-s" ./
+	#@CGO_ENABLED=0 go build -v -o ./bin/gotodocker -tags netgo -installsuffix netgo -ldflags "-s" ./
 
 docker-build: go-build
 	docker build -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) ./

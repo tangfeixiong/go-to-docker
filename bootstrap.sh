@@ -11,12 +11,13 @@ fi
 
 inst=$(docker ps -qaf name=go-to-docker)
 if [[ ! -z $inst ]]; then
-    docker stop $inst
+    docker stop $inst 2>/dev/null
 	docker rm $inst
 fi
 
-if [[ ! -z $(docker images -qf dangling=true) ]]; then
-	docker rmi $(docker images -qf dangling=true)
+dimg=$(docker images -qf dangling=true)
+if [[ ! -z $dimg ]]; then
+	docker rmi $dimg 2>/dev/null
 fi
 
 conf=$(cat $HOME/.docker/config.json | tr -d '\n\t ')

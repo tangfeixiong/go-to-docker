@@ -1052,45 +1052,59 @@ type EchoServiceClient interface {
 	//
 	// Input/Output is a same protobuf/json object. For input:
 	// {
-	// --"config":
-	// ----{
-	// ------"image": "nginx",
-	// ------"exposed_ports":
-	// --------{
-	// ----------"value":
-	// ------------{
-	// --------------"80": "webui"
-	// ------------}
-	// --------}
-	// ----},
-	// --"host_config":
-	// ----{
+	//   "config":
+	//     {
+	//       "image": "nginx",
+	//       "cmd": [
+	//         "to execute command and args, for example: /bin/bash -c ..."
+	//       ],
+	//       "entrypoint": [
+	//         "just like docker run --entrypoint=..."
+	//       ],
+	//       "env": [
+	//         "GOAPTH=/opt/go",
+	//         "GOROOT=/usr/local/bin/go"
+	//       ]
+	//       "exposed_ports":
+	//         {
+	//           "value":
+	//             {
+	//               "80": "webui"
+	//             }
+	//         }
+	//     },
+	//   "host_config":
+	//     {
 	//       "binds": [
 	//         "/host/path/a:/etc/nginx/nginx.conf,Z",
 	//         "/host/paht/b:/etc/nginx/conf.d/default.conf:Z",
 	//         "/host/path/c:/usr/share/nginx/html:ro"
 	//       ]
-	// ------"port_bindings":
-	// --------{
-	// ----------"value":
-	// ------------{
-	// --------------"80":
-	// ----------------{
-	// ------------------"host_port": "80"
-	// ----------------}
-	// ------------}
-	// --------}
-	// ----},
-	// --"network_config":
-	// ----{
-	// ----},
-	// --"container_name": "nginx"
+	//       "port_bindings":
+	//         {
+	//           "value":
+	//             {
+	//               "80":
+	//                 {
+	//                   "host_port": "80"
+	//                 }
+	//             }
+	//         }
+	//       "resources":
+	//         {
+	//           "memory": 300000000
+	//         }
+	//     },
+	//   "network_config":
+	//     {
+	//     },
+	//   "container_name": "nginx"
 	// }
-	// And returning information append this object for output:
+	// For output, plus returning elements:
 	// {
-	// --"state_code": 0,  // succeeded, otherwise none zero
-	// --"state_message": "if failed, provide error information",
-	// --"container_id": "regturned from docker engine"
+	//   "state_code": 0, // succeeded, otherwise none zero
+	//   "state_message": "if failed, provide error information"
+	//   "container_id": "returning value of docker engine"
 	// }
 	RunContainer(ctx context.Context, in *DockerRunData, opts ...grpc.CallOption) (*DockerRunData, error)
 	// Run containers with a user namespace information
@@ -1293,45 +1307,59 @@ type EchoServiceServer interface {
 	//
 	// Input/Output is a same protobuf/json object. For input:
 	// {
-	// --"config":
-	// ----{
-	// ------"image": "nginx",
-	// ------"exposed_ports":
-	// --------{
-	// ----------"value":
-	// ------------{
-	// --------------"80": "webui"
-	// ------------}
-	// --------}
-	// ----},
-	// --"host_config":
-	// ----{
+	//   "config":
+	//     {
+	//       "image": "nginx",
+	//       "cmd": [
+	//         "to execute command and args, for example: /bin/bash -c ..."
+	//       ],
+	//       "entrypoint": [
+	//         "just like docker run --entrypoint=..."
+	//       ],
+	//       "env": [
+	//         "GOAPTH=/opt/go",
+	//         "GOROOT=/usr/local/bin/go"
+	//       ]
+	//       "exposed_ports":
+	//         {
+	//           "value":
+	//             {
+	//               "80": "webui"
+	//             }
+	//         }
+	//     },
+	//   "host_config":
+	//     {
 	//       "binds": [
 	//         "/host/path/a:/etc/nginx/nginx.conf,Z",
 	//         "/host/paht/b:/etc/nginx/conf.d/default.conf:Z",
 	//         "/host/path/c:/usr/share/nginx/html:ro"
 	//       ]
-	// ------"port_bindings":
-	// --------{
-	// ----------"value":
-	// ------------{
-	// --------------"80":
-	// ----------------{
-	// ------------------"host_port": "80"
-	// ----------------}
-	// ------------}
-	// --------}
-	// ----},
-	// --"network_config":
-	// ----{
-	// ----},
-	// --"container_name": "nginx"
+	//       "port_bindings":
+	//         {
+	//           "value":
+	//             {
+	//               "80":
+	//                 {
+	//                   "host_port": "80"
+	//                 }
+	//             }
+	//         }
+	//       "resources":
+	//         {
+	//           "memory": 300000000
+	//         }
+	//     },
+	//   "network_config":
+	//     {
+	//     },
+	//   "container_name": "nginx"
 	// }
-	// And returning information append this object for output:
+	// For output, plus returning elements:
 	// {
-	// --"state_code": 0,  // succeeded, otherwise none zero
-	// --"state_message": "if failed, provide error information",
-	// --"container_id": "regturned from docker engine"
+	//   "state_code": 0, // succeeded, otherwise none zero
+	//   "state_message": "if failed, provide error information"
+	//   "container_id": "returning value of docker engine"
 	// }
 	RunContainer(context.Context, *DockerRunData) (*DockerRunData, error)
 	// Run containers with a user namespace information

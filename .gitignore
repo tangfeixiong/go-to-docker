@@ -5,7 +5,6 @@ tmp*
 *.cert
 *.crt
 *.key
-runtests_curl.sh
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
