@@ -689,6 +689,113 @@ func (m *myService) containersTerminating(req *pb.ProvisioningsData) (*pb.Provis
 	return resp, nil
 }
 
+func (m *myService) psContainers(req *pb.DockerProcessStatusReqResp) (*pb.DockerProcessStatusReqResp, error) {
+	resp := new(pb.DockerProcessStatusReqResp)
+
+	opt := types.ContainerListOptions{
+		All:    true,
+		Filter: filters.NewArgs(),
+	}
+	if nil != req && nil != req.Options {
+		opt.Quiet = req.Options.Quiet
+		opt.Size = req.Options.Size_
+		opt.All = req.Options.All
+		opt.Latest = req.Options.Latest
+		opt.Since = req.Options.Since
+		opt.Before = req.Options.Before
+		opt.Limit = int(req.Options.Limit)
+		if nil != req.Options.Filter {
+			for k, v := range req.Options.Filter.Fields {
+				for kvp, _ := range v.Value {
+					opt.Filter.Add(k, kvp)
+				}
+			}
+		}
+		resp.Options = req.Options
+	}
+
+	ctl := dockerctl.NewEngine1_12Client()
+	resultcontainers, err := ctl.ProcessStatusContainers(opt)
+	if nil != err {
+		resp.StateCode = 100
+		resp.StateMessage = err.Error()
+		return resp, fmt.Errorf("Failed to get containers status: %s", err.Error())
+	}
+
+	resp.Containers = make([]*moby.Container, len(resultcontainers))
+	for i := 0; i < len(resultcontainers); i++ {
+		resp.Containers[i] = &moby.Container{
+			Id:         resultcontainers[i].ID,
+			Names:      resultcontainers[i].Names,
+			Image:      resultcontainers[i].Image,
+			ImageId:    resultcontainers[i].ImageID,
+			Command:    resultcontainers[i].Command,
+			Created:    resultcontainers[i].Created,
+			Ports:      make([]*moby.Port, len(resultcontainers[i].Ports)),
+			SizeRw:     resultcontainers[i].SizeRw,
+			SizeRootFs: resultcontainers[i].SizeRootFs,
+			Labels:     resultcontainers[i].Labels,
+			State:      resultcontainers[i].State,
+			Status:     resultcontainers[i].Status,
+			HostConfig: &moby.Container_HostConfig{},
+			NetworkSettings: &moby.SummaryNetworkSettings{
+				Networks: make(map[string]*moby.EndpointSettings),
+			},
+			Mounts: make([]*moby.MountPoint, len(resultcontainers[i].Mounts)),
+		}
+		for j := 0; j < len(resultcontainers[i].Ports); j++ {
+			resp.Containers[i].Ports[j] = &moby.Port{
+				Ip:          resultcontainers[i].Ports[j].IP,
+				PrivatePort: int32(resultcontainers[i].Ports[j].PrivatePort),
+				PublicPort:  int32(resultcontainers[i].Ports[j].PublicPort),
+				Type:        resultcontainers[i].Ports[j].Type,
+			}
+		}
+		if len(resultcontainers[i].HostConfig.NetworkMode) > 0 {
+			resp.Containers[i].HostConfig.NetworkMode = resultcontainers[i].HostConfig.NetworkMode
+		}
+		if len(resultcontainers[i].NetworkSettings.Networks) > 0 {
+			for k, v := range resultcontainers[i].NetworkSettings.Networks {
+				resp.Containers[i].NetworkSettings.Networks[k] = &moby.EndpointSettings{
+					IpamConfig: &moby.EndpointIPAMConfig{
+					// LinkLocalIps: v.IPAMConfig.LinkLoclIPs,
+					},
+					Links:               v.Links,
+					Aliases:             v.Aliases,
+					NetworkId:           v.NetworkID,
+					EndpointId:          v.EndpointID,
+					Gateway:             v.Gateway,
+					IpAddress:           v.IPAddress,
+					IpPrefixLen:         int32(v.IPPrefixLen),
+					Ipv6Gateway:         v.IPv6Gateway,
+					GlobalIpv6Address:   v.GlobalIPv6Address,
+					GlobalIpv6PrefixLen: int32(v.GlobalIPv6PrefixLen),
+					MacAddress:          v.MacAddress,
+					// DriverOpts:          v.DriverOpts,
+				}
+				if v.IPAMConfig != nil {
+					resp.Containers[i].NetworkSettings.Networks[k].IpamConfig.Ipv4Address = v.IPAMConfig.IPv4Address
+					resp.Containers[i].NetworkSettings.Networks[k].IpamConfig.Ipv6Address = v.IPAMConfig.IPv6Address
+				}
+			}
+		}
+		if len(resultcontainers[i].Mounts) > 0 {
+			for j := 0; j < len(resultcontainers[i].Mounts); j++ {
+				resp.Containers[i].Mounts[j] = &moby.MountPoint{
+					Name:        resultcontainers[i].Mounts[j].Name,
+					Source:      resultcontainers[i].Mounts[j].Source,
+					Destination: resultcontainers[i].Mounts[j].Destination,
+					Driver:      resultcontainers[i].Mounts[j].Driver,
+					Mode:        resultcontainers[i].Mounts[j].Mode,
+					Rw:          resultcontainers[i].Mounts[j].RW,
+					Propagation: resultcontainers[i].Mounts[j].Propagation,
+				}
+			}
+		}
+	}
+	return resp, nil
+}
+
 func (m *myService) reapInstantiation(req *pb.InstantiationData) (*pb.InstantiationData, error) {
 	resp := new(pb.InstantiationData)
 	if nil == req || 0 == len(req.Name) {
@@ -736,10 +843,11 @@ func (m *myService) reapInstantiation(req *pb.InstantiationData) (*pb.Instantiat
 			},
 			Mounts: make([]*moby.MountPoint, len(item.Mounts)),
 		})
+		l := len(resp.Instantiation)
 		// for _, v := range item.Ports {
 		for i := 0; i < len(item.Ports); i++ {
-			// resp.Instantiation[len(resp.Instantiation)-1].Ports = append(resp.Instantiation[len(resp.Instantiation)-1].Ports, &moby.Port{
-			resp.Instantiation[len(resp.Instantiation)-1].Ports[i] = &moby.Port{
+			// resp.Instantiation[l-1].Ports = append(resp.Instantiation[l-1].Ports, &moby.Port{
+			resp.Instantiation[l-1].Ports[i] = &moby.Port{
 				Ip:          item.Ports[i].IP,
 				PrivatePort: int32(item.Ports[i].PrivatePort),
 				PublicPort:  int32(item.Ports[i].PublicPort),
@@ -747,11 +855,11 @@ func (m *myService) reapInstantiation(req *pb.InstantiationData) (*pb.Instantiat
 			}
 		}
 		if len(item.HostConfig.NetworkMode) > 0 {
-			resp.Instantiation[len(resp.Instantiation)-1].HostConfig.NetworkMode = item.HostConfig.NetworkMode
+			resp.Instantiation[l-1].HostConfig.NetworkMode = item.HostConfig.NetworkMode
 		}
 		if len(item.NetworkSettings.Networks) > 0 {
 			for k, v := range item.NetworkSettings.Networks {
-				resp.Instantiation[len(resp.Instantiation)-1].NetworkSettings.Networks[k] = &moby.EndpointSettings{
+				resp.Instantiation[l-1].NetworkSettings.Networks[k] = &moby.EndpointSettings{
 					IpamConfig: &moby.EndpointIPAMConfig{
 					// LinkLocalIps: v.IPAMConfig.LinkLoclIPs,
 					},
@@ -769,22 +877,24 @@ func (m *myService) reapInstantiation(req *pb.InstantiationData) (*pb.Instantiat
 					// DriverOpts:          v.DriverOpts,
 				}
 				if v.IPAMConfig != nil {
-					resp.Instantiation[len(resp.Instantiation)-1].NetworkSettings.Networks[k].IpamConfig.Ipv4Address = v.IPAMConfig.IPv4Address
-					resp.Instantiation[len(resp.Instantiation)-1].NetworkSettings.Networks[k].IpamConfig.Ipv6Address = v.IPAMConfig.IPv6Address
+					resp.Instantiation[l-1].NetworkSettings.Networks[k].IpamConfig.Ipv4Address = v.IPAMConfig.IPv4Address
+					resp.Instantiation[l-1].NetworkSettings.Networks[k].IpamConfig.Ipv6Address = v.IPAMConfig.IPv6Address
 				}
 			}
 		}
 		if len(item.Mounts) > 0 {
-			for _, v := range item.Mounts {
-				resp.Instantiation[len(resp.Instantiation)-1].Mounts = append(resp.Instantiation[len(resp.Instantiation)-1].Mounts, &moby.MountPoint{
-					Name:        v.Name,
-					Source:      v.Source,
-					Destination: v.Destination,
-					Driver:      v.Driver,
-					Mode:        v.Mode,
-					Rw:          v.RW,
-					Propagation: v.Propagation,
-				})
+			// for _, v := range item.Mounts {
+			for i := 0; i < len(item.Mounts); i++ {
+				// resp.Instantiation[l-1].Mounts = append(resp.Instantiation[l-1].Mounts, &moby.MountPoint{
+				resp.Instantiation[l-1].Mounts[i] = &moby.MountPoint{
+					Name:        item.Mounts[i].Name,
+					Source:      item.Mounts[i].Source,
+					Destination: item.Mounts[i].Destination,
+					Driver:      item.Mounts[i].Driver,
+					Mode:        item.Mounts[i].Mode,
+					Rw:          item.Mounts[i].RW,
+					Propagation: item.Mounts[i].Propagation,
+				}
 			}
 		}
 	}

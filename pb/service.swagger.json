@@ -68,6 +68,75 @@
         ]
       }
     },
+    "/v1/network-creation": {
+      "post": {
+        "operationId": "CreateDockerNetwork",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbDockerNetworkCreationReqResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbDockerNetworkCreationReqResp"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/networks": {
+      "get": {
+        "operationId": "ReapDockerNetwork",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbDockerNetworkData"
+            }
+          }
+        },
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
+    "/v1/process-statuses": {
+      "post": {
+        "summary": "Like 'docker ps' command",
+        "operationId": "ProcessStatuses",
+        "responses": {
+          "200": {
+            "description": "",
+            "schema": {
+              "$ref": "#/definitions/pbDockerProcessStatusReqResp"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbDockerProcessStatusReqResp"
+            }
+          }
+        ],
+        "tags": [
+          "EchoService"
+        ]
+      }
+    },
     "/v1/provisions": {
       "post": {
         "summary": "Run containers with a user namespace information",
@@ -127,7 +196,7 @@
     "/v1/reap-instantiation": {
       "post": {
         "summary": "Find containers with instantiating of a user namespace",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n--\"name\": \"fighter and target\"\n--\"namespace\": \"default\"\n--\"metadata\":\n----{\n------\"categroy_name\": \"default\",\n------\"class_name\": \"default\"\n------\"field_name\": \"default\"\n----}\n}\nFor output, plus a returning object:\n{\n--// Objects copy of input\n--\"instantiation\": [\n----{\n------// List of Moby Container type\n----}\n--]\n}",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"name\": \"fighter and target\"\n  \"namespace\": \"default\"\n  \"metadata\":\n    {\n      \"categroy_name\": \"default\",\n      \"class_name\": \"default\"\n      \"field_name\": \"default\"\n    }\n}\nFor output, plus a returning object:\n{\n  \"instantiation\": [\n    {\n      // List of Moby Container type\n    }\n  ]\n}",
         "operationId": "ReapInstantiation",
         "responses": {
           "200": {
@@ -155,7 +224,7 @@
     "/v1/reap-registry": {
       "post": {
         "summary": "List registry, include Docker Hub, or private registry (using .docker/config.json)",
-        "description": "Input/Output is a same protobuf/json object. For input:\n{\n--\"repositories\": [\n----{\n------name: \"127.0.0.1:5000\"\n----}\n--]\n}\nFor output, plus a returning object:\n{\n--// Objects copy of input\n--\"repositories\": [\n----{\n------name: \"127.0.0.1:5000\",\n------catalogs: [\n--------{\n----------\"name\": \"nginx\",\n----------\"tags\": [\n------------{\n--------------\"name\": \"latest\"\n------------}\n----------]\n--------}\n------]\n----}\n--],\n--\"state_code\": 0,  // Value greater than zero indicates error \n--\"state_message\": \"...\" // Usually error message \n}",
+        "description": "Input/Output is a same protobuf/json object. For input:\n{\n  \"repositories\": [\n    {\n      name: \"127.0.0.1:5000\"\n    }\n  ]\n}\nFor output, plus a returning object:\n{\n  \"repositories\": [\n    {\n      name: \"127.0.0.1:5000\",\n      catalogs: [\n        {\n          \"name\": \"nginx\",\n          \"tags\": [\n            {\n              \"name\": \"latest\"\n            }\n          ]\n        }\n      ]\n    }\n  ],\n  \"state_code\": 0,  // Value greater than zero indicates error \n  \"state_message\": \"...\" // Usually error message \n}",
         "operationId": "ReapRegistryForRepositories",
         "responses": {
           "200": {
@@ -434,6 +503,18 @@
         "port_no": {
           "type": "string",
           "format": "string"
+        }
+      }
+    },
+    "FiltersArgsValue": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean",
+            "format": "boolean"
+          }
         }
       }
     },
@@ -857,6 +938,43 @@
       },
       "title": "ContainerJSONBase contains response of Remote API:\nGET \"/containers/{name:.*}/json\""
     },
+    "mobyContainerListOptions": {
+      "type": "object",
+      "properties": {
+        "all": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "before": {
+          "type": "string",
+          "format": "string"
+        },
+        "filter": {
+          "$ref": "#/definitions/mobyFiltersArgs"
+        },
+        "latest": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "quiet": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "since": {
+          "type": "string",
+          "format": "string"
+        },
+        "size": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      },
+      "description": "ContainerListOptions holds parameters to list containers with."
+    },
     "mobyContainerNode": {
       "type": "object",
       "properties": {
@@ -1131,6 +1249,18 @@
         }
       },
       "title": "EndpointSettings stores the network endpoint details"
+    },
+    "mobyFiltersArgs": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/FiltersArgsValue"
+          }
+        }
+      },
+      "title": "Args stores filter arguments as map key:{map key: bool}.\nIt contains an aggregation of the map of arguments (which are in the form\nof -f 'key=value') based on the key, and stores values for the same key\nin a map with string keys and boolean values.\ne.g given -f 'label=label1=1' -f 'label=label2=2' -f 'image.name=ubuntu'\nthe args will be {\"image.name\":{\"ubuntu\":true},\"label\":{\"label1=1\":true,\"label2=2\":true}}"
     },
     "mobyGraphDriverData": {
       "type": "object",
@@ -1487,6 +1617,72 @@
         }
       },
       "description": "MountPoint represents a mount point configuration inside the container."
+    },
+    "mobyNetworkCreate": {
+      "type": "object",
+      "properties": {
+        "check_duplicate": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "driver": {
+          "type": "string",
+          "format": "string"
+        },
+        "enable_ipv6": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "internal": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "ipam": {
+          "$ref": "#/definitions/mobyIPAM"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "format": "string"
+          }
+        }
+      },
+      "title": "NetworkCreate is the expected body of the \"create network\" http request message"
+    },
+    "mobyNetworkCreateRequest": {
+      "type": "object",
+      "properties": {
+        "Name": {
+          "type": "string",
+          "format": "string"
+        },
+        "network_create": {
+          "$ref": "#/definitions/mobyNetworkCreate"
+        }
+      },
+      "description": "NetworkCreateRequest is the request message sent to the server for network create call."
+    },
+    "mobyNetworkCreateResponse": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "string"
+        },
+        "warning": {
+          "type": "string",
+          "format": "string"
+        }
+      },
+      "title": "NetworkCreateResponse is the response message sent by the server for network create call"
     },
     "mobyNetworkResource": {
       "type": "object",
@@ -2000,6 +2196,66 @@
             "type": "string",
             "format": "string"
           }
+        }
+      }
+    },
+    "pbDockerNetworkCreationReqResp": {
+      "type": "object",
+      "properties": {
+        "network_create_request": {
+          "$ref": "#/definitions/mobyNetworkCreateRequest"
+        },
+        "network_create_response": {
+          "$ref": "#/definitions/mobyNetworkCreateResponse"
+        },
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "pbDockerNetworkData": {
+      "type": "object",
+      "properties": {
+        "network_resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyNetworkResource"
+          }
+        },
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
+        }
+      }
+    },
+    "pbDockerProcessStatusReqResp": {
+      "type": "object",
+      "properties": {
+        "containers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/mobyContainer"
+          }
+        },
+        "options": {
+          "$ref": "#/definitions/mobyContainerListOptions"
+        },
+        "state_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "state_message": {
+          "type": "string",
+          "format": "string"
         }
       }
     },

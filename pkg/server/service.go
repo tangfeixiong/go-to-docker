@@ -53,8 +53,8 @@ func (m *myService) ReapRegistryForRepositories(ctx context.Context, in *pb.Regi
 	return m.reapRegistryForRepositories(in)
 }
 
-func (m *myService) InspectImage(ctx context.Context, in *pb.ImageArchiveData) (*pb.ImageArchiveData, error) {
-	return nil, fmt.Errorf("not ready")
+func (m *myService) ProcessStatuses(ctx context.Context, req *pb.DockerProcessStatusReqResp) (*pb.DockerProcessStatusReqResp, error) {
+	return m.psContainers(req)
 }
 
 func (m *myService) ProvisionContainers(ctx context.Context, in *pb.ProvisioningsData) (*pb.ProvisioningsData, error) {
@@ -67,6 +67,14 @@ func (m *myService) TerminationContainers(ctx context.Context, in *pb.Provisioni
 
 func (m *myService) ReapInstantiation(ctx context.Context, req *pb.InstantiationData) (*pb.InstantiationData, error) {
 	return m.reapInstantiation(req)
+}
+
+func (m *myService) ReapDockerNetwork(ctx context.Context, req *pb.DockerNetworkData) (*pb.DockerNetworkData, error) {
+	return m.reapDockerNetworking(req)
+}
+
+func (m *myService) CreateDockerNetwork(ctx context.Context, req *pb.DockerNetworkCreationReqResp) (*pb.DockerNetworkCreationReqResp, error) {
+	return m.createDockerNetwork(req)
 }
 
 func (m *myService) SnoopBridgedNetworkLandscape(ctx context.Context, req *pb.BridgedNetworkingData) (*pb.BridgedNetworkingData, error) {

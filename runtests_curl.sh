@@ -55,6 +55,27 @@ case $1 in
   "container_name": "nginx"
 }'
         ;;
+    psContainers)
+        curl -X POST http://172.17.4.50:10052/v1/process-statuses -d \
+'{
+    "options":
+	  {
+		"filter":
+		  {
+			"fields":
+			  {
+			    "name":
+				  {
+					"value":
+					  {
+				        "go-to-docker": true
+				      }
+			      }	
+			  }
+		  }
+	  }	
+}'		
+        ;;
     test-provisions)
         curl -X POST http://172.17.4.50:10052/v1/provisions -d \
 '{
@@ -134,7 +155,38 @@ case $1 in
 	]
 }'
         ;;
-		
+    network-ls)
+        curl -X GET http://172.17.4.50:10052/v1/networks
+        ;;		
+    network-create)
+        curl -X POST http://172.17.4.50:10052/v1/network-creation -d \
+'{
+  "network_create_request":
+    {
+      "network_create":
+        {
+          "ipam":
+            {
+              "config":[
+                {
+                  "subnet": "172.25.0.0/16",
+                  "ip_range": "172.25.1.0/24",
+                  "gateway": "172.25.1.1"
+                }
+              ]
+            },
+          "options":
+            {
+			  "com.docker.network.driver.mtu": "1500"
+            },
+          "labels":
+            {
+            }
+        },
+      "name": "brtest0"
+	}
+}'
+        ;;		
     *)
         echo "test method required!"
         ;;

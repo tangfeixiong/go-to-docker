@@ -80,6 +80,19 @@ func request_EchoService_RunContainer_0(ctx context.Context, marshaler runtime.M
 
 }
 
+func request_EchoService_ProcessStatuses_0(ctx context.Context, marshaler runtime.Marshaler, client EchoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DockerProcessStatusReqResp
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.ProcessStatuses(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
 func request_EchoService_ProvisionContainers_0(ctx context.Context, marshaler runtime.Marshaler, client EchoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq ProvisioningsData
 	var metadata runtime.ServerMetadata
@@ -128,6 +141,36 @@ func request_EchoService_ReapRegistryForRepositories_0(ctx context.Context, mars
 	}
 
 	msg, err := client.ReapRegistryForRepositories(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+var (
+	filter_EchoService_ReapDockerNetwork_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
+
+func request_EchoService_ReapDockerNetwork_0(ctx context.Context, marshaler runtime.Marshaler, client EchoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DockerNetworkData
+	var metadata runtime.ServerMetadata
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_EchoService_ReapDockerNetwork_0); err != nil {
+		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.ReapDockerNetwork(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func request_EchoService_CreateDockerNetwork_0(ctx context.Context, marshaler runtime.Marshaler, client EchoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq DockerNetworkCreationReqResp
+	var metadata runtime.ServerMetadata
+
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+		return nil, metadata, grpc.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	msg, err := client.CreateDockerNetwork(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
@@ -272,6 +315,34 @@ func RegisterEchoServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn
 
 	})
 
+	mux.Handle("POST", pattern_EchoService_ProcessStatuses_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+		if cn, ok := w.(http.CloseNotifier); ok {
+			go func(done <-chan struct{}, closed <-chan bool) {
+				select {
+				case <-done:
+				case <-closed:
+					cancel()
+				}
+			}(ctx.Done(), cn.CloseNotify())
+		}
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, req)
+		if err != nil {
+			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+		}
+		resp, md, err := request_EchoService_ProcessStatuses_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EchoService_ProcessStatuses_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("POST", pattern_EchoService_ProvisionContainers_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -384,6 +455,62 @@ func RegisterEchoServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn
 
 	})
 
+	mux.Handle("GET", pattern_EchoService_ReapDockerNetwork_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+		if cn, ok := w.(http.CloseNotifier); ok {
+			go func(done <-chan struct{}, closed <-chan bool) {
+				select {
+				case <-done:
+				case <-closed:
+					cancel()
+				}
+			}(ctx.Done(), cn.CloseNotify())
+		}
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, req)
+		if err != nil {
+			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+		}
+		resp, md, err := request_EchoService_ReapDockerNetwork_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EchoService_ReapDockerNetwork_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_EchoService_CreateDockerNetwork_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+		if cn, ok := w.(http.CloseNotifier); ok {
+			go func(done <-chan struct{}, closed <-chan bool) {
+				select {
+				case <-done:
+				case <-closed:
+					cancel()
+				}
+			}(ctx.Done(), cn.CloseNotify())
+		}
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, req)
+		if err != nil {
+			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+		}
+		resp, md, err := request_EchoService_CreateDockerNetwork_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_EchoService_CreateDockerNetwork_0(ctx, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("POST", pattern_EchoService_SnoopBridgedNetworkLandscape_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
@@ -450,6 +577,8 @@ var (
 
 	pattern_EchoService_RunContainer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "containers"}, ""))
 
+	pattern_EchoService_ProcessStatuses_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "process-statuses"}, ""))
+
 	pattern_EchoService_ProvisionContainers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "provisions"}, ""))
 
 	pattern_EchoService_TerminationContainers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "terminations"}, ""))
@@ -457,6 +586,10 @@ var (
 	pattern_EchoService_ReapInstantiation_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "reap-instantiation"}, ""))
 
 	pattern_EchoService_ReapRegistryForRepositories_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "reap-registry"}, ""))
+
+	pattern_EchoService_ReapDockerNetwork_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "networks"}, ""))
+
+	pattern_EchoService_CreateDockerNetwork_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "network-creation"}, ""))
 
 	pattern_EchoService_SnoopBridgedNetworkLandscape_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "snooping-brns"}, ""))
 
@@ -470,6 +603,8 @@ var (
 
 	forward_EchoService_RunContainer_0 = runtime.ForwardResponseMessage
 
+	forward_EchoService_ProcessStatuses_0 = runtime.ForwardResponseMessage
+
 	forward_EchoService_ProvisionContainers_0 = runtime.ForwardResponseMessage
 
 	forward_EchoService_TerminationContainers_0 = runtime.ForwardResponseMessage
@@ -477,6 +612,10 @@ var (
 	forward_EchoService_ReapInstantiation_0 = runtime.ForwardResponseMessage
 
 	forward_EchoService_ReapRegistryForRepositories_0 = runtime.ForwardResponseMessage
+
+	forward_EchoService_ReapDockerNetwork_0 = runtime.ForwardResponseMessage
+
+	forward_EchoService_CreateDockerNetwork_0 = runtime.ForwardResponseMessage
 
 	forward_EchoService_SnoopBridgedNetworkLandscape_0 = runtime.ForwardResponseMessage
 

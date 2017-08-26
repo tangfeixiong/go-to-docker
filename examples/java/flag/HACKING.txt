@@ -1097,3 +1097,67 @@ Token删除完成
 [INFO] Total time: 01:52 min
 [INFO] Finished at: 2017-08-22T18:33:05+00:00
 [INFO] Final Memory: 63M/512M
+
+
+[vagrant@localhost flag]$ mvn docker:build
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Flag 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- docker-maven-plugin:0.21.0:build (default-cli) @ Flag ---
+[INFO] Copying files to /Users/fanhongling/Downloads/workspace/src/flag/target/docker/172.17.4.50/5000/cepo-flag/latest/build/maven
+[INFO] Building tar: /Users/fanhongling/Downloads/workspace/src/flag/target/docker/172.17.4.50/5000/cepo-flag/latest/tmp/docker-build.tar
+[INFO] DOCKER> [172.17.4.50:5000/cepo-flag:latest]: Created docker-build.tar in 10 seconds 
+[INFO] DOCKER> [172.17.4.50:5000/cepo-flag:latest]: Built image sha256:e2e83
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 04:46 min
+[INFO] Finished at: 2017-08-23T20:20:46+00:00
+[INFO] Final Memory: 21M/326M
+[INFO] ------------------------------------------------------------------------
+[vagrant@localhost flag]$ docker inspect -f {{.NetworkSettings.IPAddress}} demo
+172.17.0.9
+[vagrant@localhost flag]$ docker run -ti -e SPRING_DATASOURCE_URL=jdbc:mysql://172.17.0.9:3306/testdb --rm 172.17.4.50:5000/cepo-flag
+OpenJDK 64-Bit Server VM warning: ignoring option PermSize=128m; support was removed in 8.0
+OpenJDK 64-Bit Server VM warning: ignoring option MaxPermSize=256m; support was removed in 8.0
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v1.5.3.RELEASE)
+
+2017-08-23 20:23:27.150  INFO 1 --- [           main] cn.com.isc.App                           : Starting App v0.0.1-SNAPSHOT on 14890f3f376a with PID 1 (/flag.jar started by root in /)
+2017-08-23 20:23:27.163  INFO 1 --- [           main] cn.com.isc.App                           : No active profile set, falling back to default profiles: default
+2017-08-23 20:23:27.424  INFO 1 --- [           main] ationConfigEmbeddedWebApplicationContext : Refreshing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@5387f9e0: startup date [Wed Aug 23 20:23:27 UTC 2017]; root of context hierarchy
+2017-08-23 20:23:31.629  INFO 1 --- [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration' of type [org.springframework.transaction.annotation.ProxyTransactionManagementConfiguration$$EnhancerBySpringCGLIB$$928ca191] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2017-08-23 20:23:32.612  INFO 1 --- [           main] s.b.c.e.t.TomcatEmbeddedServletContainer : Tomcat initialized with port(s): 8082 (http)
+2017-08-23 20:23:32.659  INFO 1 --- [           main] o.apache.catalina.core.StandardService   : Starting service Tomcat
+2017-08-23 20:23:32.665  INFO 1 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet Engine: Apache Tomcat/8.5.14
+2017-08-23 20:23:33.517  INFO 1 --- [ost-startStop-1] org.apache.jasper.servlet.TldScanner     : At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+2017-08-23 20:23:33.784  INFO 1 --- [ost-startStop-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2017-08-23 20:23:33.785  INFO 1 --- [ost-startStop-1] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 6378 ms
+2017-08-23 20:23:34.771  INFO 1 --- [ost-startStop-1] j.LocalContainerEntityManagerFactoryBean : Building JPA container EntityManagerFactory for persistence unit 'default'
+2017-08-23 20:23:34.819  INFO 1 --- [ost-startStop-1] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [
+	name: default
+	...]
+2017-08-23 20:23:35.115  INFO 1 --- [ost-startStop-1] org.hibernate.Version                    : HHH000412: Hibernate Core {5.0.12.Final}
+2017-08-23 20:23:35.120  INFO 1 --- [ost-startStop-1] org.hibernate.cfg.Environment            : HHH000206: hibernate.properties not found
+2017-08-23 20:23:35.125  INFO 1 --- [ost-startStop-1] org.hibernate.cfg.Environment            : HHH000021: Bytecode provider name : javassist
+
+...
+
+Hibernate: select token0_.id as id1_4_, token0_.team_no as team_no2_4_, token0_.token_value as token_va3_4_ from token token0_
+Token????
+2017-08-23 20:23:44.436  INFO 1 --- [           main] cn.com.isc.App                           : Started App in 18.399 seconds (JVM running for 20.159)
+??????????
+^C2017-08-23 20:30:25.013  INFO 1 --- [       Thread-4] ationConfigEmbeddedWebApplicationContext : Closing org.springframework.boot.context.embedded.AnnotationConfigEmbeddedWebApplicationContext@5387f9e0: startup date [Wed Aug 23 20:23:27 UTC 2017]; root of context hierarchy
+2017-08-23 20:30:25.016  INFO 1 --- [       Thread-4] o.s.c.support.DefaultLifecycleProcessor  : Stopping beans in phase 2147483647
+2017-08-23 20:30:25.019  INFO 1 --- [       Thread-4] o.s.j.e.a.AnnotationMBeanExporter        : Unregistering JMX-exposed beans on shutdown
+2017-08-23 20:30:25.030  INFO 1 --- [       Thread-4] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+

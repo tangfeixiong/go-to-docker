@@ -102,6 +102,15 @@ service EchoService {
     };
   }
 
+  // Like 'docker ps' command
+  //
+  rpc ProcessStatuses(DockerProcessStatusReqResp) returns (DockerProcessStatusReqResp) {
+    option (google.api.http) = {
+        post: "/v1/process-statuses"
+        body: "*"
+    };
+  }
+
   // Run containers with a user namespace information
   //
   // Input/Output is a same protobuf/json object. For input:
@@ -155,23 +164,22 @@ service EchoService {
   //
   // Input/Output is a same protobuf/json object. For input:
   // {
-  // --"name": "fighter and target"
-  // --"namespace": "default"
-  // --"metadata":
-  // ----{
-  // ------"categroy_name": "default",
-  // ------"class_name": "default"
-  // ------"field_name": "default"
-  // ----}
+  //   "name": "fighter and target"
+  //   "namespace": "default"
+  //   "metadata":
+  //     {
+  //       "categroy_name": "default",
+  //       "class_name": "default"
+  //       "field_name": "default"
+  //     }
   // }
   // For output, plus a returning object:
   // {
-  // --// Objects copy of input
-  // --"instantiation": [
-  // ----{
-  // ------// List of Moby Container type
-  // ----}
-  // --]
+  //   "instantiation": [
+  //     {
+  //       // List of Moby Container type
+  //     }
+  //   ]
   // }
   rpc ReapInstantiation(InstantiationData) returns (InstantiationData) {
     option (google.api.http) = {
@@ -184,36 +192,48 @@ service EchoService {
   //
   // Input/Output is a same protobuf/json object. For input:
   // {
-  // --"repositories": [
-  // ----{
-  // ------name: "127.0.0.1:5000"
-  // ----}
-  // --]
+  //   "repositories": [
+  //     {
+  //       name: "127.0.0.1:5000"
+  //     }
+  //   ]
   // }
   // For output, plus a returning object:
   // {
-  // --// Objects copy of input
-  // --"repositories": [
-  // ----{
-  // ------name: "127.0.0.1:5000",
-  // ------catalogs: [
-  // --------{
-  // ----------"name": "nginx",
-  // ----------"tags": [
-  // ------------{
-  // --------------"name": "latest"
-  // ------------}
-  // ----------]
-  // --------}
-  // ------]
-  // ----}
-  // --],
-  // --"state_code": 0,  // Value greater than zero indicates error 
-  // --"state_message": "..." // Usually error message 
+  //   "repositories": [
+  //     {
+  //       name: "127.0.0.1:5000",
+  //       catalogs: [
+  //         {
+  //           "name": "nginx",
+  //           "tags": [
+  //             {
+  //               "name": "latest"
+  //             }
+  //           ]
+  //         }
+  //       ]
+  //     }
+  //   ],
+  //   "state_code": 0,  // Value greater than zero indicates error 
+  //   "state_message": "..." // Usually error message 
   // }
   rpc ReapRegistryForRepositories(RegistryRepositoryData) returns (RegistryRepositoryData) {
     option (google.api.http) = {
         post: "/v1/reap-registry"
+        body: "*"
+    };
+  }
+
+  rpc ReapDockerNetwork(DockerNetworkData) returns (DockerNetworkData) {
+    option (google.api.http) = {
+        get: "/v1/networks"
+    };
+  }
+
+  rpc CreateDockerNetwork(DockerNetworkCreationReqResp) returns (DockerNetworkCreationReqResp) {
+    option (google.api.http) = {
+        post: "/v1/network-creation"
         body: "*"
     };
   }
@@ -256,6 +276,13 @@ message DockerPullData {
     string state_message = 3;
     string image_id = 4;
     string progress_report = 5;
+}
+
+message DockerProcessStatusReqResp {
+    moby.ContainerListOptions options = 1;
+    repeated moby.Container containers = 2;
+    int32 state_code = 3;
+    string state_message = 4;
 }
 
 message DockerContainerInspection {
@@ -333,6 +360,13 @@ message DockerNetworkData {
     repeated moby.NetworkResource network_resources = 1;
     int32 state_code = 2;
     string state_message = 3;
+}
+
+message DockerNetworkCreationReqResp {
+    moby.NetworkCreateRequest network_create_request = 1;
+    moby.NetworkCreateResponse network_create_response = 2;
+    int32 state_code = 3;
+    string state_message = 4;
 }
 
 message BridgedNetworkingData {

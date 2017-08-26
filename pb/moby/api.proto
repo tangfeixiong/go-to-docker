@@ -600,6 +600,50 @@ message NetworkResource {
 	map<string, string> labels = 10;    
 }
 
+// EndpointResource contains network resources allocated and used for a container in a network
+message EndpointResource {
+	string name = 1;
+	string endpoint_id = 2;
+	string mac_address = 3;
+	string ipv4_address = 4;
+	string ipv6_address = 5;
+}
+
+// NetworkCreate is the expected body of the "create network" http request message
+message NetworkCreate {
+	bool check_duplicate = 1;
+	string driver = 2;
+	bool enable_ipv6 = 3;
+	IPAM ipam = 4;
+	bool internal = 5;
+	map<string, string> options = 6;
+ 	map<string, string> labels = 7;
+}
+
+// NetworkCreateRequest is the request message sent to the server for network create call.
+message NetworkCreateRequest {
+	NetworkCreate network_create = 1;
+	string Name = 2;
+}
+
+// NetworkCreateResponse is the response message sent by the server for network create call
+message NetworkCreateResponse {
+	string id = 1;
+	string warning = 2;
+}
+
+// NetworkConnect represents the data to be used to connect a container to the network
+message NetworkConnect {
+	string container = 1;
+	EndpointSettings endpoint_config = 2;
+}
+
+// NetworkDisconnect represents the data to be used to disconnect a container from the network
+message NetworkDisconnect {
+	string container = 1;
+	bool force = 2;
+}
+
 // IPAM represents IP Address Management
 message IPAM {
 	string driver = 1;
@@ -613,15 +657,6 @@ message IPAMConfig {
 	string ip_range = 2;
 	string gateway = 3;
 	map<string, string> aux_address = 4;
-}
-
-// EndpointResource contains network resources allocated and used for a container in a network
-message EndpointResource {
-	string name = 1;
-	string endpoint_id = 2;
-	string mac_address = 3;
-	string ipv4_address = 4;
-	string ipv6_address = 5;
 }
 
 
@@ -643,7 +678,21 @@ message Image {
 message ImageListOptions {
 	string match_name = 1;
 	bool all = 2;
-	FiltersArgs filters = 3;   
+	FiltersArgs filter = 3;   
+}
+
+
+
+// ContainerListOptions holds parameters to list containers with.
+message ContainerListOptions {
+	bool quiet = 1;
+	bool size = 2;
+	bool all = 3;
+	bool latest = 4;
+	string since = 5;
+	string before = 6;
+	int32 limit = 7;
+	FiltersArgs filter = 8;
 }
 
 

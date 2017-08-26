@@ -47,7 +47,7 @@ docker-build: go-build
 docker-push: docker-build
 	docker push $(IMG_NS)/$(IMG_REPO):$(IMG_TAG)
 
-docker-run: docker-build
+docker-run:
 	$(shell ./bootstrap.sh "172.17.4.50:5000" "/etc/docker/certs.d/172.17.4.50:5000/ca.crt")
 
 .PHONY: all protoc-grpc protoc-moby go-install go-build docker-build docker-push docker-run

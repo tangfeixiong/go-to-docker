@@ -1,7 +1,11 @@
 package server
 
 import (
-	// "fmt"
+	"fmt"
+
+	"github.com/docker/engine-api/types"
+	"github.com/docker/engine-api/types/network"
+	"github.com/golang/glog"
 
 	"github.com/tangfeixiong/go-to-docker/pb"
 	"github.com/tangfeixiong/go-to-docker/pb/moby"
@@ -54,6 +58,66 @@ func (m *myService) reapDockerNetworking(req *pb.DockerNetworkData) (*pb.DockerN
 				Ipv6Address: v.IPv6Address,
 			}
 		}
+	}
+
+	return resp, nil
+}
+
+func (m *myService) createDockerNetwork(req *pb.DockerNetworkCreationReqResp) (*pb.DockerNetworkCreationReqResp, error) {
+	resp := new(pb.DockerNetworkCreationReqResp)
+	if nil == req.NetworkCreateRequest {
+		return resp, fmt.Errorf("Request required")
+	}
+	if nil == req.NetworkCreateRequest.NetworkCreate {
+		return resp, fmt.Errorf("Network Creation required")
+	}
+	if nil == req.NetworkCreateRequest.NetworkCreate.Ipam {
+		return resp, fmt.Errorf("IPAM required")
+	}
+	if 0 == len(req.NetworkCreateRequest.NetworkCreate.Ipam.Config) {
+		return resp, fmt.Errorf("IPAM Config required")
+	}
+	if 0 == len(req.NetworkCreateRequest.Name) {
+		return resp, fmt.Errorf("Network Name required")
+	}
+	resp.NetworkCreateRequest = req.NetworkCreateRequest
+
+	ctl := dockerctl.NewEngine1_12Client()
+
+	creation := types.NetworkCreate{
+		CheckDuplicate: req.NetworkCreateRequest.NetworkCreate.CheckDuplicate,
+		Driver:         req.NetworkCreateRequest.NetworkCreate.Driver,
+		EnableIPv6:     req.NetworkCreateRequest.NetworkCreate.EnableIpv6,
+		IPAM: network.IPAM{
+			Driver:  req.NetworkCreateRequest.NetworkCreate.Ipam.Driver,
+			Options: req.NetworkCreateRequest.NetworkCreate.Ipam.Options,
+			Config:  make([]network.IPAMConfig, len(req.NetworkCreateRequest.NetworkCreate.Ipam.Config)),
+		},
+		Internal: req.NetworkCreateRequest.NetworkCreate.Internal,
+		Options:  req.NetworkCreateRequest.NetworkCreate.Options,
+		Labels:   req.NetworkCreateRequest.NetworkCreate.Labels,
+	}
+	i := 0
+	for _, v := range req.NetworkCreateRequest.NetworkCreate.Ipam.Config {
+		creation.IPAM.Config[i] = network.IPAMConfig{
+			Subnet:     v.Subnet,
+			IPRange:    v.IpRange,
+			Gateway:    v.Gateway,
+			AuxAddress: v.AuxAddress,
+		}
+		i++
+	}
+
+	ncresp, err := ctl.CreateNetwork(req.NetworkCreateRequest.Name, creation)
+	if err != nil {
+		resp.StateCode = 1
+		resp.StateMessage = fmt.Sprintf("Could not perform creation, Error: %s", err.Error())
+		glog.Info(resp.StateMessage)
+		return resp, err
+	}
+	resp.NetworkCreateResponse = &moby.NetworkCreateResponse{
+		Id:      ncresp.ID,
+		Warning: ncresp.Warning,
 	}
 
 	return resp, nil

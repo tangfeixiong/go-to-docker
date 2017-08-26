@@ -9,7 +9,7 @@ LABEL maintainer="tangfeixiong <tangfx128@gmail.com>" \
 ARG jarTgt
 ARG javaOpt
 
-COPY /maven/${jarTgt:-Flag.jar} /
+COPY /maven/${jarTgt:-Flag.jar} /flag.jar
 
 ENV JAVA_OPTIONS="${javaOpt:-'-Xms128m -Xmx512m -XX:PermSize=128m -XX:MaxPermSize=256m'}" \
     SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3306/testdb" \
@@ -33,4 +33,4 @@ RUN set -x \
 # This default user is created in the openshift/base-centos7 image
 # USER 1001
 
-CMD java -Djava.security.egd=file:/dev/./urandom $JAVA_OPTIONS -jar /${jarTgt:-Flag.jar}
+CMD java -Djava.security.egd=file:/dev/./urandom $JAVA_OPTIONS -jar /flag.jar

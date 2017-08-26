@@ -179,7 +179,7 @@ func (mc *Engine1_12Client) RemoveContainer(containerid string) error {
 }
 
 func (mc *Engine1_12Client) ProcessStatusContainers(opt types.ContainerListOptions) ([]types.Container, error) {
-	glog.Infoln("Go to list container:", opt)
+	glog.Infof("Go to list container: %+v", opt)
 
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -242,6 +242,23 @@ func (mc *Engine1_12Client) InspectNetwork(networkid string) (types.NetworkResou
 	if err != nil {
 		glog.V(2).Infoln("Could not list network:", err.Error())
 		return types.NetworkResource{}, fmt.Errorf("Failed to list network. %v", err)
+	}
+	return resp, nil
+}
+
+func (mc *Engine1_12Client) CreateNetwork(name string, options types.NetworkCreate) (types.NetworkCreateResponse, error) {
+	glog.Infoln("Go to create network:")
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		glog.V(2).Infoln("Could not instantiate docker engine api:", err.Error())
+		return types.NetworkCreateResponse{}, fmt.Errorf("Failed to instantiate moby. %v", err)
+	}
+
+	resp, err := cli.NetworkCreate(context.Background(), name, options)
+	if err != nil {
+		glog.V(2).Infoln("Could not create network:", err.Error())
+		return types.NetworkCreateResponse{}, fmt.Errorf("Failed to list network. %v", err)
 	}
 	return resp, nil
 }
