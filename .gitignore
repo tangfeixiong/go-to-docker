@@ -7,6 +7,17 @@ docs/*.txt
 *.crt
 *.key
 
+/examples/java/flag/.*
+/examples/java/flag/src/main/java
+/examples/java/flag/src/main/resources
+/examples/java/flag/src/main/webapp
+/examples/java/flag/target
+/examples/java/flag/RemoteSystemsTempFiles
+/examples/python/**/*.py
+/examples/php/dynamic
+/examples/php/edusoho
+
+
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o
 *.a

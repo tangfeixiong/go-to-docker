@@ -1,0 +1,44 @@
+FROM alpine:edge
+LABEL "maintainer"="tangfeixiong <tangfx128@gmail.com>" \
+    "project"="https://github.com/tangfeixiong/go-to-docker" \
+    "name"="go-to-docker" \
+    "version"="0.1.1" \
+    "created-by"='{"namespace":"stackdocker-io","tags":"docker registry grpc grpc-gateway libpcap gopacket"}'
+
+COPY bin/gotodocker /
+
+ENV DOCKER_API_VERSION='1.12' \
+  DOCKER_CONFIG_JSON='{"auths":{"localhost:5000":{"auth":"","email":""}}}' \
+  REGISTRY_CERTS_JSON='{"localhost:5000":{"ca_base64":"","crt_base64":"","key_base64":""}}' \
+  RSA_PRIVKEYB64_JSON='{"vagrant":""}' \
+  STREAMING_HOST='FAKEHOST'
+
+# refer to https://wiki.alpinelinux.org/wiki/Intrusion_Detection_using_Snort
+RUN set -x \
+    && install_Pkgs = " \
+        libpcap \
+        #alpine-sdk 
+        #mysql-dev 
+        #php-mysql 
+        #lighttpd 
+        #php-xml 
+        #php-pear 
+        #libpcap-dev 
+        #php-gd 
+        #pcre-dev 
+        #wireshark 
+        #tcpdump 
+        #tcpflow 
+        #cvs 
+        #bison 
+        #flex 
+    " \
+    && apk add --update $install_Pkgs \
+    && rm -rf /var/cache/apk/* \
+    #curl -jkSL https://www.snort.org/downloads/snort/snort-2.9.9.0.tar.gz -o /tmp/snort.tar.gz 
+    && echo
+ 
+EXPOSE 10051 10052
+
+ENTRYPOINT ["/gotodocker", "serve"]
+CMD ["--v=2", "--logtostderr=true"]

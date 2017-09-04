@@ -1,0 +1,22 @@
+version: '2'
+
+services:
+  data:
+    image: tianon/true
+    # image: cogniteev/echo
+    # image: busybox
+    restart: restart
+    volumes:
+    # - container-data:/opt/data
+    - /opt/container-data:/opt/data
+    
+  target-alive-checker:
+    depends_on:
+    - data
+    image: tangfeixiong/target-alive-checker
+    restart: on-failure    
+    volumes_from:
+    - data
+volumes:
+#    container-data:
+#        external: true

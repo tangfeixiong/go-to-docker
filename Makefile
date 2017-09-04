@@ -6,6 +6,8 @@ GOPATHD?=/home/vagrant/go
 IMG_NS?=docker.io/tangfeixiong
 IMG_REPO?=go-to-docker
 IMG_TAG?=0.1
+GIT_COMMIT=$(shell date +%y%m%d%H%M)-git$(shell git rev-parse --short=7 HEAD)
+REGISTRY_HOST?=172.17.4.50:5000
 
 all: protoc-grpc docker-push
 
@@ -47,7 +49,12 @@ docker-build: go-build
 docker-push: docker-build
 	docker push $(IMG_NS)/$(IMG_REPO):$(IMG_TAG)
 
-docker-run:
-	$(shell ./bootstrap.sh "172.17.4.50:5000" "/etc/docker/certs.d/172.17.4.50:5000/ca.crt")
+docker-cgo:
+	go build -v -a -o ./bin/gotodocker ./
+	docker build -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG)-$(GIT_COMMIT) -f Dockerfile.cgo ./
+	docker push $(IMG_NS)/$(IMG_REPO):$(IMG_TAG)
 
-.PHONY: all protoc-grpc protoc-moby go-install go-build docker-build docker-push docker-run
+docker-run:
+	$(info $(shell ./bootstrap.sh $(REGISTRY_HOST) "/etc/docker/certs.d/$(REGISTRY_HOST)/ca.crt"))
+
+.PHONY: all protoc-grpc protoc-moby go-install go-build docker-build docker-push docker-cgo docker-run

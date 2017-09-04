@@ -1,3 +1,5 @@
+// +build !cgo
+
 package server
 
 import (
@@ -11,11 +13,15 @@ import (
 func (m *myService) sniffEtherNetworking(req *pb.EthernetSniffingData) (*pb.EthernetSniffingData, error) {
 	resp := new(pb.EthernetSniffingData)
 
-	if nil == req || "" == req.Iface {
-		resp.StateCode = 10
-		resp.StateMessage = "Request required"
-		return resp, fmt.Errorf("Request required")
-	}
+	resp.StateCode = 999
+	resp.StateMessage = "Not running with CGO disabled"
+	return resp, fmt.Errorf(resp.StateMessage)
+
+	//	if nil == req || "" == req.Iface {
+	//		resp.StateCode = 10
+	//		resp.StateMessage = "Request required"
+	//		return resp, fmt.Errorf("Request required")
+	//	}
 
 	//	content, err := gopacketctl.PcapdumpOnce(req.Iface, time.Second*3)
 	//	if nil != err {
@@ -25,8 +31,4 @@ func (m *myService) sniffEtherNetworking(req *pb.EthernetSniffingData) (*pb.Ethe
 	//	}
 	//	resp.StatsAndPackets = content
 	//	return resp, err
-
-	resp.StateCode = 999
-	resp.StateMessage = "Not running with docker container"
-	return resp, fmt.Errorf(resp.StateMessage)
 }
