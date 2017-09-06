@@ -16,6 +16,7 @@ docs/*.txt
 /examples/python/**/*.py
 /examples/php/dynamic
 /examples/php/edusoho
+/examples/php/rival
 
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)

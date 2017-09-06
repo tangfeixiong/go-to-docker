@@ -5,6 +5,8 @@
 #   https://github.com/dcharbonnier/alpine-docker-cron   
 #   https://github.com/renskiy/cron-docker-image/tree/master/alpine
 #   https://forums.docker.com/t/how-to-run-a-cron-job-inside-a-container-alpine/7759
+#   https://github.com/matriphe/docker-alpine-php/blob/master/5.6/CLI/Dockerfile
+#   https://github.com/wodby/php
 #   https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
 FROM alpine
 LABEL maintainer='tangfeixiong <tangfx128@gmail.com>' \
@@ -12,20 +14,40 @@ LABEL maintainer='tangfeixiong <tangfx128@gmail.com>' \
       name="cron" \
       namespace="stackdocker" \
       annotation='{"stackdocker.io/created-by":""}' \
-      tag = "alpine cron python"
+      tag="alpine cron python"
 
 RUN set -x \
-    && apk add --update bash wget curl git php php-curl php-openssl php-json php-phar php-dom python py-pip mysql-client \
+    && apk add --update \
+        bash \
+        curl \
+        wget \
+        git \
+        mysql-client \
+        php5 \
+        php5-cli \
+        php5-common \
+        php5-gd \
+        php5-phar \
+        php5-curl \
+        php5-mysql \
+        php5-openssl \
+        php5-json \
+        php5-dom \
+        python \
+        py-pip \
+        py-mysqldb \
     && rm -rf /var/cache/apk/* \
 # python 
     && pip install MySQL-python redis \
+# php
+    && ln -sf /usr/bin/php5 /usr/bin/php \
 # php composer
     #curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer 
     && wget https://raw.githubusercontent.com/composer/getcomposer.org/master/web/installer -O - -q | php -- --quiet \
 # finally
     && echo    
 
-COPY app.sh *.py app/
+COPY docker-entrypoint.sh *.py app/
 WORKDIR app/
 
 RUN touch crontab.tmp \
