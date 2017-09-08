@@ -39,9 +39,14 @@ import:
   version: a22138067af1c4942683050411a841ade67fe1eb
 - package: github.com/spf13/cobra
 - package: github.com/spf13/pflag
+- package: golang.org/x/crypto
 - package: golang.org/x/net
   subpackages:
   - context
+  - http2
+  - net
+  - trace
+- package: golang.org/x/text
 - package: google.golang.org/grpc
   version: v1.0.4
   subpackages:

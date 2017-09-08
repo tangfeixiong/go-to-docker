@@ -1,0 +1,49 @@
+syntax = "proto3";
+package pb;
+
+import "google/api/annotations.proto";
+
+service CounselorService {
+  rpc CreateCheck(CheckActionReqResp) returns (CheckActionReqResp) {
+    option (google.api.http) = {
+	  post: "/v1/checkactions"
+      body: "*"
+    };
+  }
+
+  rpc ReapCheck(CheckActionReqResp) returns (CheckActionReqResp) {
+    option (google.api.http) = {
+	  get: "/v1/checkactions/{name}"
+	  additional_bindings {
+	    get: "/v1/checkactions"
+	  }
+    };
+  }
+
+  rpc UpdateCheck(CheckActionReqResp) returns (CheckActionReqResp) {
+    option (google.api.http) = {
+	  put: "/v1/checkactions/{name}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteCheck(CheckActionReqResp) returns (CheckActionReqResp) {
+    option (google.api.http) = {
+	  delete: "/v1/checkactions/{name}"
+    };
+  }
+}
+
+message CheckActionReqResp {
+    string name = 1;
+    repeated string command = 2;
+    repeated string args = 3;
+    repeated string env = 4;
+    map<string, string> conf = 5;
+    string work_dir = 6;
+    int32 periodic = 7;
+    string state_code = 8;
+    string state_message = 9;
+    string timestamp = 10;
+    string destination_path = 11;
+}
