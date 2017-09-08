@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"syscall"
@@ -37,6 +38,7 @@ type myCounselor struct {
 	webXCheckerCM          map[string]*counselor.WebXCheckerConfigMgmt
 	redisSentinelAddresses string
 	redisAddresses         []string
+	redisDB                int
 	etcdAddresses          string
 	mysqlAddress           string
 	gnatsdAddresses        string
@@ -48,6 +50,7 @@ type myCounselor struct {
 	subSubject             string
 	subQueue               string
 	pubSubject             string
+	cmCache                string
 	unsubCh                chan string
 	pubCh                  chan []byte
 }
@@ -58,8 +61,9 @@ func Run() {
 	mc.httpHost = ":10062"
 	mc.webXCheckerCM = make(map[string]*counselor.WebXCheckerConfigMgmt)
 	mc.redisAddresses = make([]string, 0)
-	mc.priorityCMDB = []string{"sentinel redis etcd mysql"}
-	mc.priorityMQ = []string{"sentinel redis gnatsd kafka rabbit"}
+	mc.pubSubject = "checkalive"
+	mc.priorityCMDB = []string{"sentinel", "redis", "etcd", "mysql"}
+	mc.priorityMQ = []string{"sentinel", "redis", "gnatsd", "kafka", "rabbit"}
 
 	if v, ok := os.LookupEnv("CHECKALIVE_GRPC_PORT"); ok && 0 != len(v) {
 		if strings.Contains(v, ":") {
@@ -88,6 +92,14 @@ func Run() {
 	if v, ok := os.LookupEnv("DATABUS_REDIS_HOST"); ok {
 		mc.redisAddresses = append(mc.redisAddresses, v)
 	}
+	if v, ok := os.LookupEnv("DATABUS_REDIS_DB"); ok {
+		if n, err := strconv.Atoi(v); err != nil {
+			glog.Infoln("Failed to parse Redis Db number, using default: ", err)
+		} else {
+			mc.redisDB = n
+		}
+	}
+
 	if v, ok := os.LookupEnv("DATABUS_ETCD_HOSTS"); ok {
 		mc.etcdAddresses = v
 	}
@@ -106,6 +118,14 @@ func Run() {
 	}
 	if v, ok := os.LookupEnv("DATABUS_RABBIT_HOST"); ok {
 		mc.rabbitAddress = v
+	}
+
+	if v, ok := os.LookupEnv("CHECK_MESSAGE_PUBSUB"); ok && v != "" {
+		mc.pubSubject = v
+	}
+
+	if v, ok := os.LookupEnv("CHECK_CM_CACHE"); ok && v != "" {
+		mc.cmCache = v
 	}
 
 	if v, ok := os.LookupEnv("DATABUS_PRIORITY_CMDB"); ok && v != "" {
@@ -276,7 +296,6 @@ func (m *myCounselor) CreateWebXCheck(ctx context.Context, req *healthcheckerpb.
 
 	var found error = errors.New("Stop recursive searching")
 	err := filepath.Walk(m.packgesHome, func(path string, f os.FileInfo, err error) error {
-		println(path)
 		switch {
 		case path == m.packgesHome:
 			return nil
@@ -461,6 +480,7 @@ func (m *myCounselor) DeleteCheck(ctx context.Context, req *healthcheckerpb.Chec
 }
 
 func (m *myCounselor) writeRedis(content *healthcheckerpb.CheckActionReqResp) error {
+	glog.Infoln("write cm into cache")
 	k := content.Name
 	v, err := json.Marshal(content)
 	if err != nil {
@@ -472,7 +492,7 @@ func (m *myCounselor) writeRedis(content *healthcheckerpb.CheckActionReqResp) er
 	//		v = []byte(content.StateMessage)
 	//	}
 
-	c, err := redis.DialURL(m.redisAddresses[0])
+	c, err := redis.DialURL(fmt.Sprintf("redis://%s", m.redisAddresses[0]), redis.DialDatabase(m.redisDB))
 	if err != nil {
 		// handle connection error
 		glog.Infoln("Could not open cache service,", err.Error())
@@ -480,11 +500,20 @@ func (m *myCounselor) writeRedis(content *healthcheckerpb.CheckActionReqResp) er
 	}
 	defer c.Close()
 
-	if err := c.Send("SET", k, string(v)); err != nil {
-		glog.Infof("Send(%v, %v) returned error %v", k, string(v), err)
-		return fmt.Errorf("Failed to send: %s", err.Error())
+	cmk := m.cmCache + "." + k
+	//	if err := c.Send("SET", cmk, string(v)); err != nil {
+	//		glog.Infof("Send(%v, %v) returned error %v", cmk, string(v), err)
+	//		return fmt.Errorf("Failed to send: %s", err.Error())
+	//	}
+	//	c.Flush()
+
+	// if reply, err := c.Do("HMSET", cmk, "name", content.Name, "conf", content.Conf, "periodic", content.Periodic, "state_message", content.StateMessage, "timestamp", content.Timestamp); err != nil {
+	if reply, err := c.Do("SET", cmk, string(v)); err != nil {
+		glog.Infof("Failed to set cm %s: %s", cmk, err.Error())
+		return fmt.Errorf("Failed to set cm %s: %s", cmk, err.Error())
+	} else {
+		glog.Infof("Set CM %s: %v", cmk, reply)
 	}
-	c.Flush()
 	return nil
 }
 
@@ -535,6 +564,7 @@ func (m *myCounselor) writeEtcdV3(content *healthcheckerpb.CheckActionReqResp) e
 }
 
 func (m *myCounselor) publishRedis(content *healthcheckerpb.CheckActionReqResp) error {
+	glog.Infoln("public check...")
 	k := content.Name
 	v, err := json.Marshal(content)
 	if err != nil {
@@ -546,15 +576,21 @@ func (m *myCounselor) publishRedis(content *healthcheckerpb.CheckActionReqResp) 
 	//		v = []byte(content.StateMessage)
 	//	}
 
-	c, err := redis.DialURL(m.redisAddresses[0])
+	c, err := redis.DialURL(fmt.Sprintf("redis://%s", m.redisAddresses[0]), redis.DialDatabase(m.redisDB))
 	if err != nil {
 		// handle connection error
-		glog.Infoln("Could not open cache service,", err.Error())
+		glog.Infoln("Could not open subscription service,", err.Error())
 		return fmt.Errorf("Failed to connect Redis: %s", err.Error())
 	}
 	defer c.Close()
 
-	c.Do("PUBLISH", k, string(v))
+	subj := m.pubSubject + "." + k
+	if reply, err := c.Do("PUBLISH", subj, string(v)); err != nil {
+		glog.Infof("Failed to publish subject %s: %s", subj, err.Error())
+		return fmt.Errorf("Failed to publish subject %s: %s", subj, err.Error())
+	} else {
+		glog.Infof("Published subject %s: %v", subj, reply)
+	}
 	return nil
 }
 

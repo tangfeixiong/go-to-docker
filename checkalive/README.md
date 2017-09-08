@@ -249,3 +249,58 @@ go to delete check
 Ticker stopped
 ^C
 ```
+
+__Redis__
+
+Config
+```
+[vagrant@bogon go-to-docker]$ export DATABUS_REDIS_HOST=172.18.0.3:6379
+[vagrant@bogon go-to-docker]$ export DATABUS_REDIS_DB=15
+```
+
+Server
+```
+[vagrant@bogon go-to-docker]$ ./checkalive/bin/target-cm serve --v=2 --logtostderr
+Start gRPC Gateway into host :10061
+Start gRPC on host [::]:10061
+http on host: [::]:10062
+I0908 09:07:52.097088    6031 daemon.go:265] go to create check: "name:\"web1check.py\" command:\"python\" command:\"web1check.py\" conf:<key:\"hosts.list\" value:\"bG9jYWxob3N0Cg==\" > work_dir:\"web1check\" periodic:3 "
+I0908 09:07:52.097935    6031 daemon.go:290] path: web1check.py
+Visited: examples/python/checkalive/web1check/web1check.py
+filepath.Walk() returned Stop recursive searching
+config file
+Tick at 2017-09-08 09:07:55.110137239 +0000 UTC
+---------------------------------------------------------------
+checking host: localhost
+global name 'headers' is not defined
+Host: localhost seems down
+
+I0908 09:07:55.286601    6031 daemon.go:478] write cm into cache
+I0908 09:07:55.290580    6031 daemon.go:508] Set CM checkalive.web1check.py: OK
+I0908 09:07:55.290867    6031 daemon.go:560] public check...
+I0908 09:07:55.291846    6031 daemon.go:585] Published subject checkalive.web1check.py: 0
+Tick at 2017-09-08 09:07:58.11035487 +0000 UTC
+---------------------------------------------------------------
+checking host: localhost
+global name 'headers' is not defined
+Host: localhost seems down
+
+I0908 09:07:58.306364    6031 daemon.go:478] write cm into cache
+I0908 09:07:58.307305    6031 daemon.go:508] Set CM checkalive.web1check.py: OK
+I0908 09:07:58.307997    6031 daemon.go:560] public check...
+I0908 09:07:58.308896    6031 daemon.go:585] Published subject checkalive.web1check.py: 0
+^C[vagrant@bogon go-to-docker]$ 
+```
+
+Client
+```
+[vagrant@localhost go-to-docker]$ docker exec -ti gitlab_redis_1 bash
+root@fe0ae27989c4:/# redis-cli 
+127.0.0.1:6379> select 15
+OK
+127.0.0.1:6379[15]> get checkalive.web1check.py
+"{\"name\":\"web1check.py\",\"command\":[\"python\",\"web1check.py\"],\"conf\":{\"hosts.list\":\"bG9jYWxob3N0Cg==\"},\"work_dir\":\"web1check\",\"periodic\":3,\"state_message\":\"---------------------------------------------------------------\\nchecking host: localhost\\nglobal name 'headers' is not defined\\nHost: localhost seems down\\n\\n---------------------------------------------------------------\\nchecking host: localhost\\nglobal name 'headers' is not defined\\nHost: localhost seems down\\n\",\"timestamp\":\"2017-09-08T09:08:46Z\",\"destination_path\":\"examples/python/checkalive/web1check/web1check.py\"}"
+127.0.0.1:6379[15]> quit
+root@fe0ae27989c4:/# exit
+exit
+```

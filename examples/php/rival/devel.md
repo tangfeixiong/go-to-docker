@@ -38,6 +38,11 @@ Goodbye from Redis 2.8.4!
 
 ### Redis
 
+https://redis.io/topics/rediscli#showing-help-about-redis-commands
+
+* help @<category> shows all the commands about a given category. The categories are: @generic, @list, @set, @sorted_set, @hash, @pubsub, @transactions, @connection, @server, @scripting, @hyperloglog.
+* help <commandname> shows specific help for the command given as argument.
+
 pubsub
 ```
 root@fe0ae27989c4:/# redis-cli help @pubsub  

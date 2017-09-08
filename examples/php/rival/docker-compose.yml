@@ -1,0 +1,20 @@
+version: '2'
+
+services:
+  redis:
+    command:
+    - --loglevel warning
+    image: sameersbn/redis:latest
+    restart: always
+    volumes:
+    - /srv/docker/redis:/var/lib/redis:Z
+
+  checker-cm:
+    environment: 
+    - DATABUS_REDIS_HOST='redis:6379'
+    - DATABUS_REDIS_DB='15'
+    - CHECK_MESSAGE_PUBSUB='checkalive'
+    - CHECK_CM_CACHE='checkalive'
+    image: tangfeixiong/target-cm:0.1
+    restart: always
+    
