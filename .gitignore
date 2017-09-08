@@ -16,7 +16,9 @@ docs/*.txt
 /examples/python/**/*.py
 /examples/php/dynamic
 /examples/php/edusoho
-/examples/php/rival
+/examples/php/rival/think
+/examples/php/rival/vendor
+/examples/php/rival/proposal.md
 
 hosts.list
 

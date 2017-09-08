@@ -1,0 +1,15 @@
+{
+    "name": "tangfx/rival",
+    "description": "\"think worker extension test\"",
+    "type": "project",
+    "authors": [
+        {
+            "name": "tangfeixiong",
+            "email": "tangfx128@gmail.com"
+        }
+    ],
+    "require": {
+        "topthink/think-worker": "^1.0",
+        "predis/predis": "^1.1"
+    }
+}

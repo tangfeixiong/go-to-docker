@@ -28,6 +28,7 @@ RUN set -x \
         php5-common \
         php5-gd \
         php5-phar \
+        php5-posix \
         php5-curl \
         php5-mysql \
         php5-openssl \

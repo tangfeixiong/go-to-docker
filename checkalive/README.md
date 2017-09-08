@@ -193,7 +193,9 @@ Ticker stopped
 
 ```
 
-Docker test
+### Docker run
+
+For example
 ```
 [vagrant@bogon go-to-docker]$ docker run --rm -ti --name target-cm -p 10062:10062 tangfeixiong/target-cm:0.1-1709080032-git_0c88f84
 Start gRPC Gateway into host :10061
@@ -201,11 +203,6 @@ Start gRPC on host [::]:10061
 http on host: [::]:10062
 I0908 00:41:42.491245       1 daemon.go:250] go to create check: "name:\"web1check.py\" command:\"python\" command:\"web1check.py\" conf:<key:\"hosts.list\" value:\"bG9jYWxob3N0Cg==\" > work_dir:\"web1check\" periodic:3 "
 I0908 00:41:42.491405       1 daemon.go:275] path: web1check.py
-examples/python/checkalive
-examples/python/checkalive/web1check
-examples/python/checkalive/web1check/hosts.list
-examples/python/checkalive/web1check/web1check.py
-Visited: examples/python/checkalive/web1check/web1check.py
 filepath.Walk() returned Stop recursive searching
 config file
 Tick at 2017-09-08 00:41:45.587638257 +0000 UTC
