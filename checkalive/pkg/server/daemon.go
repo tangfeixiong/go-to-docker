@@ -564,7 +564,7 @@ func (m *myCounselor) writeEtcdV3(content *healthcheckerpb.CheckActionReqResp) e
 }
 
 func (m *myCounselor) publishRedis(content *healthcheckerpb.CheckActionReqResp) error {
-	glog.Infoln("public check...")
+	glog.Infoln("publish check...")
 	k := content.Name
 	v, err := json.Marshal(content)
 	if err != nil {

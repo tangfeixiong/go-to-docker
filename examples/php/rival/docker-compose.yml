@@ -9,7 +9,7 @@ services:
     volumes:
     - /srv/docker/redis:/var/lib/redis:Z
 
-  checker-cm:
+  checkmsg-subscriber:
     environment: 
     - DATABUS_REDIS_HOST='redis:6379'
     - DATABUS_REDIS_DB='15'

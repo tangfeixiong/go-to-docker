@@ -13,6 +13,7 @@ $pubsub = $client->pubSubLoop();
 
 // Subscribe to your channels
 $pubsub->subscribe('control_channel', 'notifications');
+$pubsub->psubscribe('checkalive.*');
 
 // Start processing the pubsup messages. Open a terminal and use redis-cli
 // to push messages to the channels. Examples:
@@ -37,6 +38,12 @@ foreach ($pubsub as $message) {
                      PHP_EOL, "  {$message->payload}", PHP_EOL, PHP_EOL;
             }
             break;
+        
+        case 'pmessage':
+            echo "Received the following message from {$message->channel}:",
+                 PHP_EOL, "  {$message->payload}", PHP_EOL, PHP_EOL;
+            break;
+            
     }
 }
 
