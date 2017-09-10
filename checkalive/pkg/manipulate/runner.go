@@ -25,6 +25,11 @@ type Runner interface {
 	//	Delete(string, string, string) ([]byte, error)
 	//	// Get returns Kubernetes resources
 	//	Get([]byte, string) ([]byte, error)
+	/*
+	   awd1-4-tag-1, awd1-8-tag-1, web1-2-tag-1
+	*/
+	Python_00_check(string, ...string) ([]byte, error)
+	Web1_2_check(string, ...string) ([]byte, error)
 	Web1Check(string) ([]byte, error)
 	Web2Check(string) ([]byte, error)
 }

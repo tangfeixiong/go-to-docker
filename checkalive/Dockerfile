@@ -48,7 +48,7 @@ RUN set -x \
 # finally
     && echo    
 
-COPY bin/target-cm program/ /
+COPY bin/target-cm* program/ /
 
 # default settings
 #ENV CHECKALIVE_GRPC_PORT="10061" \

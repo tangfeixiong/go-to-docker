@@ -5,6 +5,25 @@
 // package kubectl
 package manipulate
 
+func python_check(wd string, opts ...string) ([]byte, error) {
+	cmd := command(opts...)
+
+	if len(wd) != 0 {
+		cmd.Dir = wd
+	}
+
+	Path = "python"
+	return cmd.CombinedOutput()
+}
+
+func (r RealRunner) Python_00_check(wd string, opts ...string) ([]byte, error) {
+	return python_check(wd, opts...)
+}
+
+func (r RealRunner) Web1_2_check(wd string, opts ...string) ([]byte, error) {
+	return python_check(wd, opts...)
+}
+
 func webXcheck(wd, f string) ([]byte, error) {
 	args := []string{f}
 

@@ -164,12 +164,12 @@ service EchoService {
   //
   // Input/Output is a same protobuf/json object. For input:
   // {
-  //   "name": "fighter and target"
-  //   "namespace": "default"
+  //   "name": "fighter and target",
+  //   "namespace": "default",
   //   "metadata":
   //     {
   //       "categroy_name": "default",
-  //       "class_name": "default"
+  //       "class_name": "default",
   //       "field_name": "default"
   //     }
   // }

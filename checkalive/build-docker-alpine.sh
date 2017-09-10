@@ -18,6 +18,9 @@ cp -r $DIR/Dockerfile $DIR/bin $CTX
 # cp -r $DIR/../examples/php/... $CTX/program/examples/...
 
 mkdir -p $CTX/program/examples/python/checkalive
+cp -r $DIR/../examples/python/checkalive/awd1-4 $CTX/program/examples/python/checkalive
+cp -r $DIR/../examples/python/checkalive/awd1-8 $CTX/program/examples/python/checkalive
+cp -r $DIR/../examples/python/checkalive/web1-2 $CTX/program/examples/python/checkalive
 cp -r $DIR/../examples/python/checkalive/web1check $CTX/program/examples/python/checkalive
 cp -r $DIR/../examples/python/checkalive/web2check $CTX/program/examples/python/checkalive
 

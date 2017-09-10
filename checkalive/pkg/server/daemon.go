@@ -263,20 +263,85 @@ func (m *myCounselor) startGateway(ch <-chan bool) {
 }
 
 func (m *myCounselor) CreateCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
-	return m.CreateWebXCheck(ctx, req)
+	glog.Infof("go to create check: %q", req)
+	if req == nil || req.Name == "" {
+		return req, fmt.Errorf("Request required")
+	}
+	if len(req.DestConfigurations) == 0 {
+		return m.CreateWebXCheck(ctx, req)
+	}
+	return m.createAWDxCheck(ctx, req)
+}
+
+func (m *myCounselor) createAWDxCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
+	if v, ok := m.webXCheckerCM[req.Name]; ok {
+		return v.ActionReqResp, fmt.Errorf("CM of %s exists, delete or update first", req.Name)
+	}
+
+	cm := new(counselor.WebXCheckerConfigMgmt)
+	if resp, err := cm.ConfigCreation(m.packgesHome, req); err != nil {
+		return resp, err
+	}
+
+LOOPC:
+	for _, priority := range m.priorityCMDB {
+		switch priority {
+		case "sentinel":
+			break
+		case "redis":
+			if len(m.redisAddresses) > 0 {
+				cm.WriteCMDBFn = m.writeRedis
+				break LOOPC
+			}
+			break
+		case "etcd":
+			if m.etcdAddresses != "" {
+				cm.WriteCMDBFn = m.writeEtcdV3
+				break LOOPC
+			}
+			break
+		case "mysql":
+			break
+		}
+	}
+
+LOOPM:
+	for _, priority := range m.priorityMQ {
+		switch priority {
+		case "sentinel":
+			break
+		case "redis":
+			if len(m.redisAddresses) > 0 {
+				cm.WriteMQFn = m.publishRedis
+				break LOOPM
+			}
+			break
+		case "gnatsd":
+			if m.gnatsdAddresses != "" {
+				cm.WriteMQFn = m.publishGnatsd
+				break LOOPM
+			}
+			break
+		case "kafka":
+			break
+		case "rabbit":
+			break
+		}
+	}
+
+	defer cm.StartCheck()
+
+	m.webXCheckerCM[req.Name] = cm
+	return cm.ActionReqResp, nil
 }
 
 func (m *myCounselor) CreateWebXCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
-	glog.Infof("go to create check: %q", req)
 	resp := new(healthcheckerpb.CheckActionReqResp)
-	if req == nil || req.Name == "" {
-		return resp, fmt.Errorf("Request required")
-	}
 	if _, ok := m.webXCheckerCM[req.Name]; ok {
 		return resp, fmt.Errorf("CM of %s exists, delete or update first", req.Name)
 	}
 
-	var checkpath string = "awd1check.py"
+	var checkpath string = "web1check.py"
 	l := len(req.Command)
 	if l > 0 {
 		switch {

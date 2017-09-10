@@ -11,9 +11,11 @@ services:
 
   checker-cm:
     environment: 
-    - DATABUS_REDIS_HOST='redis:6379'
-    - DATABUS_REDIS_DB='15'
-    - CHECK_MESSAGE_PUBSUB='checkalive'
-    - CHECK_CM_CACHE='checkalive'
+    - DATABUS_REDIS_HOST=redis:6379
+    - DATABUS_REDIS_DB=15
+    - CHECK_MESSAGE_PUBSUB=checkalive
+    - CHECK_CM_CACHE=checkalive
     image: tangfeixiong/target-cm:0.1
+    # ports:
+    # - "10062:10062"
     restart: always

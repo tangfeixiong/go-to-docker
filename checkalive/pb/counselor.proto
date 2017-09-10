@@ -46,4 +46,20 @@ message CheckActionReqResp {
     string state_message = 9;
     string timestamp = 10;
     string destination_path = 11;
+    string selector = 12;
+    map<string, DestinationConfig> dest_configurations = 13;
+}
+
+message DestinationConfig {
+    string name = 1;
+    repeated string command = 2;
+    repeated string args = 3;
+    repeated string env = 4;
+    map<string, string> conf = 5;
+    string work_dir = 6;
+    int32 periodic = 7;
+    string state_code = 8;
+    string state_message = 9;
+    string timestamp = 10;
+    string destination_path = 11;
 }
