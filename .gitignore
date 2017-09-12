@@ -14,13 +14,14 @@ docs/*.txt
 /examples/java/flag/target
 /examples/java/flag/RemoteSystemsTempFiles
 /examples/python/**/*.py
+/examples/python/**/hosts.list
 /examples/php/dynamic
 /examples/php/edusoho
-/examples/php/rival/think
-/examples/php/rival/vendor
-/examples/php/rival/proposal.md
+/examples/php/rival/laravel-app/docs
+/examples/php/rival/laravel-app/vendor
+/examples/php/rival/pubsub/vendor
+/examples/php/rival/think5-app
 
-hosts.list
 
 # Compiled Object files, Static and Dynamic libs (Shared Objects)
 *.o

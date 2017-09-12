@@ -1,3 +1,4 @@
+# publisher
 version: '2'
 
 services:
@@ -11,9 +12,9 @@ services:
 
   checkmsg-subscriber:
     environment: 
-    - DATABUS_REDIS_HOST='redis:6379'
-    - DATABUS_REDIS_DB='15'
-    - CHECK_MESSAGE_PUBSUB='checkalive'
-    - CHECK_CM_CACHE='checkalive'
+    - DATABUS_REDIS_HOST=redis:6379
+    - DATABUS_REDIS_DB=15
+    - CHECK_MESSAGE_PUBSUB=checkalive
+    - CHECK_CM_CACHE=checkalive
     image: tangfeixiong/target-cm:0.1
     restart: always
