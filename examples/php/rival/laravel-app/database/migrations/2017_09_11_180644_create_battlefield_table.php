@@ -1,3 +1,6 @@
+// [vagrant@bogon laravel-app]$ php artisan make:migration create_battlefield_table --create=battlefield
+// Created Migration: 2017_09_11_180644_create_battlefield_table
+
 <?php
 
 use Illuminate\Support\Facades\Schema;
