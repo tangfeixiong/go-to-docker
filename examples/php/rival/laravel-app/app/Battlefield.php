@@ -60,4 +60,20 @@ class Battlefield extends Model
      */
     protected $fillable = ['name', 'description', 'match_item', 'status', 'payment'];
 
+    /**
+     * Get the networking records associated with the battlefield_id.
+     */
+    public function networkings()
+    {
+        return $this->hasOne('App\Networking');
+    }
+
+    /**
+     * Get the networking records associated with the battlefield_id.
+     */
+    public function checkalives()
+    {
+        return $this->hasOne('App\CheckAlive');
+    }
+
 }
