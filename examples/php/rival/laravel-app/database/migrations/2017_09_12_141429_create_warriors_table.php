@@ -13,7 +13,7 @@ class CreateWarriorsTable extends Migration
      */
     public function up()
     {
-        Schema::create('warriors', function (Blueprint $table) {
+        Schema::create('warrior', function (Blueprint $table) {
             // $table->increments('id');
             // $table->timestamps();
 
@@ -38,6 +38,6 @@ class CreateWarriorsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('warriors');
+        Schema::dropIfExists('warrior');
     }
 }

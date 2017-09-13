@@ -35,4 +35,11 @@ class Warrior extends Model
         return $this->belongsTo('App\WarTeam');
     }
 
+    /**
+     * Get the WarCamp record associated with the warrior_id.
+     */
+    public function warCamp()
+    {
+        return $this->hasOne('App\WarCamp');
+    }
 }

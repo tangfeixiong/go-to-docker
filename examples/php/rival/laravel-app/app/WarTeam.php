@@ -36,8 +36,16 @@ class WarTeam extends Model
     /**
      * Get the warrior for the WarTeam.
      */
-    public function warrior()
+    public function warriors()
     {
         return $this->hasMany('App\Warrior');
+    }
+
+    /**
+     * Get the WarCamp record associated with the war_team_id.
+     */
+    public function warCamps()
+    {
+        return $this->hasManyThrough('App\WarCamp', 'App\Warrior');
     }
 }

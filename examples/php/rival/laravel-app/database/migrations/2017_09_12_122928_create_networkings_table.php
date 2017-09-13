@@ -17,7 +17,7 @@ class CreateNetworkingsTable extends Migration
      */
     public function up()
     {
-        Schema::create('networkings', function (Blueprint $table) {
+        Schema::create('networking', function (Blueprint $table) {
             // $table->increments('id');
             // $table->timestamps();
 
@@ -43,6 +43,6 @@ class CreateNetworkingsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('networkings');
+        Schema::dropIfExists('networking');
     }
 }

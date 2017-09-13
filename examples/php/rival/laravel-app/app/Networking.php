@@ -17,5 +17,24 @@ class Networking extends Model
      *
      * @var array
      */
-    protected $fillable = ['battlefield_id', 'name', 'gateway', 'subnets', 'bridge', 'dns', 'host_routes', 'infra_type'];
+    protected $fillable = [
+        'battlefield_id',
+        'name',
+        'gateway',
+        'subnets',
+        'bridge',
+        'dns',
+        'host_routes',
+        'infra_type',
+    ];
+
+
+    /**
+     * Get the battlefield that owns the Networking.
+     */
+    public function battlefield()
+    {
+        return $this->belongsTo('App\Battlefield');
+    }
+
 }

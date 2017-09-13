@@ -13,7 +13,7 @@ class CreateWarTeamsTable extends Migration
      */
     public function up()
     {
-        Schema::create('war_teams', function (Blueprint $table) {
+        Schema::create('war_team', function (Blueprint $table) {
             // $table->increments('id');
             // $table->timestamps();
             
@@ -45,7 +45,7 @@ class CreateWarTeamsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('war_teams');
+        Schema::dropIfExists('war_team');
     }
 }
 
