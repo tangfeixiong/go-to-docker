@@ -12,11 +12,12 @@ class BattlefieldRepository
 // ORM
 //
     public function reapAll() {
-        return App\Battlefield::all();
+        return \App\Battlefield::all();
     }  
        
     public function reapOne($id) {
-        return App\Battlefield::where("id", "==", $id).get();
+        // return App\Battlefield::where("id", $id).get();
+        return \App\Battlefield::find($id);
     }     
     
     /**
@@ -31,7 +32,7 @@ class BattlefieldRepository
 
         $bf = new Battlefield;
 
-        $affected = $bf->fill([
+        $bf->fill([
             'name' => $name,
             'description' => $desc,
             'match_item' => $matchItem,
@@ -39,8 +40,8 @@ class BattlefieldRepository
             'payment' => $payment
         ]);
         
-        if ($affected)
-            return bf->id
+        if ($bf->save())
+            return $bf->id;
         
         // $bf = App\Battlefield::create([
         //     'name' => $name,
@@ -53,7 +54,7 @@ class BattlefieldRepository
         //     return $bf->id;
     }
     
-    pubilc function update($id, $name, $desc, $matchItem, $status='not-ready', $payment='beta')
+    public function toUpdate($id, $name, $desc, $matchItem, $status='not-ready', $payment='beta')
     {
         // Validate the ...
 
@@ -65,7 +66,7 @@ class BattlefieldRepository
                 'payment' => $payment
             ]);
             
-        return $affectedRows
+        return $affectedRows;
 
         // $bf = new Battlefield;
         
@@ -80,18 +81,18 @@ class BattlefieldRepository
         // return $bf->save()
     }
     
-    public function delete($id)
+    public function toDelete($id)
     {
         $bf = App\Battlefield::where('id', '==', $id);
         
         if ($bf.networkings().get().count() > 0)
-            return NULL
+            return NULL;
         if ($bf.checkalives().get().count() > 0)
-            return NULL
+            return NULL;
         
         $affectedRows = App\Battlefield::where('id', '==', $id)->delete();
         
-        return $affectedRows
+        return $affectedRows;
     }
 
 //
@@ -120,7 +121,7 @@ class BattlefieldRepository
     public function insert($name, $desc, $matchItem, $status='not-ready', $payment='beta')
     {
         $id = DB::table('battlefield')
-            ->insertGetId([
+            ->insert([
                 [
                     'name' => $name,
                     'description' => $desc,

@@ -53,4 +53,34 @@ class BattlefieldTest extends TestCase
 
     }
     
+    public function testRepoSelect()
+    {
+       $repo = new BattlefieldRepository;
+    
+       $rows = $repo->reapAll();
+    
+       $this->assertTrue(count($rows) > 0);
+       // var_dump($rows);
+       echo(count($rows));
+    
+       $rows = $repo->reapOne(1);
+    
+       $this->assertNotNull($rows);
+       // var_dump($rows);
+       echo($rows);
+    
+       $rows = $repo->index();
+    
+       $this->assertTrue(count($rows) > 0);
+       // var_dump($rows);
+       echo(count($rows));
+    
+       $rows = $repo->selectOne(1);
+    
+       $this->assertNotNull($rows);
+       // var_dump($rows);
+       echo($rows);
+
+    }
+    
 }
