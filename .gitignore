@@ -19,7 +19,7 @@ docs/*.txt
 /examples/java/flag/src/main/java/cn/com/isc/filter
 /examples/java/flag/src/main/java/cn/com/isc/repository
 /examples/java/flag/src/main/java/cn/com/isc/server
-/examples/java/flag/src/main/java/cn/com/isc/util
+/examples/java/flag/src/main/java/cn/com/isc/until
 /examples/java/flag/src/main/resources/static
 /examples/java/flag/src/main/webapp
 /examples/java/flag/target
