@@ -1,0 +1,54 @@
+
+server:
+  port: 8082
+
+spring:
+  profiles: dev # spring.profiles.active= # Comma-separated list (or list if using YAML) of active profiles.
+
+  datasource:
+    url: jdbc:mysql://172.17.0.8:3306/testdb # JDBC url of the database.
+    username: testuser # Login user of the database.
+    password: testpassword # Login password of the database.
+    name: testdb # Name of the datasource.
+    driverClassName: com.mysql.jdbc.Driver
+    max-active: 20
+    max-idle: 8
+    min-idle: 8
+    initial-size: 10
+    # spring.datasource.continue-on-error=false # Do not stop if an error occurs while initializing the database.
+    # spring.datasource.data= # Data (DML) script resource references.
+    # spring.datasource.data-username= # User of the database to execute DML scripts (if different).
+    # spring.datasource.data-password= # Password of the database to execute DML scripts (if different).
+    # spring.datasource.initialize=true # Populate the database using 'data.sql'.
+    # spring.datasource.schema= # Schema (DDL) script resource references.
+    # spring.datasource.schema-username= # User of the database to execute DDL scripts (if different).
+    # spring.datasource.schema-password= # Password of the database to execute DDL scripts (if different).
+    # spring.datasource.separator=; # Statement separator in SQL initialization scripts.
+    # spring.datasource.sql-script-encoding= # SQL scripts encoding.
+
+  jpa:
+    # spring.data.jpa.repositories.enabled=true # Enable JPA repositories.
+    database: MYSQL # spring.jpa.database= # Target database to operate on, auto-detected by default. Can be alternatively set using the "databasePlatform" property.
+    # spring.jpa.database-platform= # Name of the target database to operate on, auto-detected by default. Can be alternatively set using the "Database" enum.
+    # spring.jpa.generate-ddl=false # Initialize the schema on startup.
+    show-sql: true # spring.jpa.show-sql=false # Enable logging of SQL statements.
+    hibernate:
+      ddl-auto: none #update # spring.jpa.hibernate.ddl-auto= # DDL mode. This is actually a shortcut for the "hibernate.hbm2ddl.auto" property (validate: validate the schema, makes no changes to the database. update: update the schema. create: creates the schema, destroying previous data. create-drop: drop the schema when the SessionFactory is closed explicitly, typically when the application is stopped.). Default to "create-drop" when using an embedded database, "none" otherwise.
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy # spring.jpa.hibernate.naming.strategy= # Hibernate 4 naming strategy fully qualified name. Not supported with Hibernate 5.
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+        
+  mvc:
+    view:
+      prefix: /
+      suffix: .html
+
+task:
+  monitor: '*/5 * * * * ?'
+
+volume:
+  mount: /tmp/mnt-home
+    
+minus:
+  seconds: 10

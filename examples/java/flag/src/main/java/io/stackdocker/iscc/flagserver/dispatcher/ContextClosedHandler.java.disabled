@@ -1,0 +1,95 @@
+package io.stackdocker.iscc.flagserver.dispatcher;
+
+
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.stereotype.Component;
+
+import com.xxx.core.XProvLogger;
+
+@Component
+class ContextClosedHandler implements ApplicationListener<ContextClosedEvent> , ApplicationContextAware,BeanPostProcessor{
+
+
+    private ApplicationContext context;
+    
+    public Logger logger = XProvLogger.getInstance().x;
+    
+    public void onApplicationEvent(ContextClosedEvent event) {
+    
+    
+        Map<String, ThreadPoolTaskScheduler> schedulers = context.getBeansOfType(ThreadPoolTaskScheduler.class);
+    
+        for (ThreadPoolTaskScheduler scheduler : schedulers.values()) {         
+            scheduler.getScheduledExecutor().shutdown();
+            try {
+                scheduler.getScheduledExecutor().awaitTermination(20000, TimeUnit.MILLISECONDS);
+                if(scheduler.getScheduledExecutor().isTerminated() || scheduler.getScheduledExecutor().isShutdown())
+                    logger.info("Scheduler "+scheduler.getThreadNamePrefix() + " has stoped");
+                else{
+                    logger.info("Scheduler "+scheduler.getThreadNamePrefix() + " has not stoped normally and will be shut down immediately");
+                    scheduler.getScheduledExecutor().shutdownNow();
+                    logger.info("Scheduler "+scheduler.getThreadNamePrefix() + " has shut down immediately");
+                }
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    
+        Map<String, ThreadPoolTaskExecutor> executers = context.getBeansOfType(ThreadPoolTaskExecutor.class);
+    
+        for (ThreadPoolTaskExecutor executor: executers.values()) {
+            int retryCount = 0;
+            while(executor.getActiveCount()>0 && ++retryCount<51){
+                try {
+                    logger.info("Executer "+executor.getThreadNamePrefix()+" is still working with active " + executor.getActiveCount()+" work. Retry count is "+retryCount);
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            if(!(retryCount<51))
+                logger.info("Executer "+executor.getThreadNamePrefix()+" is still working.Since Retry count exceeded max value "+retryCount+", will be killed immediately");
+            executor.shutdown();
+            logger.info("Executer "+executor.getThreadNamePrefix()+" with active " + executor.getActiveCount()+" work has killed");
+        }
+    }
+    
+    
+    @Override
+    public void setApplicationContext(ApplicationContext context)
+            throws BeansException {
+        this.context = context;
+    
+    }
+    
+    
+    @Override
+    public Object postProcessAfterInitialization(Object object, String arg1)
+            throws BeansException {
+        return object;
+    }
+    
+    
+    @Override
+    public Object postProcessBeforeInitialization(Object object, String arg1)
+            throws BeansException {
+        if(object instanceof ThreadPoolTaskScheduler)
+            ((ThreadPoolTaskScheduler)object).setWaitForTasksToCompleteOnShutdown(true);
+        if(object instanceof ThreadPoolTaskExecutor)
+            ((ThreadPoolTaskExecutor)object).setWaitForTasksToCompleteOnShutdown(true);
+        return object;
+    }
+}

@@ -1,7 +1,3 @@
-// [vagrant@bogon laravel-app]$ php artisan make:model -m Warrior
-// Model created successfully.
-// Created Migration: 2017_09_12_141429_create_warriors_table
-
 <?php
 
 namespace App;
@@ -10,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Warrior extends Model
 {
+    // [vagrant@bogon laravel-app]$ php artisan make:model -m Warrior
+    // Model created successfully.
+    // Created Migration: 2017_09_12_141429_create_warriors_table
     //
 
     /**

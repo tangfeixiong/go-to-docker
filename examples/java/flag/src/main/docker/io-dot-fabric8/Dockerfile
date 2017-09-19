@@ -1,15 +1,16 @@
-# FROM openshift/base-centos7
 FROM docker.io/centos:centos7
+# FROM openshift/base-centos7
 LABEL maintainer="tangfeixiong <tangfx128@gmail.com>" \
-    project="cepo/ctf" \
-    name="flag-rest-server" \
-    repository="default" \
-    tag="centos java springboot"
+      project="https://github.com/tangfeixiong/go-to-docker" \
+      name="refresh-cm" \
+      namespace="stackdocker0x2Eio" \
+      annotation='{"stackdocker.io/created-by":"n/a"}' \
+      tag="centos java springboot"
 
 ARG jarTgt
 ARG javaOpt
 
-COPY /maven/${jarTgt:-Flag.jar} /flag.jar
+COPY /maven/${jarTgt:-refresh-cm.jar} /refresh-cm.jar
 
 ENV JAVA_OPTIONS="${javaOpt:-'-Xms128m -Xmx512m -XX:PermSize=128m -XX:MaxPermSize=256m'}" \
     SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3306/testdb" \
@@ -33,4 +34,4 @@ RUN set -x \
 # This default user is created in the openshift/base-centos7 image
 # USER 1001
 
-CMD java -Djava.security.egd=file:/dev/./urandom $JAVA_OPTIONS -jar /flag.jar
+CMD java -Djava.security.egd=file:/dev/./urandom $JAVA_OPTIONS -jar /refresh-cm.jar

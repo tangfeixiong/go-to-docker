@@ -1,0 +1,28 @@
+version: '2'
+
+services:
+  mysql:
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_USER=testuser
+    - MYSQL_PASSWORD=testpassword
+    - MYSQL_DATABASE=testdb
+    image: mysql:5.7
+    restart: unless-stopped
+    volumes:
+    - /srv/mysql/data:/var/lib/mysql
+
+  refresh-cm:
+    environment:
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/testdb
+    - SPRING_DATASOURCE_USERNAME=testuser
+    - SPRING_DATASOURCE_PASSWORD=testpassword
+    - SERVER_PORT=8082
+    - VOLUME_MOUNT=/tmp/mnt-home
+    _ MINUS_SECONDS=10
+    image: docker.io/tangfeixiong/refresh-cm:0.1
+    ports:
+    - "8082:8082"
+    restart: always    
+    volumes:
+    - /tmp/mnt-home:/tmp/mnt-home

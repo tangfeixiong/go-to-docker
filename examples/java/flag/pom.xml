@@ -2,13 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>cn.com.isc</groupId>
-	<artifactId>Flag</artifactId>
+	<groupId>https0x3A0x2F0x2Fgithub0x2Ecom0x2Ftangfeixiong.go-to-docker.examples.java.flag</groupId>
+	<artifactId>refresh-cm</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>Flag</name>
-	<url>https://github.com/stackdocker</url>
+	<name>Refresh Controller Manager</name>
+	<url>https://github.com/tangfeixiong/go-to-docker/master/examples/java/flag</url>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -19,9 +19,9 @@
 	<properties>
 		<java.version>1.8</java.version>
         <springfox.version>2.7.0</springfox.version>
-		<image.namespace>172.17.4.50:5000</image.namespace>
-		<image.name>isc-flag</image.name>
-		<image.tag>latest</image.tag>
+		<image.namespace>docker.io</image.namespace>
+		<image.name>tangfeixiong/refresh-cm</image.name>
+		<image.tag>0.1</image.tag>
 	</properties>
 
 	<dependencies>
@@ -72,6 +72,27 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.1.1.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.2</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- API documentation using swagger.io -->
         <dependency>
             <groupId>io.springfox</groupId>
@@ -121,6 +142,7 @@
               <version>0.21.0</version>
               <extensions>true</extensions>
 			  <configuration>
+			    <logStdout>true</logStdout>
 			    <images>
 			      <image>
 			        <name>${image.namespace}/${image.name}:${image.tag}</name>
