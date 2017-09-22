@@ -79,7 +79,7 @@ public class RefreshReqResp implements Serializable {
     private Map<String, RefreshConfig> info;	
     
     @JsonProperty("config")	
-    @NotEmpty(message = "Config is required.")
+    // @NotEmpty(message = "Config is required.")
     private Config config;
     
     @Value("${minus.seconds}")
@@ -94,7 +94,7 @@ public class RefreshReqResp implements Serializable {
         this.periodic = 0;
         this.refreshingAt = new GregorianCalendar(1999, 11, 30).getTime();
         this.minusSeconds = 10;
-        this.rounds = 0;
+        this.rounds = 1;
         this.count = 0;
         this.dataStore = "";
         this.stateCode = 0;

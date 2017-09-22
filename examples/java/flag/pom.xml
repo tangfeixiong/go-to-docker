@@ -72,6 +72,35 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <version>1.8.7.RELEASE</version>
+			<optional>true</optional>
+        </dependency>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.9.0</version>
+			<optional>true</optional>
+		</dependency>
+        <!-- https://mvnrepository.com/artifact/biz.paluch.redis/lettuce -->
+		<dependency>
+			<groupId>biz.paluch.redis</groupId>
+			<artifactId>lettuce</artifactId>
+			<version>4.2.2.Final</version>
+			<optional>true</optional>
+		</dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -142,7 +171,7 @@
               <version>0.21.0</version>
               <extensions>true</extensions>
 			  <configuration>
-			    <logStdout>true</logStdout>
+			    <showLogs>true</showLogs>
 			    <images>
 			      <image>
 			        <name>${image.namespace}/${image.name}:${image.tag}</name>

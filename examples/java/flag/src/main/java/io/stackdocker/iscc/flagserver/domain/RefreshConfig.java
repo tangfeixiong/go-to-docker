@@ -72,6 +72,7 @@ public class RefreshConfig implements Serializable {
     @JsonProperty("flag")	
 	private Flag flag;
     
+    private Integer projectId;
     private Integer imageId;
 	
     @JsonCreator
@@ -168,6 +169,33 @@ public class RefreshConfig implements Serializable {
     
     public void setFlag(Flag flag) {
         this.flag = flag;
+    }	
+    
+    public void setRefreshFlag(RefreshFlag flag) {
+        if ( this.flag != null && flag != null) {
+            // this.flag.setId(flag.getId());
+            // this.flag.setEnv(flag.getProjectId());
+            // this.flag.setTeamNo(flag.getTeamId());
+            this.flag.setToken(flag.getToken());
+            this.flag.setRound(flag.getRound());
+            this.flag.setMd5String(flag.getMd5String());
+        }
+    }
+    
+    public Integer getProjectId() {
+        return projectId;
+    }
+    
+    public void setProjectId(Integer id) {
+        this.projectId = id;
+    }	
+    
+    public Integer getImageId() {
+        return imageId;
+    }
+    
+    public void setImageId(Integer id) {
+        this.imageId = id;
     }	
 	
 	@Override

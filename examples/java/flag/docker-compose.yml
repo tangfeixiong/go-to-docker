@@ -12,11 +12,23 @@ services:
     volumes:
     - /srv/mysql/data:/var/lib/mysql
 
+  redis:
+    command:
+    - --loglevel warning
+    image: sameersbn/redis:latest
+    restart: always
+    volumes:
+    - redis-data:/var/lib/redis
+
   refresh-cm:
     environment:
     - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/testdb
     - SPRING_DATASOURCE_USERNAME=testuser
     - SPRING_DATASOURCE_PASSWORD=testpassword
+    - SPRING_REDIS_HOST=redis
+    - SPRING_REDIS_PORT=6379
+    - SPRING_REDIS_DATABASE=0
+    - SPRING_CACHE_TYPE=none  # comment it if redis is available
     - SERVER_PORT=8082
     - VOLUME_MOUNT=/tmp/mnt-home
     _ MINUS_SECONDS=10
@@ -26,3 +38,7 @@ services:
     restart: always    
     volumes:
     - /tmp/mnt-home:/tmp/mnt-home
+
+volumes:
+    redis-data:
+      # external: true # Force docker compose to look for an existing volume

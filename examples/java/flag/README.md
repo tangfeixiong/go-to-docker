@@ -153,6 +153,48 @@ And output
 C2B4CA9C56973A3EBD65BC91ADB517E3 
 ```
 
+### Via Redis
+
+First
+```
+[vagrant@bogon flag]$ docker run -d --name=redis sameersbn/redis --loglevel warning
+[vagrant@bogon flag]$ docker inspect -f {{.NetworkSettings.IPAddress}} redis
+172.17.0.9
+```
+
+Then
+```
+[vagrant@localhost flag]$ docker run --rm -p 8082:8082 -v /tmp/mnt-home:/tmp/mnt-home -e SPRING_DATASOURCE_URL=jdbc:mysql://172.17.0.8:3306/testdb -e SPRING_DATASOURCE_USERNAME=testuser -e SPRING_DATASOURCE_PASSWORD=testpassword -e SPRING_REDIS_HOST=172.17.0.9 docker.io/tangfeixiong/refresh-cm:0.1
+### snip ###
+/v1/refresh-creation
+Go to create refreshing: id:1,image_id:1,project_id:1,name:test
+Search flags repository by project: 1
+Hibernate: select flag0_.id as id1_2_, flag0_.round as round2_2_, flag0_.team_no as team_no3_2_, flag0_.token as token4_2_, flag0_.env as env5_2_, flag0_.md5string as md6_2_ from flag flag0_ where flag0_.env=?
+Schedule Key : team1 Value : container_id:1,config_id:1,team_id:1,name:flag,sub_path:demo1/
+Runnable Task with test on thread ThreadPoolTaskScheduler1
+get flag with: env=1 teamNo=1 round=1
+Search flags repository by project: 1
+Hibernate: select flag0_.id as id1_2_, flag0_.round as round2_2_, flag0_.team_no as team_no3_2_, flag0_.token as token4_2_, flag0_.env as env5_2_, flag0_.md5string as md6_2_ from flag flag0_ where flag0_.env=?
+RefreshFlag(id=50271, projectId=1, teamId=1, token=1, round=1, md5String=11BF33B2D7F8A37B59F6A128A86693FE)
+Runnable Task with test on thread ThreadPoolTaskScheduler3
+get flag with: env=1 teamNo=1 round=2
+Search flags repository by project: 1
+Hibernate: select flag0_.id as id1_2_, flag0_.round as round2_2_, flag0_.team_no as team_no3_2_, flag0_.token as token4_2_, flag0_.env as env5_2_, flag0_.md5string as md6_2_ from flag flag0_ where flag0_.env=?
+RefreshFlag(id=50272, projectId=1, teamId=1, token=1, round=2, md5String=C2B4CA9C56973A3EBD65BC91ADB517E3)
+### snip ###
+Game over, bout : 10
+```
+
+After requested, may verify Redis cache, for example __KEYS__
+```
+[vagrant@localhost flag]$ echo -e "KEYS *\r\nQUIT\r\n" | curl telnet://172.17.0.9:6379
+*1
+$94
+initialflags:??srjava.lang.Integer⠤???8Ivaluexrjava.lang.Number???
+                                                                  ???xp
++OK
+```
+
 ### Deploy
 
 Refer to [`docker-compose.yml`](./docker-compose.yml)
@@ -166,6 +208,11 @@ Refert to [`mysql-dump.sql`](./src/main/resources/mysql-dump.sql)
 Run
 ```
 [vagrant@bogon flag]$ mvn compile package spring-boot:run -Dspring.profiles.active=dev
+```
+
+Or
+```
+[vagrant@bogon flag]$ mvn compile package spring-boot:run -Dspring.profiles.active=dev -Dspring.redis.host=172.17.0.9
 ```
 
 ### Test
@@ -187,23 +234,23 @@ To curl
 > User-Agent: curl/7.43.0
 > Accept: */*
 > Content-Type: application/json
-> Content-Length: 640
+> Content-Length: 641
 > 
-* upload completely sent off: 640 out of 640 bytes
+* upload completely sent off: 641 out of 641 bytes
 < HTTP/1.1 200 
 HTTP/1.1 200 
-< Set-Cookie: JSESSIONID=947D1841175B458F7A8F092F1963F98A; Path=/; HttpOnly
-Set-Cookie: JSESSIONID=947D1841175B458F7A8F092F1963F98A; Path=/; HttpOnly
+< Set-Cookie: JSESSIONID=E36AF703BA327A0031533396C75FCEBD; Path=/; HttpOnly
+Set-Cookie: JSESSIONID=E36AF703BA327A0031533396C75FCEBD; Path=/; HttpOnly
 < Content-Type: application/json;charset=UTF-8
 Content-Type: application/json;charset=UTF-8
 < Transfer-Encoding: chunked
 Transfer-Encoding: chunked
-< Date: Tue, 19 Sep 2017 08:42:54 GMT
-Date: Tue, 19 Sep 2017 08:42:54 GMT
+< Date: Fri, 22 Sep 2017 10:26:18 GMT
+Date: Fri, 22 Sep 2017 10:26:18 GMT
 
 < 
 * Connection #0 to host 172.17.4.50 left intact
-{"refreshingDatetime":1505810589000,"id":1,"image_id":1,"battlefield_id":1,"name":"test","periodic":15,"refreshing_rfc3339":"2017-09-19T08:43:09","rounds":10,"count":0,"data_store":"test1/","state_code":0,"state_message":"","refreshing_info":{"test":{"container_id":1,"refresh_config_id":0,"team_id":1,"name":"1","sub_path":"demo1/","state_code":0,"state_message":"","flag":null}},"config":{"id":1,"common":"20170826","tremcount":null,"count":10,"environmentCount":null}}
+{"refreshingDatetime":1506075993000,"id":1,"image_id":1,"battlefield_id":1,"name":"test","periodic":15,"refreshing_rfc3339":"2017-09-22T10:26:33","rounds":10,"count":0,"data_store":"test1/","state_code":0,"state_message":"","refreshing_info":{"team1":{"projectId":null,"container_id":1,"refresh_config_id":0,"team_id":1,"name":"1","sub_path":"demo1/","state_code":0,"state_message":"","flag":null}},"config":{"id":1,"common":"20170826","tremcount":null,"count":10,"environmentCount":null}}
 ```
  
 Last to show

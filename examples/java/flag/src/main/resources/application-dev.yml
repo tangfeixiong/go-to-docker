@@ -38,7 +38,22 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
-        
+
+  cache:
+    type: none # spring.cache.type= # Cache type, auto-detected according to the environment by default.
+
+  redis:
+    # spring.redis.cluster.nodes= # Comma-separated list of "host:port" pairs to bootstrap from.
+    # spring.redis.database=0 # Database index used by the connection factory.
+    # spring.redis.url= # Connection URL, will override host, port and password (user will be ignored), e.g. redis://user:password@example.com:6379
+    # spring.redis.host=localhost # Redis server host.
+    # spring.redis.password= # Login password of the redis server.
+    # spring.redis.port=6379 # Redis server port.
+    # spring.redis.sentinel.master= # Name of Redis server.
+    # spring.redis.sentinel.nodes= # Comma-separated list of host:port pairs.
+    # spring.redis.timeout=0 # Connection timeout in milliseconds.
+# management.health.redis.enabled=true # Enable Redis health check.
+  
   mvc:
     view:
       prefix: /

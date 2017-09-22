@@ -3,6 +3,7 @@ package io.stackdocker.iscc.flagserver.dispatcher;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ScheduledFuture;
@@ -10,12 +11,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.PeriodicTrigger;
@@ -24,15 +27,17 @@ import org.springframework.scheduling.Trigger;
 import org.springframework.scheduling.TriggerContext;
 import org.springframework.stereotype.Component;
 
-import cn.com.isc.entity.Config;
-import cn.com.isc.entity.Flag;
-import cn.com.isc.entity.Token;
-import cn.com.isc.server.ConfigService;
-import cn.com.isc.server.FlagService;
-import cn.com.isc.server.TokenService;
+//import cn.com.isc.entity.Config;
+//import cn.com.isc.entity.Flag;
+//import cn.com.isc.entity.Token;
+//import cn.com.isc.server.ConfigService;
+//import cn.com.isc.server.FlagService;
+//import cn.com.isc.server.TokenService;
 
 import io.stackdocker.iscc.flagserver.api.RefreshReqResp;
+import io.stackdocker.iscc.flagserver.cache.FlagCacheableService;
 import io.stackdocker.iscc.flagserver.domain.RefreshConfig;
+import io.stackdocker.iscc.flagserver.domain.RefreshFlag;
 
 @Component
 public class RefreshScheduler {
@@ -71,10 +76,10 @@ public class RefreshScheduler {
     private int minusSeconds = 0;
 	
 	@Autowired
-	private ConfigService configService;
+	private FlagCacheableService cacheableService;
     
-	@Autowired
-	private FlagService flagService;
+	// @Autowired
+	// private FlagService flagService;
     
     public RefreshScheduler() {
         String env = System.getenv("VOLUME_MOUNT");
@@ -94,9 +99,17 @@ public class RefreshScheduler {
         RefreshReqResp resp = new RefreshReqResp();
         Path mnt = Paths.get(mountRoot);
         if (Files.notExists(mnt)) {
-            resp.setStateCode(new Integer(10));
-    		resp.setStateMessage("Data store mount point not exists");
-            return resp;            
+            try {
+                mnt.toFile().mkdirs();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                resp.setStateCode(new Integer(10));
+	            resp.setStateMessage("Failed to create mount point, error: " + ex.getMessage());
+                return resp;
+            }
+//            resp.setStateCode(new Integer(10));
+//            resp.setStateMessage("Mount point not exists");
+//            return resp;            
         }
         
         if ((req.getId() == null || req.getId() <= 0) && (req.getName() == null || req.getName().trim() == "")) {
@@ -125,18 +138,22 @@ public class RefreshScheduler {
             return resp;                        
         }
         resp.setImageId(req.getImageId());
-        if (req.getProjectId() != null && req.getProjectId() > 0) {
-            resp.setProjectId(req.getProjectId());
+        if (req.getProjectId() == null && req.getProjectId() <= 0) {
+            resp.setStateCode(new Integer(102));
+			resp.setStateMessage("Battlefield id is required");
+            return resp;                        
         }
+        resp.setProjectId(req.getProjectId());
         if (req.getPeriodic() != null) {
             resp.setPeriodic(req.getPeriodic());
         }
         if (req.getRefreshingAt() != null) {
             resp.setRefreshingAt(req.getRefreshingAt());
         }
-        if (req.getRounds() != null && req.getRounds() > 0) {
+        if (req.getRounds() != null && req.getRounds() > 0)
             resp.setRounds(req.getRounds());
-        }
+        else if (resp.getPeriodic() == 0)
+            resp.setRounds(1);
         if (req.getCount() != null && req.getCount() > 0) {
             resp.setCount(req.getCount());
         }
@@ -144,13 +161,26 @@ public class RefreshScheduler {
             resp.setDataStore(req.getDataStore().trim());
         }
 		if ( req.getInfo() == null || req.getInfo().size() == 0 ) {
-			resp.setStateCode(new Integer(102));
+			resp.setStateCode(new Integer(103));
 			resp.setStateMessage("Refresh settings were required");
 			return resp;			
 		}
         resp.setConfig(req.getConfig());
-
         if (minusSeconds > 0) resp.setMinusSeconds(minusSeconds);
+        if (new GregorianCalendar(1999, 11, 30).getTime().compareTo(resp.getRefreshingDatetime()) < 0
+                &&  resp.getRefreshingDatetime().getTime() - System.currentTimeMillis() < 1000L * resp.getMinusSeconds()) {
+            resp.setStateCode(new Integer(106));
+            resp.setStateMessage("Could not count to minus " + resp.getMinusSeconds() + " seconds");
+            return resp;                    
+        }
+
+        List<RefreshFlag> cache = cacheableService.search(resp.getProjectId());
+        if ( cache == null || cache.size() == 0 ) {
+			resp.setStateCode(new Integer(21));
+			resp.setStateMessage("Flag rows have not generated");
+			return resp;			            
+        } 
+
 		for (Map.Entry<String, RefreshConfig> entry : req.getInfo().entrySet()) {
             String key = entry.getKey();
             RefreshConfig value = entry.getValue();
@@ -158,7 +188,7 @@ public class RefreshScheduler {
             
             RefreshConfig item = new RefreshConfig();
             if (value.getContainerId() == null || value.getContainerId() <= 0) {
-                resp.setStateCode(new Integer(103));
+                resp.setStateCode(new Integer(104));
 			    resp.setStateMessage("Container id is required");
                 return resp;                
             } 
@@ -168,7 +198,7 @@ public class RefreshScheduler {
             else 
                 item.setName(resp.getId().toString());
 			if ( value.getTeamId() == null || value.getTeamId() <= 0 ){
-                resp.setStateCode(new Integer(104));
+                resp.setStateCode(new Integer(105));
 			    resp.setStateMessage("Team id is required");
                 return resp;
 			}
@@ -177,6 +207,16 @@ public class RefreshScheduler {
                 item.setSubPath(value.getSubPath().trim());
             else 
                 item.setSubPath(item.getContainerId().toString());
+            
+        LOOP:
+            for (int i = 1; i <= resp.getRounds(); i++) {
+                for (RefreshFlag flag: cache) {
+                    if (flag.getTeamId() == item.getTeamId() && flag.getRound() == i ) continue LOOP;
+                }
+                resp.setStateCode(new Integer(22));
+			    resp.setStateMessage("Flag rows are incomplete of team id " + item.getTeamId());
+                return resp;                
+            }
                         
             Path dir = mnt.resolve(resp.getDataStore()).resolve(item.getSubPath());
             if (Files.notExists(dir)) {
@@ -185,20 +225,45 @@ public class RefreshScheduler {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     resp.setStateCode(new Integer(12));
-		            resp.setStateMessage("Failed to create data store, error: " + ex.getMessage());
+		            resp.setStateMessage("Failed to create data path, error: " + ex.getMessage());
                     return resp;
+                }
+            }
+            Path newFilePath = dir.resolve(item.getName());
+            if (Files.notExists(newFilePath)) {
+                try {
+                    Files.createFile(newFilePath);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    resp.setStateCode(new Integer(12));
+		            resp.setStateMessage("Failed to touch file, error: " + ex.getMessage());
+                    return resp;                    
+                }
+            } else {
+                try {
+                    Files.write(newFilePath, new byte[0], StandardOpenOption.TRUNCATE_EXISTING);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    resp.setStateCode(new Integer(12));
+		            resp.setStateMessage("Failed to truncate file, error: " + ex.getMessage());
+                    return resp;                    
                 }
             }
             
             resp.addRefreshConfig(key, item);
         }
         
-        if (resp.getPeriodic() == 0) return resp;
-        if (new GregorianCalendar(1999, 11, 30).getTime().compareTo(resp.getRefreshingDatetime()) < 0
-                &&  resp.getRefreshingDatetime().getTime() - System.currentTimeMillis() < 1000L * resp.getMinusSeconds()) {
-            resp.setStateCode(new Integer(105));
-            resp.setStateMessage("Could not count to minus " + resp.getMinusSeconds() + " seconds");
-            return resp;                    
+        Runnable task = new RunnableTask(this, resp.getName());
+        if (resp.getPeriodic() == 0) {
+            try {
+                ScheduledFuture<?> job = taskScheduler.schedule(task, resp.getRefreshingDatetime());
+                works.put(resp.getName(), new Work(resp, job));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                resp.setStateCode(new Integer(13));
+                resp.setStateMessage("Could not create scheduler, error: " + ex.getMessage());            
+            }        
+            return resp;
         }
         
         long delay = 1000L * resp.getPeriodic();
@@ -206,10 +271,8 @@ public class RefreshScheduler {
         // trigger.setFixedRate(true);
         // trigger.setInitialDelay(resp.getRefreshingDatetime().getTime() - System.currentTimeMillis());
         // taskScheduler.schedule(new RunnableTask(this, resp.getName()), periodicTrigger);
-        Runnable task = new RunnableTask(this, resp.getName());
-        Date startTime = resp.getRefreshingDatetime();
         try {
-            ScheduledFuture<?> job = taskScheduler.scheduleAtFixedRate(task, startTime, delay);
+            ScheduledFuture<?> job = taskScheduler.scheduleAtFixedRate(task, resp.getRefreshingDatetime(), delay);
             works.put(resp.getName(), new Work(resp, job));
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -267,14 +330,14 @@ public class RefreshScheduler {
             String key = entry.getKey();
             RefreshConfig value = entry.getValue();
 
-		    System.out.println("get flag with: env=" + resp.getImageId() + " teamNo=" + value.getTeamId() + " round=" + resp.getCount());
-			Flag result = flagService.get( resp.getImageId(), value.getTeamId(), resp.getCount() );
+		    System.out.println("get flag with: env=" + resp.getProjectId() + " teamNo=" + value.getTeamId() + " round=" + resp.getCount());
+            RefreshFlag result = cacheableService.search(resp.getProjectId(), value.getTeamId(), resp.getCount());
 			if ( result == null ){
                 resp.setStateCode(new Integer(200));
 			    resp.setStateMessage("Could not find flag value");
                 return resp;                
             }
-		    System.out.println("flag: " + result);
+		    System.out.println(result);
 			
             Path fp = Paths.get(mountRoot, resp.getDataStore(), value.getSubPath(), value.getName());
             try {
@@ -287,7 +350,7 @@ public class RefreshScheduler {
                 return resp;
             }               
 			
-            value.setFlag(result);
+            value.setRefreshFlag(result);
 		}
         
         return resp;
