@@ -1,0 +1,74 @@
+
+version: '2'
+
+services:
+  mysql:
+    environment:
+    - MYSQL_ROOT_PASSWORD=password
+    - MYSQL_USER=testuser
+    - MYSQL_PASSWORD=testpassword
+    - MYSQL_DATABASE=testdb
+    image: mysql:5.7
+    restart: unless-stopped
+    volumes:
+    - /srv/mysql/data:/var/lib/mysql
+
+  redis:
+    command:
+    - --loglevel warning
+    image: sameersbn/redis:latest
+    restart: always
+    volumes:
+    - /srv/docker/redis:/var/lib/redis
+
+  php-nginx:
+    environment:
+    - MYSQL_USER=testuser
+    - MYSQL_PASSWORD=testpassword
+    - MYSQL_DATABASE=testdb
+    - MYSQL_SERVER_ADDRESS=mysql:3306
+    - DOCKER_RESOURCE_PROVIDER=go-to-docker:10052
+    image: tangfeixiong/nginx-php-demo
+    ports:
+    - "80:80"
+    restart: on-failure    
+
+  go-to-docker:
+    depends_on:
+    - etcd
+    environment:
+    - DOCKER_CONFIG_JSON={"auths":{}}
+    - REGISTRY_CERTS_JSON={}
+    image: docker.io/tangfeixiong/go-to-docker:0.1
+    # ports:
+    # - "10052:10052"
+    privileged: true
+    restart: always
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  target-cm:
+    environment: 
+    - DATABUS_REDIS_HOST=redis:6379
+    - DATABUS_REDIS_DB=15
+    - CHECK_MESSAGE_PUBSUB=checkalive
+    - CHECK_CM_CACHE=checkalive
+    image: docker.io/tangfeixiong/target-cm:0.1
+    # ports:
+    # - "10062:10062"
+    restart: always
+
+  refresh-cm:
+    environment:
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/testdb
+    - SPRING_DATASOURCE_USERNAME=testuser
+    - SPRING_DATASOURCE_PASSWORD=testpassword
+    - SERVER_PORT=8082
+    - VOLUME_MOUNT=/tmp/mnt-home
+    _ MINUS_SECONDS=10
+    image: docker.io/tangfeixiong/refresh-cm:0.1
+    # ports:
+    # - "8082:8082"
+    restart: always    
+    volumes:
+    - /tmp/mnt-home:/tmp/mnt-home

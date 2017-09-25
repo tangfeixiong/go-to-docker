@@ -45,12 +45,12 @@ type CheckActionReqResp struct {
 	Conf               map[string]string             `protobuf:"bytes,5,rep,name=conf" json:"conf,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	WorkDir            string                        `protobuf:"bytes,6,opt,name=work_dir,json=workDir,proto3" json:"work_dir,omitempty"`
 	Periodic           int32                         `protobuf:"varint,7,opt,name=periodic,proto3" json:"periodic,omitempty"`
-	StateCode          string                        `protobuf:"bytes,8,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
-	StateMessage       string                        `protobuf:"bytes,9,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
-	Timestamp          string                        `protobuf:"bytes,10,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	DestinationPath    string                        `protobuf:"bytes,11,opt,name=destination_path,json=destinationPath,proto3" json:"destination_path,omitempty"`
-	Selector           string                        `protobuf:"bytes,12,opt,name=selector,proto3" json:"selector,omitempty"`
-	DestConfigurations map[string]*DestinationConfig `protobuf:"bytes,13,rep,name=dest_configurations,json=destConfigurations" json:"dest_configurations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+	Duration           int32                         `protobuf:"varint,8,opt,name=duration,proto3" json:"duration,omitempty"`
+	DestConfigurations map[string]*DestinationConfig `protobuf:"bytes,9,rep,name=dest_configurations,json=destConfigurations" json:"dest_configurations,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value"`
+	StateCode          int32                         `protobuf:"varint,10,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage       string                        `protobuf:"bytes,11,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+	Timestamp          string                        `protobuf:"bytes,12,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	DestinationPath    string                        `protobuf:"bytes,13,opt,name=destination_path,json=destinationPath,proto3" json:"destination_path,omitempty"`
 }
 
 func (m *CheckActionReqResp) Reset()                    { *m = CheckActionReqResp{} }
@@ -107,11 +107,25 @@ func (m *CheckActionReqResp) GetPeriodic() int32 {
 	return 0
 }
 
-func (m *CheckActionReqResp) GetStateCode() string {
+func (m *CheckActionReqResp) GetDuration() int32 {
+	if m != nil {
+		return m.Duration
+	}
+	return 0
+}
+
+func (m *CheckActionReqResp) GetDestConfigurations() map[string]*DestinationConfig {
+	if m != nil {
+		return m.DestConfigurations
+	}
+	return nil
+}
+
+func (m *CheckActionReqResp) GetStateCode() int32 {
 	if m != nil {
 		return m.StateCode
 	}
-	return ""
+	return 0
 }
 
 func (m *CheckActionReqResp) GetStateMessage() string {
@@ -135,20 +149,6 @@ func (m *CheckActionReqResp) GetDestinationPath() string {
 	return ""
 }
 
-func (m *CheckActionReqResp) GetSelector() string {
-	if m != nil {
-		return m.Selector
-	}
-	return ""
-}
-
-func (m *CheckActionReqResp) GetDestConfigurations() map[string]*DestinationConfig {
-	if m != nil {
-		return m.DestConfigurations
-	}
-	return nil
-}
-
 type DestinationConfig struct {
 	Name            string            `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Command         []string          `protobuf:"bytes,2,rep,name=command" json:"command,omitempty"`
@@ -157,10 +157,12 @@ type DestinationConfig struct {
 	Conf            map[string]string `protobuf:"bytes,5,rep,name=conf" json:"conf,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	WorkDir         string            `protobuf:"bytes,6,opt,name=work_dir,json=workDir,proto3" json:"work_dir,omitempty"`
 	Periodic        int32             `protobuf:"varint,7,opt,name=periodic,proto3" json:"periodic,omitempty"`
-	StateCode       string            `protobuf:"bytes,8,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
-	StateMessage    string            `protobuf:"bytes,9,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
-	Timestamp       string            `protobuf:"bytes,10,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	DestinationPath string            `protobuf:"bytes,11,opt,name=destination_path,json=destinationPath,proto3" json:"destination_path,omitempty"`
+	Duration        int32             `protobuf:"varint,8,opt,name=duration,proto3" json:"duration,omitempty"`
+	Tpl             map[string]string `protobuf:"bytes,9,rep,name=tpl" json:"tpl,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	StateCode       int32             `protobuf:"varint,10,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage    string            `protobuf:"bytes,11,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+	Timestamp       string            `protobuf:"bytes,12,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	DestinationPath string            `protobuf:"bytes,13,opt,name=destination_path,json=destinationPath,proto3" json:"destination_path,omitempty"`
 }
 
 func (m *DestinationConfig) Reset()                    { *m = DestinationConfig{} }
@@ -217,11 +219,25 @@ func (m *DestinationConfig) GetPeriodic() int32 {
 	return 0
 }
 
-func (m *DestinationConfig) GetStateCode() string {
+func (m *DestinationConfig) GetDuration() int32 {
+	if m != nil {
+		return m.Duration
+	}
+	return 0
+}
+
+func (m *DestinationConfig) GetTpl() map[string]string {
+	if m != nil {
+		return m.Tpl
+	}
+	return nil
+}
+
+func (m *DestinationConfig) GetStateCode() int32 {
 	if m != nil {
 		return m.StateCode
 	}
-	return ""
+	return 0
 }
 
 func (m *DestinationConfig) GetStateMessage() string {
@@ -515,39 +531,14 @@ func (m *CheckActionReqResp) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintCounselor(dAtA, i, uint64(m.Periodic))
 	}
-	if len(m.StateCode) > 0 {
-		dAtA[i] = 0x42
+	if m.Duration != 0 {
+		dAtA[i] = 0x40
 		i++
-		i = encodeVarintCounselor(dAtA, i, uint64(len(m.StateCode)))
-		i += copy(dAtA[i:], m.StateCode)
-	}
-	if len(m.StateMessage) > 0 {
-		dAtA[i] = 0x4a
-		i++
-		i = encodeVarintCounselor(dAtA, i, uint64(len(m.StateMessage)))
-		i += copy(dAtA[i:], m.StateMessage)
-	}
-	if len(m.Timestamp) > 0 {
-		dAtA[i] = 0x52
-		i++
-		i = encodeVarintCounselor(dAtA, i, uint64(len(m.Timestamp)))
-		i += copy(dAtA[i:], m.Timestamp)
-	}
-	if len(m.DestinationPath) > 0 {
-		dAtA[i] = 0x5a
-		i++
-		i = encodeVarintCounselor(dAtA, i, uint64(len(m.DestinationPath)))
-		i += copy(dAtA[i:], m.DestinationPath)
-	}
-	if len(m.Selector) > 0 {
-		dAtA[i] = 0x62
-		i++
-		i = encodeVarintCounselor(dAtA, i, uint64(len(m.Selector)))
-		i += copy(dAtA[i:], m.Selector)
+		i = encodeVarintCounselor(dAtA, i, uint64(m.Duration))
 	}
 	if len(m.DestConfigurations) > 0 {
 		for k, _ := range m.DestConfigurations {
-			dAtA[i] = 0x6a
+			dAtA[i] = 0x4a
 			i++
 			v := m.DestConfigurations[k]
 			msgSize := 0
@@ -572,6 +563,29 @@ func (m *CheckActionReqResp) MarshalTo(dAtA []byte) (int, error) {
 				i += n1
 			}
 		}
+	}
+	if m.StateCode != 0 {
+		dAtA[i] = 0x50
+		i++
+		i = encodeVarintCounselor(dAtA, i, uint64(m.StateCode))
+	}
+	if len(m.StateMessage) > 0 {
+		dAtA[i] = 0x5a
+		i++
+		i = encodeVarintCounselor(dAtA, i, uint64(len(m.StateMessage)))
+		i += copy(dAtA[i:], m.StateMessage)
+	}
+	if len(m.Timestamp) > 0 {
+		dAtA[i] = 0x62
+		i++
+		i = encodeVarintCounselor(dAtA, i, uint64(len(m.Timestamp)))
+		i += copy(dAtA[i:], m.Timestamp)
+	}
+	if len(m.DestinationPath) > 0 {
+		dAtA[i] = 0x6a
+		i++
+		i = encodeVarintCounselor(dAtA, i, uint64(len(m.DestinationPath)))
+		i += copy(dAtA[i:], m.DestinationPath)
 	}
 	return i, nil
 }
@@ -670,26 +684,47 @@ func (m *DestinationConfig) MarshalTo(dAtA []byte) (int, error) {
 		i++
 		i = encodeVarintCounselor(dAtA, i, uint64(m.Periodic))
 	}
-	if len(m.StateCode) > 0 {
-		dAtA[i] = 0x42
+	if m.Duration != 0 {
+		dAtA[i] = 0x40
 		i++
-		i = encodeVarintCounselor(dAtA, i, uint64(len(m.StateCode)))
-		i += copy(dAtA[i:], m.StateCode)
+		i = encodeVarintCounselor(dAtA, i, uint64(m.Duration))
+	}
+	if len(m.Tpl) > 0 {
+		for k, _ := range m.Tpl {
+			dAtA[i] = 0x4a
+			i++
+			v := m.Tpl[k]
+			mapSize := 1 + len(k) + sovCounselor(uint64(len(k))) + 1 + len(v) + sovCounselor(uint64(len(v)))
+			i = encodeVarintCounselor(dAtA, i, uint64(mapSize))
+			dAtA[i] = 0xa
+			i++
+			i = encodeVarintCounselor(dAtA, i, uint64(len(k)))
+			i += copy(dAtA[i:], k)
+			dAtA[i] = 0x12
+			i++
+			i = encodeVarintCounselor(dAtA, i, uint64(len(v)))
+			i += copy(dAtA[i:], v)
+		}
+	}
+	if m.StateCode != 0 {
+		dAtA[i] = 0x50
+		i++
+		i = encodeVarintCounselor(dAtA, i, uint64(m.StateCode))
 	}
 	if len(m.StateMessage) > 0 {
-		dAtA[i] = 0x4a
+		dAtA[i] = 0x5a
 		i++
 		i = encodeVarintCounselor(dAtA, i, uint64(len(m.StateMessage)))
 		i += copy(dAtA[i:], m.StateMessage)
 	}
 	if len(m.Timestamp) > 0 {
-		dAtA[i] = 0x52
+		dAtA[i] = 0x62
 		i++
 		i = encodeVarintCounselor(dAtA, i, uint64(len(m.Timestamp)))
 		i += copy(dAtA[i:], m.Timestamp)
 	}
 	if len(m.DestinationPath) > 0 {
-		dAtA[i] = 0x5a
+		dAtA[i] = 0x6a
 		i++
 		i = encodeVarintCounselor(dAtA, i, uint64(len(m.DestinationPath)))
 		i += copy(dAtA[i:], m.DestinationPath)
@@ -764,25 +799,8 @@ func (m *CheckActionReqResp) Size() (n int) {
 	if m.Periodic != 0 {
 		n += 1 + sovCounselor(uint64(m.Periodic))
 	}
-	l = len(m.StateCode)
-	if l > 0 {
-		n += 1 + l + sovCounselor(uint64(l))
-	}
-	l = len(m.StateMessage)
-	if l > 0 {
-		n += 1 + l + sovCounselor(uint64(l))
-	}
-	l = len(m.Timestamp)
-	if l > 0 {
-		n += 1 + l + sovCounselor(uint64(l))
-	}
-	l = len(m.DestinationPath)
-	if l > 0 {
-		n += 1 + l + sovCounselor(uint64(l))
-	}
-	l = len(m.Selector)
-	if l > 0 {
-		n += 1 + l + sovCounselor(uint64(l))
+	if m.Duration != 0 {
+		n += 1 + sovCounselor(uint64(m.Duration))
 	}
 	if len(m.DestConfigurations) > 0 {
 		for k, v := range m.DestConfigurations {
@@ -796,6 +814,21 @@ func (m *CheckActionReqResp) Size() (n int) {
 			mapEntrySize := 1 + len(k) + sovCounselor(uint64(len(k))) + l
 			n += mapEntrySize + 1 + sovCounselor(uint64(mapEntrySize))
 		}
+	}
+	if m.StateCode != 0 {
+		n += 1 + sovCounselor(uint64(m.StateCode))
+	}
+	l = len(m.StateMessage)
+	if l > 0 {
+		n += 1 + l + sovCounselor(uint64(l))
+	}
+	l = len(m.Timestamp)
+	if l > 0 {
+		n += 1 + l + sovCounselor(uint64(l))
+	}
+	l = len(m.DestinationPath)
+	if l > 0 {
+		n += 1 + l + sovCounselor(uint64(l))
 	}
 	return n
 }
@@ -840,9 +873,19 @@ func (m *DestinationConfig) Size() (n int) {
 	if m.Periodic != 0 {
 		n += 1 + sovCounselor(uint64(m.Periodic))
 	}
-	l = len(m.StateCode)
-	if l > 0 {
-		n += 1 + l + sovCounselor(uint64(l))
+	if m.Duration != 0 {
+		n += 1 + sovCounselor(uint64(m.Duration))
+	}
+	if len(m.Tpl) > 0 {
+		for k, v := range m.Tpl {
+			_ = k
+			_ = v
+			mapEntrySize := 1 + len(k) + sovCounselor(uint64(len(k))) + 1 + len(v) + sovCounselor(uint64(len(v)))
+			n += mapEntrySize + 1 + sovCounselor(uint64(mapEntrySize))
+		}
+	}
+	if m.StateCode != 0 {
+		n += 1 + sovCounselor(uint64(m.StateCode))
 	}
 	l = len(m.StateMessage)
 	if l > 0 {
@@ -1182,10 +1225,10 @@ func (m *CheckActionReqResp) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCode", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Duration", wireType)
 			}
-			var stringLen uint64
+			m.Duration = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowCounselor
@@ -1195,138 +1238,12 @@ func (m *CheckActionReqResp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				m.Duration |= (int32(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthCounselor
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.StateCode = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 9:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateMessage", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowCounselor
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthCounselor
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.StateMessage = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 10:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowCounselor
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthCounselor
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Timestamp = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 11:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field DestinationPath", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowCounselor
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthCounselor
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.DestinationPath = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 12:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Selector", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowCounselor
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthCounselor
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Selector = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DestConfigurations", wireType)
 			}
@@ -1446,6 +1363,112 @@ func (m *CheckActionReqResp) Unmarshal(dAtA []byte) error {
 				var mapvalue *DestinationConfig
 				m.DestConfigurations[mapkey] = mapvalue
 			}
+			iNdEx = postIndex
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StateCode", wireType)
+			}
+			m.StateCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCounselor
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StateCode |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StateMessage", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCounselor
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthCounselor
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.StateMessage = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 12:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCounselor
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthCounselor
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Timestamp = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 13:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DestinationPath", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCounselor
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthCounselor
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.DestinationPath = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1778,10 +1801,10 @@ func (m *DestinationConfig) Unmarshal(dAtA []byte) error {
 				}
 			}
 		case 8:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCode", wireType)
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Duration", wireType)
 			}
-			var stringLen uint64
+			m.Duration = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowCounselor
@@ -1791,22 +1814,147 @@ func (m *DestinationConfig) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
+				m.Duration |= (int32(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Tpl", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCounselor
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
 				return ErrInvalidLengthCounselor
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.StateCode = string(dAtA[iNdEx:postIndex])
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCounselor
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var stringLenmapkey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCounselor
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLenmapkey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLenmapkey := int(stringLenmapkey)
+			if intStringLenmapkey < 0 {
+				return ErrInvalidLengthCounselor
+			}
+			postStringIndexmapkey := iNdEx + intStringLenmapkey
+			if postStringIndexmapkey > l {
+				return io.ErrUnexpectedEOF
+			}
+			mapkey := string(dAtA[iNdEx:postStringIndexmapkey])
+			iNdEx = postStringIndexmapkey
+			if m.Tpl == nil {
+				m.Tpl = make(map[string]string)
+			}
+			if iNdEx < postIndex {
+				var valuekey uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowCounselor
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					valuekey |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				var stringLenmapvalue uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowCounselor
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLenmapvalue |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLenmapvalue := int(stringLenmapvalue)
+				if intStringLenmapvalue < 0 {
+					return ErrInvalidLengthCounselor
+				}
+				postStringIndexmapvalue := iNdEx + intStringLenmapvalue
+				if postStringIndexmapvalue > l {
+					return io.ErrUnexpectedEOF
+				}
+				mapvalue := string(dAtA[iNdEx:postStringIndexmapvalue])
+				iNdEx = postStringIndexmapvalue
+				m.Tpl[mapkey] = mapvalue
+			} else {
+				var mapvalue string
+				m.Tpl[mapkey] = mapvalue
+			}
 			iNdEx = postIndex
-		case 9:
+		case 10:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StateCode", wireType)
+			}
+			m.StateCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowCounselor
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StateCode |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 11:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field StateMessage", wireType)
 			}
@@ -1835,7 +1983,7 @@ func (m *DestinationConfig) Unmarshal(dAtA []byte) error {
 			}
 			m.StateMessage = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 10:
+		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
 			}
@@ -1864,7 +2012,7 @@ func (m *DestinationConfig) Unmarshal(dAtA []byte) error {
 			}
 			m.Timestamp = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 11:
+		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field DestinationPath", wireType)
 			}
@@ -2022,41 +2170,43 @@ var (
 func init() { proto.RegisterFile("pb/counselor.proto", fileDescriptorCounselor) }
 
 var fileDescriptorCounselor = []byte{
-	// 576 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x54, 0xcd, 0x6e, 0xd3, 0x4c,
-	0x14, 0xfd, 0x9c, 0xa4, 0x3f, 0xbe, 0x69, 0xf5, 0x85, 0x0b, 0xa5, 0xd3, 0x50, 0xd2, 0x28, 0x6c,
-	0x42, 0x11, 0xb1, 0x68, 0x91, 0x40, 0xdd, 0x81, 0xc3, 0x12, 0x09, 0x19, 0xb1, 0xa9, 0x10, 0xd1,
-	0xc4, 0xbe, 0x4d, 0xad, 0xc6, 0x9e, 0x61, 0x66, 0x1a, 0x54, 0x21, 0x36, 0xbc, 0x02, 0x1b, 0x58,
-	0xf3, 0x32, 0x2c, 0x91, 0x78, 0x01, 0x54, 0x78, 0x06, 0xd6, 0x68, 0xc6, 0x34, 0xb4, 0x24, 0xd9,
-	0x44, 0x62, 0xc3, 0x6e, 0xee, 0xb9, 0xc7, 0xe7, 0xdc, 0x3f, 0x19, 0x50, 0xf6, 0x83, 0x58, 0x1c,
-	0xe7, 0x9a, 0x86, 0x42, 0x75, 0xa4, 0x12, 0x46, 0x60, 0x49, 0xf6, 0xeb, 0x9b, 0x03, 0x21, 0x06,
-	0x43, 0x0a, 0xb8, 0x4c, 0x03, 0x9e, 0xe7, 0xc2, 0x70, 0x93, 0x8a, 0x5c, 0x17, 0x8c, 0xd6, 0x8f,
-	0x0a, 0x60, 0x78, 0x48, 0xf1, 0xd1, 0x83, 0xd8, 0xc2, 0x11, 0xbd, 0x8c, 0x48, 0x4b, 0x44, 0xa8,
-	0xe4, 0x3c, 0x23, 0xe6, 0x35, 0xbd, 0xb6, 0x1f, 0xb9, 0x37, 0x32, 0x58, 0x8a, 0x45, 0x96, 0xf1,
-	0x3c, 0x61, 0xa5, 0x66, 0xb9, 0xed, 0x47, 0x67, 0xa1, 0x65, 0x73, 0x35, 0xd0, 0xac, 0xec, 0x60,
-	0xf7, 0xc6, 0x1a, 0x94, 0x29, 0x1f, 0xb1, 0x8a, 0x83, 0xec, 0x13, 0xef, 0x42, 0x25, 0x16, 0xf9,
-	0x01, 0x5b, 0x68, 0x96, 0xdb, 0xd5, 0x9d, 0x66, 0x47, 0xf6, 0x3b, 0x93, 0xce, 0x9d, 0x50, 0xe4,
-	0x07, 0x8f, 0x72, 0xa3, 0x4e, 0x22, 0xc7, 0xc6, 0x0d, 0x58, 0x7e, 0x25, 0xd4, 0x51, 0x2f, 0x49,
-	0x15, 0x5b, 0x74, 0xd5, 0x2c, 0xd9, 0xb8, 0x9b, 0x2a, 0xac, 0xc3, 0xb2, 0x24, 0x95, 0x8a, 0x24,
-	0x8d, 0xd9, 0x52, 0xd3, 0x6b, 0x2f, 0x44, 0xe3, 0x18, 0xaf, 0x03, 0x68, 0xc3, 0x0d, 0xf5, 0x62,
-	0x91, 0x10, 0x5b, 0x76, 0x1f, 0xfa, 0x0e, 0x09, 0x45, 0x42, 0x78, 0x03, 0x56, 0x8b, 0x74, 0x46,
-	0x5a, 0xf3, 0x01, 0x31, 0xdf, 0x31, 0x56, 0x1c, 0xf8, 0xb8, 0xc0, 0x70, 0x13, 0x7c, 0x93, 0x66,
-	0xa4, 0x0d, 0xcf, 0x24, 0x83, 0x42, 0x62, 0x0c, 0xe0, 0x4d, 0xa8, 0x25, 0xa4, 0x4d, 0x9a, 0xbb,
-	0x79, 0xf6, 0x24, 0x37, 0x87, 0xac, 0xea, 0x48, 0xff, 0x9f, 0xc3, 0x9f, 0x70, 0x73, 0x68, 0x0b,
-	0xd5, 0x34, 0xa4, 0xd8, 0x08, 0xc5, 0x56, 0x1c, 0x65, 0x1c, 0x63, 0x0f, 0x2e, 0x5b, 0x7a, 0xcf,
-	0x36, 0x9b, 0x0e, 0x8e, 0x55, 0xb1, 0x1d, 0xb6, 0xea, 0x86, 0xd4, 0x99, 0x31, 0xa4, 0x2e, 0x69,
-	0x13, 0x5e, 0xf8, 0xa0, 0x18, 0x19, 0x26, 0x13, 0x89, 0xfa, 0x3d, 0xf0, 0xc7, 0x33, 0xb5, 0x5b,
-	0x39, 0xa2, 0x93, 0x5f, 0x6b, 0xb5, 0x4f, 0xbc, 0x02, 0x0b, 0x23, 0x3e, 0x3c, 0x26, 0x56, 0x72,
-	0x58, 0x11, 0xec, 0x95, 0xee, 0x7b, 0xf5, 0xe7, 0xb0, 0x3e, 0xc3, 0x67, 0x8a, 0xcc, 0xad, 0xf3,
-	0x32, 0xd5, 0x9d, 0x35, 0x5b, 0x78, 0xf7, 0xf7, 0x18, 0x0a, 0x91, 0x73, 0xea, 0xad, 0x0f, 0x65,
-	0xb8, 0x34, 0x41, 0xf8, 0x2b, 0x77, 0xb7, 0x7b, 0xe1, 0xee, 0xb6, 0xa6, 0x56, 0xf6, 0x2f, 0x9e,
-	0xdd, 0xdc, 0x9b, 0xdf, 0xf9, 0x58, 0x86, 0x5a, 0x78, 0xf6, 0x2b, 0x79, 0x4a, 0x6a, 0x94, 0xc6,
-	0x84, 0xfb, 0x50, 0x0d, 0x15, 0xd9, 0x4e, 0xec, 0x3d, 0xe2, 0xd5, 0xe9, 0xa7, 0x59, 0x9f, 0x81,
-	0xb7, 0xae, 0xbd, 0xfd, 0xf2, 0xfd, 0x5d, 0x69, 0xad, 0x55, 0x0b, 0x46, 0x77, 0x82, 0xd8, 0xe6,
-	0xb9, 0xcb, 0xeb, 0x3d, 0x6f, 0x1b, 0x25, 0xf8, 0x11, 0x71, 0x39, 0x9f, 0xf2, 0xae, 0x53, 0xbe,
-	0x8d, 0xeb, 0x7f, 0x2a, 0x07, 0xaf, 0xed, 0xfd, 0xbc, 0xd9, 0x47, 0x9c, 0x30, 0x45, 0x0e, 0xd5,
-	0x67, 0x32, 0x99, 0xbb, 0x9b, 0x96, 0xf3, 0xdc, 0xac, 0xcf, 0xf2, 0xb4, 0x4d, 0xbd, 0x80, 0x6a,
-	0x97, 0x86, 0x34, 0xaf, 0xc5, 0x96, 0xb3, 0xd8, 0xd8, 0x9e, 0x65, 0xf1, 0xb0, 0xf6, 0xe9, 0xb4,
-	0xe1, 0x7d, 0x3e, 0x6d, 0x78, 0x5f, 0x4f, 0x1b, 0xde, 0xfb, 0x6f, 0x8d, 0xff, 0xfa, 0x8b, 0xee,
-	0x9f, 0xbe, 0xfb, 0x33, 0x00, 0x00, 0xff, 0xff, 0x48, 0xf9, 0x01, 0x10, 0x0b, 0x06, 0x00, 0x00,
+	// 601 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x55, 0xbd, 0x6e, 0x13, 0x41,
+	0x10, 0xe6, 0x6c, 0x27, 0xf1, 0x8d, 0x13, 0x61, 0x06, 0x42, 0x36, 0x26, 0x38, 0x96, 0x69, 0x4c,
+	0x10, 0x36, 0x24, 0x08, 0x50, 0x3a, 0x38, 0x53, 0x22, 0xa1, 0x03, 0x9a, 0x08, 0x61, 0xad, 0xef,
+	0x26, 0xce, 0x29, 0x77, 0xb7, 0xcb, 0xed, 0xc6, 0x28, 0x42, 0x34, 0xbc, 0x02, 0x0d, 0x1d, 0x05,
+	0x2f, 0x43, 0x89, 0xc4, 0x0b, 0xa0, 0xc0, 0x33, 0x50, 0xa3, 0xdd, 0x8b, 0xf3, 0x83, 0xed, 0x82,
+	0x48, 0x50, 0xd0, 0xcd, 0x7c, 0x33, 0xf7, 0x7d, 0xdf, 0xec, 0xce, 0xda, 0x80, 0xb2, 0xdf, 0x09,
+	0xc4, 0x5e, 0xaa, 0x28, 0x16, 0x59, 0x5b, 0x66, 0x42, 0x0b, 0x2c, 0xc8, 0x7e, 0x6d, 0x65, 0x20,
+	0xc4, 0x20, 0xa6, 0x0e, 0x97, 0x51, 0x87, 0xa7, 0xa9, 0xd0, 0x5c, 0x47, 0x22, 0x55, 0x79, 0x47,
+	0xf3, 0x67, 0x09, 0xd0, 0xdb, 0xa1, 0x60, 0xf7, 0x41, 0x60, 0x60, 0x9f, 0x5e, 0xf9, 0xa4, 0x24,
+	0x22, 0x94, 0x52, 0x9e, 0x10, 0x73, 0x1a, 0x4e, 0xcb, 0xf5, 0x6d, 0x8c, 0x0c, 0xe6, 0x02, 0x91,
+	0x24, 0x3c, 0x0d, 0x59, 0xa1, 0x51, 0x6c, 0xb9, 0xfe, 0x28, 0x35, 0xdd, 0x3c, 0x1b, 0x28, 0x56,
+	0xb4, 0xb0, 0x8d, 0xb1, 0x0a, 0x45, 0x4a, 0x87, 0xac, 0x64, 0x21, 0x13, 0xe2, 0x1d, 0x28, 0x05,
+	0x22, 0xdd, 0x66, 0x33, 0x8d, 0x62, 0xab, 0xb2, 0xde, 0x68, 0xcb, 0x7e, 0x7b, 0x5c, 0xb9, 0xed,
+	0x89, 0x74, 0xfb, 0x51, 0xaa, 0xb3, 0x7d, 0xdf, 0x76, 0xe3, 0x32, 0x94, 0x5f, 0x8b, 0x6c, 0xb7,
+	0x17, 0x46, 0x19, 0x9b, 0xb5, 0x6e, 0xe6, 0x4c, 0xde, 0x8d, 0x32, 0xac, 0x41, 0x59, 0x52, 0x16,
+	0x89, 0x30, 0x0a, 0xd8, 0x5c, 0xc3, 0x69, 0xcd, 0xf8, 0x47, 0xb9, 0xa9, 0x85, 0x7b, 0x99, 0x1d,
+	0x95, 0x95, 0xf3, 0xda, 0x28, 0xc7, 0x1e, 0x5c, 0x0c, 0x49, 0xe9, 0x9e, 0xe1, 0x8f, 0x06, 0x87,
+	0xa8, 0x62, 0xae, 0xf5, 0xd5, 0x9e, 0xe2, 0xab, 0x4b, 0x4a, 0x7b, 0xa7, 0x3e, 0xc8, 0x5d, 0x62,
+	0x38, 0x56, 0xc0, 0xab, 0x00, 0x4a, 0x73, 0x4d, 0xbd, 0x40, 0x84, 0xc4, 0xc0, 0xca, 0xbb, 0x16,
+	0xf1, 0x44, 0x48, 0x78, 0x0d, 0x16, 0xf2, 0x72, 0x42, 0x4a, 0xf1, 0x01, 0xb1, 0x8a, 0x9d, 0x6b,
+	0xde, 0x82, 0x8f, 0x73, 0x0c, 0x57, 0xc0, 0xd5, 0x51, 0x42, 0x4a, 0xf3, 0x44, 0xb2, 0x79, 0xdb,
+	0x70, 0x0c, 0xe0, 0x75, 0xa8, 0x1a, 0xdd, 0x28, 0xb5, 0x8a, 0x3d, 0xc9, 0xf5, 0x0e, 0x5b, 0xb0,
+	0x4d, 0xe7, 0x4f, 0xe0, 0x4f, 0xb8, 0xde, 0xa9, 0xdd, 0x03, 0xf7, 0xe8, 0x4c, 0xcd, 0xad, 0xec,
+	0xd2, 0xfe, 0xe1, 0xb5, 0x9a, 0x10, 0x2f, 0xc1, 0xcc, 0x90, 0xc7, 0x7b, 0xc4, 0x0a, 0x16, 0xcb,
+	0x93, 0xcd, 0xc2, 0x7d, 0xa7, 0xf6, 0x02, 0x96, 0xa6, 0x0c, 0x3d, 0x81, 0xe6, 0xc6, 0x49, 0x9a,
+	0xca, 0xfa, 0xa2, 0x39, 0xc5, 0xee, 0xb1, 0x93, 0x9c, 0xe4, 0x04, 0x7b, 0xf3, 0x63, 0x09, 0x2e,
+	0x8c, 0x35, 0xfc, 0x95, 0xbd, 0xdb, 0x38, 0xb5, 0x77, 0xab, 0x13, 0x9d, 0xfd, 0x8b, 0xb5, 0xbb,
+	0x05, 0x45, 0x2d, 0xe3, 0xc3, 0x35, 0xab, 0x4f, 0xb6, 0xf1, 0x4c, 0xc6, 0xb9, 0x0b, 0xd3, 0xfa,
+	0x9f, 0xec, 0xd1, 0x5d, 0x28, 0x8f, 0xc6, 0xfa, 0x93, 0xef, 0xd6, 0x3f, 0x15, 0xa1, 0xea, 0x8d,
+	0x7e, 0xd0, 0x9e, 0x52, 0x36, 0x8c, 0x02, 0xc2, 0x2d, 0xa8, 0x78, 0x19, 0x99, 0x13, 0x30, 0x4f,
+	0x14, 0x2f, 0x4f, 0x7e, 0xad, 0xb5, 0x29, 0x78, 0xf3, 0xca, 0xbb, 0xaf, 0x3f, 0xde, 0x17, 0x16,
+	0x9b, 0xd5, 0xce, 0xf0, 0x76, 0x27, 0x30, 0x75, 0x6e, 0xeb, 0x6a, 0xd3, 0x59, 0x43, 0x09, 0xae,
+	0x4f, 0x5c, 0x9e, 0x8d, 0x79, 0xc3, 0x32, 0xdf, 0xc4, 0xa5, 0xdf, 0x99, 0x3b, 0x6f, 0xcc, 0x16,
+	0xbf, 0xdd, 0x42, 0x1c, 0x13, 0x45, 0x0e, 0x95, 0xe7, 0x32, 0x3c, 0xf3, 0x34, 0x4d, 0xab, 0xb9,
+	0x52, 0x9b, 0xa6, 0x69, 0x86, 0x7a, 0x09, 0x95, 0x2e, 0xc5, 0x74, 0x56, 0x89, 0x55, 0x2b, 0xb1,
+	0xbc, 0x36, 0x4d, 0xe2, 0x61, 0xf5, 0xf3, 0x41, 0xdd, 0xf9, 0x72, 0x50, 0x77, 0xbe, 0x1d, 0xd4,
+	0x9d, 0x0f, 0xdf, 0xeb, 0xe7, 0xfa, 0xb3, 0xf6, 0x9f, 0x65, 0xe3, 0x57, 0x00, 0x00, 0x00, 0xff,
+	0xff, 0x72, 0xb6, 0x9f, 0x4f, 0x91, 0x06, 0x00, 0x00,
 }

@@ -42,12 +42,12 @@ message CheckActionReqResp {
     map<string, string> conf = 5;
     string work_dir = 6;
     int32 periodic = 7;
-    string state_code = 8;
-    string state_message = 9;
-    string timestamp = 10;
-    string destination_path = 11;
-    string selector = 12;
-    map<string, DestinationConfig> dest_configurations = 13;
+    int32 duration = 8;
+    map<string, DestinationConfig> dest_configurations = 9;
+    int32 state_code = 10;
+    string state_message = 11;
+    string timestamp = 12;
+    string destination_path = 13;
 }
 
 message DestinationConfig {
@@ -58,8 +58,10 @@ message DestinationConfig {
     map<string, string> conf = 5;
     string work_dir = 6;
     int32 periodic = 7;
-    string state_code = 8;
-    string state_message = 9;
-    string timestamp = 10;
-    string destination_path = 11;
+    int32 duration = 8;
+    map<string, string> tpl = 9;
+    int32 state_code =10;
+    string state_message = 11;
+    string timestamp = 12;
+    string destination_path = 13;
 }

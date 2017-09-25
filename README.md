@@ -1,12 +1,12 @@
 # go-to-docker
 
-Working with Docker (http://docs.docker.com/) Engine API (version 1.12, 1.13) & Registry API (v2)
+Working around Docker (http://docs.docker.com/) Engine API (version 1.12, 1.13) & Registry API (v2)
 
-Wrapping with insecure gRPC and gRPC-Gateway
+HTTP/TCP Wrapper with gRPC and gRPC-Gateway (insecure mode)
 
 ## Development
 
-How to
+Make binary
 ```
 [vagrant@localhost go-to-docker]$ make go-install
 go install -v ./
@@ -16,7 +16,7 @@ github.com/tangfeixiong/go-to-docker/cmd
 github.com/tangfeixiong/go-to-docker
 ```
 
-Dockernized
+Make dockernized
 ```
 [vagrant@localhost go-to-docker]$ make
 ### snip ###
@@ -41,7 +41,27 @@ For `REGISTRY_CERTS_JSON` environment
 [vagrant@localhost go-to-docker]$ echo "{\"127.0.0.1:5000\":{\"ca_base64\":\"$(base64 -w 0 /etc/docker/certs.d/127.0.0.1:5000/ca.crt)\"}}"
 ```
 
-### [Docker Compose](https://docs.docker.com/compose/reference/overview/)
+
+### Docker API
+
+Examples with docker client, engine-api, go-dockerclient, and native json api
+
+* docker client - https://github.com/docker/docker/tree/master/client
+* go-dockerclient - https://github.com/fsouza/go-dockerclient
+* engine-api - https://github.com/docker/engine-api
+* docker-registry-client - https://github.com/heroku/docker-registry-client
+
+### Inspired
+
+https://github.com/grpc-ecosystem/grpc-gateway
+
+https://github.com/philips/grpc-gateway-example
+
+https://github.com/jcbsmpsn/golang-https-example
+
+### Deployment
+
+[Docker Compose](https://docs.docker.com/compose/reference/overview/)
 
 Download from [Github Release Repositories](https://github.com/docker/compose/releases)
 ```
@@ -75,21 +95,3 @@ Example
 
 [vagrant@localhost go-to-docker]$ docker-compose up -d
 ```
-
-
-## Docker API
-
-Examples with docker client, engine-api, go-dockerclient, and native json api
-
-* docker client - https://github.com/docker/docker/tree/master/client
-* go-dockerclient - https://github.com/fsouza/go-dockerclient
-* engine-api - https://github.com/docker/engine-api
-* docker-registry-client - https://github.com/heroku/docker-registry-client
-
-## Inspired
-
-https://github.com/grpc-ecosystem/grpc-gateway
-
-https://github.com/philips/grpc-gateway-example
-
-https://github.com/jcbsmpsn/golang-https-example

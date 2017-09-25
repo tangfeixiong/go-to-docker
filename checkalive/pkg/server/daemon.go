@@ -35,7 +35,7 @@ type myCounselor struct {
 	grpcHost               string
 	httpHost               string
 	packgesHome            string
-	webXCheckerCM          map[string]*counselor.WebXCheckerConfigMgmt
+	checkermanager         map[string]*counselor.CheckerController
 	redisSentinelAddresses string
 	redisAddresses         []string
 	redisDB                int
@@ -59,9 +59,10 @@ func Run() {
 	mc := new(myCounselor)
 	mc.grpcHost = ":10061"
 	mc.httpHost = ":10062"
-	mc.webXCheckerCM = make(map[string]*counselor.WebXCheckerConfigMgmt)
+	mc.checkermanager = make(map[string]*counselor.CheckerController)
 	mc.redisAddresses = make([]string, 0)
 	mc.pubSubject = "checkalive"
+	mc.cmCache = "checkalive"
 	mc.priorityCMDB = []string{"sentinel", "redis", "etcd", "mysql"}
 	mc.priorityMQ = []string{"sentinel", "redis", "gnatsd", "kafka", "rabbit"}
 
@@ -265,21 +266,28 @@ func (m *myCounselor) startGateway(ch <-chan bool) {
 func (m *myCounselor) CreateCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
 	glog.Infof("go to create check: %q", req)
 	if req == nil || req.Name == "" {
-		return req, fmt.Errorf("Request required")
+		return req, fmt.Errorf("Request name is required")
 	}
-	if len(req.DestConfigurations) == 0 {
-		return m.CreateWebXCheck(ctx, req)
-	}
-	return m.createAWDxCheck(ctx, req)
+	//	if len(req.DestConfigurations) == 0 {
+	//		return m.CreateLegacy(ctx, req)
+	//	}
+	return m.createCheck(ctx, req)
 }
 
-func (m *myCounselor) createAWDxCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
-	if v, ok := m.webXCheckerCM[req.Name]; ok {
-		return v.ActionReqResp, fmt.Errorf("CM of %s exists, delete or update first", req.Name)
+func (m *myCounselor) createCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
+	if _, ok := m.checkermanager[req.Name]; ok {
+		return req, fmt.Errorf("Dispatcher exists, delete or update first. name=%s", req.Name)
+	}
+	if req.Periodic < 1 {
+		return req, fmt.Errorf("Periodic must be greater than one second, name: %s", req.Name)
+	}
+	if req.Duration < 1 {
+		return req, fmt.Errorf("Total duration must be greater than one second, name: %s", req.Name)
 	}
 
-	cm := new(counselor.WebXCheckerConfigMgmt)
-	if resp, err := cm.ConfigCreation(m.packgesHome, req); err != nil {
+	checkctl := new(counselor.CheckerController)
+	resp, err := checkctl.Dispatch(m.packgesHome, req)
+	if err != nil {
 		return resp, err
 	}
 
@@ -290,13 +298,13 @@ LOOPC:
 			break
 		case "redis":
 			if len(m.redisAddresses) > 0 {
-				cm.WriteCMDBFn = m.writeRedis
+				checkctl.WriteCMDBFn = m.writeRedis
 				break LOOPC
 			}
 			break
 		case "etcd":
 			if m.etcdAddresses != "" {
-				cm.WriteCMDBFn = m.writeEtcdV3
+				checkctl.WriteCMDBFn = m.writeEtcdV3
 				break LOOPC
 			}
 			break
@@ -312,13 +320,13 @@ LOOPM:
 			break
 		case "redis":
 			if len(m.redisAddresses) > 0 {
-				cm.WriteMQFn = m.publishRedis
+				checkctl.WriteMQFn = m.publishRedis
 				break LOOPM
 			}
 			break
 		case "gnatsd":
 			if m.gnatsdAddresses != "" {
-				cm.WriteMQFn = m.publishGnatsd
+				checkctl.WriteMQFn = m.publishGnatsd
 				break LOOPM
 			}
 			break
@@ -329,15 +337,15 @@ LOOPM:
 		}
 	}
 
-	defer cm.StartCheck()
+	defer checkctl.Start()
 
-	m.webXCheckerCM[req.Name] = cm
-	return cm.ActionReqResp, nil
+	m.checkermanager[req.Name] = checkctl
+	return resp, nil
 }
 
-func (m *myCounselor) CreateWebXCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
+func (m *myCounselor) CreateLegacy(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
 	resp := new(healthcheckerpb.CheckActionReqResp)
-	if _, ok := m.webXCheckerCM[req.Name]; ok {
+	if _, ok := m.checkermanager[req.Name]; ok {
 		return resp, fmt.Errorf("CM of %s exists, delete or update first", req.Name)
 	}
 
@@ -410,7 +418,7 @@ func (m *myCounselor) CreateWebXCheck(ctx context.Context, req *healthcheckerpb.
 	resp.Periodic = req.Periodic
 	resp.DestinationPath = req.DestinationPath
 
-	cm := new(counselor.WebXCheckerConfigMgmt)
+	cm := new(counselor.CheckerController)
 	cm.ActionReqResp = resp
 	cm.RootPath = m.packgesHome
 
@@ -460,7 +468,7 @@ LOOPM:
 		}
 	}
 
-	m.webXCheckerCM[resp.Name] = cm
+	m.checkermanager[resp.Name] = cm
 	cm.CreateTicker()
 
 	return resp, nil
@@ -476,12 +484,12 @@ func (m *myCounselor) UpdateWebXCheck(ctx context.Context, req *healthcheckerpb.
 	if req == nil || req.Name == "" {
 		return resp, fmt.Errorf("Request required")
 	}
-	if _, ok := m.webXCheckerCM[req.Name]; !ok {
+	if _, ok := m.checkermanager[req.Name]; !ok {
 		return resp, fmt.Errorf("CM of %s does not exists, create first", req.Name)
 	}
 
 	println("workdir")
-	checkpath := m.webXCheckerCM[req.Name].ActionReqResp.DestinationPath
+	checkpath := m.checkermanager[req.Name].ActionReqResp.DestinationPath
 	workdir := filepath.Join(m.packgesHome, req.WorkDir)
 	if !strings.HasPrefix(checkpath, workdir) {
 		glog.Infoln("Mismatched workdir:", workdir)
@@ -501,16 +509,16 @@ func (m *myCounselor) UpdateWebXCheck(ctx context.Context, req *healthcheckerpb.
 	}
 
 	resp.Name = req.Name
-	// m.webXCheckerCM[req.Name].ActionReqResp.Command = req.Command
-	m.webXCheckerCM[req.Name].ActionReqResp.Args = req.Args
-	m.webXCheckerCM[req.Name].ActionReqResp.Env = req.Env
-	m.webXCheckerCM[req.Name].ActionReqResp.Conf = req.Conf
-	m.webXCheckerCM[req.Name].ActionReqResp.WorkDir = req.WorkDir
-	m.webXCheckerCM[req.Name].ActionReqResp.Periodic = req.Periodic
-	// m.webXCheckerCM[req.Name].ActionReqResp.DestinationPath = req.DestinationPath
+	// m.checkermanager[req.Name].ActionReqResp.Command = req.Command
+	m.checkermanager[req.Name].ActionReqResp.Args = req.Args
+	m.checkermanager[req.Name].ActionReqResp.Env = req.Env
+	m.checkermanager[req.Name].ActionReqResp.Conf = req.Conf
+	m.checkermanager[req.Name].ActionReqResp.WorkDir = req.WorkDir
+	m.checkermanager[req.Name].ActionReqResp.Periodic = req.Periodic
+	// m.checkermanager[req.Name].ActionReqResp.DestinationPath = req.DestinationPath
 
-	resp = m.webXCheckerCM[req.Name].ActionReqResp
-	m.webXCheckerCM[req.Name].UpdateTicker()
+	resp = m.checkermanager[req.Name].ActionReqResp
+	m.checkermanager[req.Name].UpdateTicker()
 	return resp, nil
 }
 
@@ -520,7 +528,7 @@ func (m *myCounselor) ReapCheck(ctx context.Context, req *healthcheckerpb.CheckA
 	if req == nil || req.Name == "" {
 		return resp, fmt.Errorf("Request required")
 	}
-	v, ok := m.webXCheckerCM[req.Name]
+	v, ok := m.checkermanager[req.Name]
 	if !ok {
 		return resp, fmt.Errorf("CM of %s does not exists", req.Name)
 	}
@@ -534,13 +542,13 @@ func (m *myCounselor) DeleteCheck(ctx context.Context, req *healthcheckerpb.Chec
 	if req == nil || req.Name == "" {
 		return resp, fmt.Errorf("Request required")
 	}
-	v, ok := m.webXCheckerCM[req.Name]
+	v, ok := m.checkermanager[req.Name]
 	if !ok {
 		return resp, fmt.Errorf("CM of %s does not exists", req.Name)
 	}
 	v.DestroyTicker()
 	resp = v.ActionReqResp
-	delete(m.webXCheckerCM, req.Name)
+	delete(m.checkermanager, req.Name)
 	return resp, nil
 }
 
@@ -552,10 +560,6 @@ func (m *myCounselor) writeRedis(content *healthcheckerpb.CheckActionReqResp) er
 		glog.Infoln("Could not marshal into JSON,", err.Error())
 		return fmt.Errorf("Failed to mashal into JSON: %s", err.Error())
 	}
-	//	if content.StateMessage != "" {
-	//		k = strings.Join([]string{content.DestinationPath, contet.Timestamp}, "/")
-	//		v = []byte(content.StateMessage)
-	//	}
 
 	c, err := redis.DialURL(fmt.Sprintf("redis://%s", m.redisAddresses[0]), redis.DialDatabase(m.redisDB))
 	if err != nil {
@@ -631,15 +635,11 @@ func (m *myCounselor) writeEtcdV3(content *healthcheckerpb.CheckActionReqResp) e
 func (m *myCounselor) publishRedis(content *healthcheckerpb.CheckActionReqResp) error {
 	glog.Infoln("publish check...")
 	k := content.Name
-	v, err := json.Marshal(content)
+	v, err := json.Marshal(content.DestConfigurations)
 	if err != nil {
 		glog.Infoln("Could not marshal into JSON,", err.Error())
 		return fmt.Errorf("Failed to mashal into JSON: %s", err.Error())
 	}
-	//	if content.StateMessage != "" {
-	//		k = strings.Join([]string{content.DestinationPath, contet.Timestamp}, "/")
-	//		v = []byte(content.StateMessage)
-	//	}
 
 	c, err := redis.DialURL(fmt.Sprintf("redis://%s", m.redisAddresses[0]), redis.DialDatabase(m.redisDB))
 	if err != nil {

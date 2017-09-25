@@ -277,7 +277,7 @@ Host: localhost seems down
 
 I0908 09:07:55.286601    6031 daemon.go:478] write cm into cache
 I0908 09:07:55.290580    6031 daemon.go:508] Set CM checkalive.web1check.py: OK
-I0908 09:07:55.290867    6031 daemon.go:560] public check...
+I0908 09:07:55.290867    6031 daemon.go:560] publish check...
 I0908 09:07:55.291846    6031 daemon.go:585] Published subject checkalive.web1check.py: 0
 Tick at 2017-09-08 09:07:58.11035487 +0000 UTC
 ---------------------------------------------------------------
