@@ -349,7 +349,7 @@ func (cc *CheckerController) doCheck(key string) {
 	var err error
 	prev := cc.ActionReqResp.DestConfigurations[key].StateCode
 	switch filepath.Base(destinationPath) {
-	case "awd1-4-tag-1-0x20_checker.py", "awd1-8-tag-1-0x20_checker.py":
+	case "awd1-4-checker.py", "awd1-8-checker.py":
 		opts := append(append([]string{}, cc.ActionReqResp.Command[1:]...), value.Args...)
 		result, err = manipulate.Client.Python_00_check(workdir, opts...)
 		if err != nil {

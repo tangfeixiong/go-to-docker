@@ -193,7 +193,7 @@ public class RefreshScheduler {
                 return resp;                
             } 
             item.setContainerId(value.getContainerId());
-            if (value.getName() != null && item.getName().trim() != "")
+            if (value.getName() != null && value.getName().trim() != "")
                 item.setName(value.getName().trim());
             else 
                 item.setName(resp.getId().toString());

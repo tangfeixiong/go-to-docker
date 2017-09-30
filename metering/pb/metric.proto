@@ -1,0 +1,29 @@
+syntax = "proto3";
+package pb;
+
+message MetricReqResp {
+    KnownMeter meter = 1;
+    RequestType request_type = 2;
+    bytes request_info = 3;
+    MetricType metric_type = 4;
+    bytes metric_data = 5;
+}
+
+enum KnownMeter {
+    CADVISOR = 0;
+    DOCKER = 1;
+    HEAPSTER = 2;
+    PROMETHEUS = 3;
+}
+
+enum RequestType {
+    CADVISOR_V1_ContainerInfoRequest = 0;
+    CADVISOR_V2_ContainerInfoRequest = 1;
+    
+}
+
+enum MetricType {
+    CADVISOR_V1_CpuUsage = 0;
+    CADVISOR_V1_CpuCFS = 1;
+    
+}

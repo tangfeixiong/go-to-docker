@@ -1,0 +1,22 @@
+syntax = "proto3";
+package pb;
+
+import "google/api/annotations.proto";
+
+import "pb/metric.proto";
+
+service CollectorService {
+  rpc Transit (pb.MetricReqResp) returns (pb.MetricReqResp) {
+    option (google.api.http) = {
+	  post: "/v1/metering"
+      body: "*"
+    };
+  }
+
+  rpc BatchTransit (stream pb.MetricReqResp) returns (stream pb.MetricReqResp) {
+    option (google.api.http) = {
+	  post: "/v1/stream"
+      body: "*"
+    };
+  }
+}

@@ -1,0 +1,12 @@
+# An universal package manager
+
+## Support
+
+RedHat/CentOS/Fedora rpm packages
+
+Debian/Ubuntu deb packages
+
+Alpine apk managed packages
+
+When Docker engine is installed
+

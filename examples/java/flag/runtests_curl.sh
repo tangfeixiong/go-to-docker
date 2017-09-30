@@ -41,7 +41,7 @@ case $1 in
     }
 }"
         ;;
-    create)
+    update)
 	    curl http://172.17.4.50:8082/v1/refresh-updation \
 		    -H "Content-Type: application/json" -X POST -iv -d \
 "{

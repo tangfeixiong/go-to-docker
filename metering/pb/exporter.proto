@@ -1,0 +1,15 @@
+syntax = "proto3";
+package pb;
+
+import "google/api/annotations.proto";
+
+import "pb/metric.proto";
+
+service ExporterService {
+  rpc Measure(pb.MetricReqResp) returns (pb.MetricReqResp) {
+    option (google.api.http) = {
+	  post: "/v1/metering"
+      body: "*"
+    };
+  }
+}
