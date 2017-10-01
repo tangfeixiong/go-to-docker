@@ -7,6 +7,7 @@ import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ScheduledFuture;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -356,6 +357,35 @@ public class RefreshScheduler {
         return resp;
     }
     
+    public List<RefreshReqResp> getAll() {
+        List<RefreshReqResp> resp = new ArrayList<RefreshReqResp>();
+        for (Work value : works.values()) {
+            resp.add(value.getContext());
+        }
+        return resp;
+    }
+    
+    public RefreshReqResp findOne(Integer id) {
+        for (Work value : works.values()) {
+            if (value.getContext().getId() == id) return value.getContext();
+        }
+        RefreshReqResp resp = new RefreshReqResp();
+        resp.setStateCode(404);
+        resp.setStateMessage("Not Found");
+        return resp;
+    }
+    
+    public RefreshReqResp findByProject(Integer projectId) {
+        for (Work value : works.values()) {
+            System.out.println("projectId:" + value.getContext().getProjectId());
+            if (value.getContext().getProjectId() == projectId) return value.getContext();
+        }
+        System.out.println("Not found, projectId=" + projectId);
+        RefreshReqResp resp = new RefreshReqResp();
+        resp.setStateCode(404);
+        resp.setStateMessage("Not Found");
+        return resp;
+    }
 }
 
 class RunnableTask implements Runnable {

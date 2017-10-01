@@ -31,7 +31,7 @@ services:
     - SPRING_CACHE_TYPE=none  # comment it if redis is available
     - SERVER_PORT=8082
     - VOLUME_MOUNT=/tmp/mnt-home
-    _ MINUS_SECONDS=10
+    - MINUS_SECONDS=10
     image: docker.io/tangfeixiong/refresh-cm:0.1
     ports:
     - "8082:8082"

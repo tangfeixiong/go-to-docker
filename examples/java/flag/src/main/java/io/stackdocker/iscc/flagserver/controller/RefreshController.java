@@ -5,12 +5,19 @@ import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.com.isc.config.Scheduler;
@@ -35,38 +42,47 @@ public class RefreshController {
     public RefreshController() {
         
     }
-	
-	@GetMapping("/v1/open")
-	public Map<String, Object> test(){
-		flagService.open();
-		
-		Map<String, Object> result = new HashMap<String, Object>();
-		result.put("time", new Date().getTime());
-		result.put("status", "OK");
-		scheduler.setCurrentTime(System.currentTimeMillis());
-		
-		return result;
-	}
 
     // fanhonglingdeMacBook-Pro:go-to-authnz fanhongling$ curl http://172.17.4.50:8082/getMechineFlag -X POST -H "Content-Type: application/json" -d '{"env": 1, "teamNo": 1}'
     // {"flag":"3784AD50F3C6D375567CE31FC09F6D89"}
     // 比赛回合数，例如flag值30分钟一刷新，比赛时间为10个小时，那么回合数就为20
 	@PostMapping("/v1/refresh-creation")
 	public RefreshReqResp createRefresh( @RequestBody RefreshReqResp req ){
-		System.out.println("Go to create refreshing: " + req);
+		System.out.println("Go to start refreshing: " + req);
         return resch.create(req);
 	}
     
 	@PostMapping("/v1/refresh-deletion")
 	public RefreshReqResp deleteRefresh( @RequestBody RefreshReqResp req ){
-		System.out.println("Go to delete refreshing: " + req);
+		System.out.println("Go to stop refreshing: " + req);
         return resch.delete(req);
 	}
     
 	@PostMapping("/v1/refresh-updation")
 	public RefreshReqResp updateRefresh( @RequestBody RefreshReqResp req ){
-		System.out.println("Go to update refreshing: " + req);
+		System.out.println("Go to restart refreshing: " + req);
         return resch.update(req);
+	}
+	
+	@GetMapping("/v1/statuses")
+	public List<RefreshReqResp> getAll(){
+		return resch.getAll();
+	}
+    
+	@GetMapping("/v1/statuses/{id}")
+	public RefreshReqResp getOne(@PathVariable Integer id, HttpServletResponse response){
+        RefreshReqResp resp = resch.findOne(id);
+        if (resp.getStateCode() > 0) response.setStatus(resp.getStateCode());
+        return resp;
+	}
+	
+	@GetMapping("/v1/find/")
+    public ResponseEntity<RefreshReqResp> findOne(@RequestParam(value="bf", required=true) Integer projectId){	
+		System.out.println("Go to find by project: " + projectId);
+        RefreshReqResp resp = resch.findByProject(projectId);
+        if (resp.getStateCode() > 0)
+            return new ResponseEntity<RefreshReqResp>(resp, HttpStatus.valueOf(resp.getStateCode()));
+        return new ResponseEntity<RefreshReqResp>(resp, HttpStatus.OK);
 	}
 	
 	//5）具备数据库查询接口功能，即：当靶机请求属于该靶机的Flag值时，Flag控制服务器端程序可去数据库中检索到，并response给请求发起方
@@ -80,17 +96,6 @@ public class RefreshController {
 			result.put("Token", "");
 		}
 		return result;
-	}
-	
-	//返回当前轮次
-	@PostMapping("/v1/getCount")
-	public Map<String, Object> get(){
-		Map<String, Object> map = new HashMap<String, Object>();
-		map.put("value", scheduler.getCount());
-		long lCtime = System.currentTimeMillis();
-		
-		map.put("timestamp",  (lCtime - scheduler.getCurrentTime())/1000);
-		return map;
 	}
 }
 

@@ -195,6 +195,12 @@ initialflags:??srjava.lang.Integer⠤???8Ivaluexrjava.lang.Number???
 +OK
 ```
 
+Or
+```
+[vagrant@localhost flag]$ docker exec -ti redis redis-cli keys "*"
+1) "initialflags:\xac\xed\x00\x05sr\x00\x11java.lang.Integer\x12\xe2\xa0\xa4\xf7\x81\x878\x02\x00\x01I\x00\x05valuexr\x00\x10java.lang.Number\x86\xac\x95\x1d\x0b\x94\xe0\x8b\x02\x00\x00xp\x00\x00\x00\x01"
+```
+
 ### Deploy
 
 Refer to [`docker-compose.yml`](./docker-compose.yml)
@@ -256,9 +262,65 @@ Date: Fri, 22 Sep 2017 10:26:18 GMT
 Last to show
 ```
 [vagrant@localhost flag]$ ls /tmp/mnt-home/test1/demo1/
-1
-[vagrant@localhost flag]$ cat /tmp/mnt-home/test1/demo1/1
-C2B4CA9C56973A3EBD65BC91ADB517E3
+1     flag
+[vagrant@localhost flag]$ cat /tmp/mnt-home/test1/demo1/flag 
+1828B3E38F52C125A1E57115306C446F
+```
+
+Show _count_
+```
+[vagrant@localhost flag]$ ./runtests_curl.sh count
+*   Trying 172.17.4.50...
+* Connected to 172.17.4.50 (172.17.4.50) port 8082 (#0)
+> GET /v1/find/?bf=1 HTTP/1.1
+> Host: 172.17.4.50:8082
+> User-Agent: curl/7.43.0
+> Accept: */*
+> Content-Type: application/json
+> Accept-Type: application/json
+> 
+< HTTP/1.1 200 
+HTTP/1.1 200 
+< Set-Cookie: JSESSIONID=644350BA146BF24724C0AF503FA0DAD9; Path=/; HttpOnly
+Set-Cookie: JSESSIONID=644350BA146BF24724C0AF503FA0DAD9; Path=/; HttpOnly
+< Content-Type: application/json;charset=UTF-8
+Content-Type: application/json;charset=UTF-8
+< Transfer-Encoding: chunked
+Transfer-Encoding: chunked
+< Date: Sun, 01 Oct 2017 03:02:24 GMT
+Date: Sun, 01 Oct 2017 03:02:24 GMT
+
+< 
+* Connection #0 to host 172.17.4.50 left intact
+{"refreshingDatetime":1506826927000,"id":1,"image_id":1,"battlefield_id":1,"name":"test","periodic":15,"refreshing_rfc3339":"2017-10-01T03:02:07","rounds":10,"count":2,"data_store":"test1/","state_code":0,"state_message":"","refreshing_info":{"team1":{"projectId":null,"container_id":1,"refresh_config_id":0,"team_id":1,"name":"flag","sub_path":"demo1/","state_code":0,"state_message":"","flag":null}},"config":{"id":1,"common":"20170826","tremcount":null,"count":10,"environmentCount":null}}
+```
+
+If game over
+```
+[vagrant@localhost flag]$ ./runtests_curl.sh count
+*   Trying 172.17.4.50...
+* Connected to 172.17.4.50 (172.17.4.50) port 8082 (#0)
+> GET /v1/find/?bf=1 HTTP/1.1
+> Host: 172.17.4.50:8082
+> User-Agent: curl/7.43.0
+> Accept: */*
+> Content-Type: application/json
+> Accept-Type: application/json
+> 
+< HTTP/1.1 404 
+HTTP/1.1 404 
+< Set-Cookie: JSESSIONID=FDE8792B6CD3324F8BDE65E7A314BB62; Path=/; HttpOnly
+Set-Cookie: JSESSIONID=FDE8792B6CD3324F8BDE65E7A314BB62; Path=/; HttpOnly
+< Content-Type: application/json;charset=UTF-8
+Content-Type: application/json;charset=UTF-8
+< Transfer-Encoding: chunked
+Transfer-Encoding: chunked
+< Date: Sun, 01 Oct 2017 03:04:52 GMT
+Date: Sun, 01 Oct 2017 03:04:52 GMT
+
+< 
+* Connection #0 to host 172.17.4.50 left intact
+{"refreshingDatetime":946512000000,"id":0,"image_id":0,"battlefield_id":0,"name":"","periodic":0,"refreshing_rfc3339":"1999-12-30T00:00:00","rounds":1,"count":0,"data_store":"","state_code":404,"state_message":"Not Found","refreshing_info":{},"config":null}
 ```
 
 ## Reference

@@ -2,7 +2,7 @@
 
 DATETIME=$(date +%Y-%m-%dT%H:%M:%S -d "+15 seconds")
 case $1 in
-    create)
+    start)
 	    curl http://172.17.4.50:8082/v1/refresh-creation \
 		    -H "Content-Type: application/json" -X POST -iv -d \
 "{
@@ -41,6 +41,18 @@ case $1 in
     }
 }"
         ;;
+    count)
+	    curl http://172.17.4.50:8082/v1/find/?bf=1 -X GET -iv \
+            -H "Content-Type: application/json" -H "Accept-Type: application/json"
+        ;;    
+    delete)
+	    curl http://172.17.4.50:8082/v1/refresh-updation \
+		    -H "Content-Type: application/json" -X POST -iv -d \
+"{
+  \"id\": 1,
+  \"name\": \"test\"
+}"
+        ;;    
     update)
 	    curl http://172.17.4.50:8082/v1/refresh-updation \
 		    -H "Content-Type: application/json" -X POST -iv -d \
@@ -79,7 +91,7 @@ case $1 in
         }
     }
 }"
-    ;;
+        ;;
     signin)
 	    curl http://172.17.4.50:8082/checkLogin \
 		    -H "Content-Type: application/json" -X POST -iv -d \
@@ -87,7 +99,7 @@ case $1 in
   "username": "admin",
   "passwd": "123456"    
 }'
-    ;;
+        ;;
     *)
         echo "Valid test: create, update, delete"
         ;;
