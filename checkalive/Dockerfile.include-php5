@@ -19,20 +19,26 @@ LABEL maintainer='tangfeixiong <tangfx128@gmail.com>' \
 RUN set -x \
     && apk add --update \
         bash \
-		ca-certificates \
         curl \
         wget \
         git \
         mysql-client \
-		openssl-dev \
 		libxml2-dev \
 		libxslt-dev \
-		libffi-dev \
         python \
         py-pip \
         py-mysqldb \
-		python-dev \
-		build-base \
+        php5 \
+        php5-cli \
+        php5-common \
+        php5-gd \
+        php5-phar \
+        php5-posix \
+        php5-curl \
+        php5-mysql \
+        php5-openssl \
+        php5-json \
+        php5-dom \
     && rm -rf /var/cache/apk/* \
 # python 
     && pip install \
@@ -43,7 +49,11 @@ RUN set -x \
 		pyquery \
 		multipart_encode \
 		poster \
-		requests \
+# php
+    && ln -sf /usr/bin/php5 /usr/bin/php \
+# php composer
+    #curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer 
+    && wget https://raw.githubusercontent.com/composer/getcomposer.org/master/web/installer -O - -q | php -- --quiet \
 # finally
     && echo    
 

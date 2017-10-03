@@ -1,6 +1,12 @@
-# Wrapper server working like crond
+# Instruction
 
-## Build
+Wrapper server working like crond
+
+## Table of content
+* [Development](#development)
+* [Test](#test)
+
+## Development
 
 Protobuf
 ```
@@ -17,151 +23,257 @@ Alternative bin
 [vagrant@bogon go-to-docker]$ ./checkalive/build-go.sh --cgo
 ```
 
-Docker
+### Docker
+
+Build
 ```
-[vagrant@bogon go-to-docker]$ ./checkalive/build-docker-alpine.sh 
-Sending build context to Docker daemon 9.309 MB
+[vagrant@bogon go-to-docker]$ ./checkalive/build-docker-alpine.sh --build
+Sending build context to Docker daemon 15.56 MB
 Step 1 : FROM alpine
  ---> 7328f6f8b418
 Step 2 : LABEL maintainer 'tangfeixiong <tangfx128@gmail.com>' project "https://github.com/tangfeixiong/go-to-docker" name "tickerjobcm" namespace "stackdocker" annotation '{"stackdocker.io/created-by":"n/a"}' tag "alpine php python"
  ---> Using cache
- ---> 84039785f7c7
-Step 3 : RUN set -x     && apk add --update         bash         curl         wget         git         mysql-client         php5         php5-cli         php5-common         php5-gd         php5-phar         php5-curl         php5-mysql         php5-openssl         php5-json         php5-dom         python         py-pip         py-mysqldb     && rm -rf /var/cache/apk/*     && pip install MySQL-python redis     && ln -sf /usr/bin/php5 /usr/bin/php     && wget https://raw.githubusercontent.com/composer/getcomposer.org/master/web/installer -O - -q | php -- --quiet     && echo
- ---> Running in 288c510e8e06
-+ apk add --update bash curl wget git mysql-client php5 php5-cli php5-common php5-gd php5-phar php5-curl php5-mysql php5-openssl php5-json php5-dom python py-pip py-mysqldb
+ ---> 088ffda24a88
+Step 3 : RUN set -x     && apk add --update         bash 		ca-certificates         curl         wget         git         mysql-client 		openssl-dev 		libxml2-dev 		libxslt-dev 		libffi-dev         python         py-pip         py-mysqldb 		python-dev 		build-base     && rm -rf /var/cache/apk/*     && pip install 	    MySQL-python 		redis 		MultipartPostHandler 		scp 		pyquery 		multipart_encode 		poster     && echo
+ ---> Running in 35e7fd9b5d28
++ apk add --update bash ca-certificates curl wget git mysql-client openssl-dev libxml2-dev libxslt-dev libffi-dev python py-pip py-mysqldb python-dev build-base
 fetch http://dl-cdn.alpinelinux.org/alpine/v3.6/main/x86_64/APKINDEX.tar.gz
 fetch http://dl-cdn.alpinelinux.org/alpine/v3.6/community/x86_64/APKINDEX.tar.gz
-(1/39) Installing ncurses-terminfo-base (6.0-r8)
-(2/39) Installing ncurses-terminfo (6.0-r8)
-(3/39) Installing ncurses-libs (6.0-r8)
-(4/39) Installing readline (6.3.008-r5)
-(5/39) Installing bash (4.3.48-r1)
+(1/57) Upgrading musl (1.1.16-r10 -> 1.1.16-r13)
+(2/57) Installing ncurses-terminfo-base (6.0-r8)
+(3/57) Installing ncurses-terminfo (6.0-r8)
+(4/57) Installing ncurses-libs (6.0-r8)
+(5/57) Installing readline (6.3.008-r5)
+(6/57) Installing bash (4.3.48-r1)
 Executing bash-4.3.48-r1.post-install
-(6/39) Installing ca-certificates (20161130-r2)
-(7/39) Installing libssh2 (1.8.0-r1)
-(8/39) Installing libcurl (7.55.0-r0)
-(9/39) Installing curl (7.55.0-r0)
-(10/39) Installing expat (2.2.0-r1)
-(11/39) Installing pcre (8.41-r0)
-(12/39) Installing git (2.13.5-r0)
-(13/39) Installing mariadb-common (10.1.26-r0)
-(14/39) Installing mariadb-client (10.1.26-r0)
-(15/39) Installing mysql-client (10.1.26-r0)
-(16/39) Installing php5-common (5.6.31-r0)
-(17/39) Installing libxml2 (2.9.4-r4)
-(18/39) Installing php5-cli (5.6.31-r0)
-(19/39) Installing php5 (5.6.31-r0)
-(20/39) Installing php5-curl (5.6.31-r0)
-(21/39) Installing php5-dom (5.6.31-r0)
-(22/39) Installing libbz2 (1.0.6-r5)
-(23/39) Installing libpng (1.6.29-r1)
-(24/39) Installing freetype (2.7.1-r1)
-(25/39) Installing libjpeg-turbo (1.5.1-r0)
-(26/39) Installing php5-gd (5.6.31-r0)
-(27/39) Installing php5-json (5.6.31-r0)
-(28/39) Installing php5-mysql (5.6.31-r0)
-(29/39) Installing php5-openssl (5.6.31-r0)
-(30/39) Installing php5-phar (5.6.31-r0)
-(31/39) Installing libffi (3.2.1-r3)
-(32/39) Installing gdbm (1.12-r0)
-(33/39) Installing sqlite-libs (3.18.0-r0)
-(34/39) Installing python2 (2.7.13-r1)
-(35/39) Installing mariadb-client-libs (10.1.26-r0)
-(36/39) Installing py-mysqldb (1.2.5-r0)
-(37/39) Installing py-setuptools (33.1.1-r1)
-(38/39) Installing py2-pip (9.0.1-r1)
-(39/39) Installing wget (1.19.1-r2)
+(7/57) Installing binutils-libs (2.28-r2)
+(8/57) Installing binutils (2.28-r2)
+(9/57) Installing gmp (6.1.2-r0)
+(10/57) Installing isl (0.17.1-r0)
+(11/57) Installing libgomp (6.3.0-r4)
+(12/57) Installing libatomic (6.3.0-r4)
+(13/57) Installing pkgconf (1.3.7-r0)
+(14/57) Installing libgcc (6.3.0-r4)
+(15/57) Installing mpfr3 (3.1.5-r0)
+(16/57) Installing mpc1 (1.0.3-r0)
+(17/57) Installing libstdc++ (6.3.0-r4)
+(18/57) Installing gcc (6.3.0-r4)
+(19/57) Installing musl-dev (1.1.16-r13)
+(20/57) Installing libc-dev (0.7.1-r0)
+(21/57) Installing g++ (6.3.0-r4)
+(22/57) Installing make (4.2.1-r0)
+(23/57) Installing fortify-headers (0.8-r0)
+(24/57) Installing build-base (0.5-r0)
+(25/57) Installing ca-certificates (20161130-r2)
+(26/57) Installing libssh2 (1.8.0-r1)
+(27/57) Installing libcurl (7.55.0-r0)
+(28/57) Installing curl (7.55.0-r0)
+(29/57) Installing expat (2.2.0-r1)
+(30/57) Installing pcre (8.41-r0)
+(31/57) Installing git (2.13.5-r0)
+(32/57) Upgrading musl-utils (1.1.16-r10 -> 1.1.16-r13)
+(33/57) Installing libffi (3.2.1-r3)
+(34/57) Installing libffi-dev (3.2.1-r3)
+(35/57) Installing zlib-dev (1.2.11-r0)
+(36/57) Installing libxml2 (2.9.4-r4)
+(37/57) Installing libxml2-dev (2.9.4-r4)
+(38/57) Installing libgpg-error (1.27-r0)
+(39/57) Installing libgcrypt (1.7.9-r0)
+(40/57) Installing libxslt (1.1.29-r3)
+(41/57) Installing libxslt-dev (1.1.29-r3)
+(42/57) Installing mariadb-common (10.1.26-r0)
+(43/57) Installing mariadb-client (10.1.26-r0)
+(44/57) Installing mysql-client (10.1.26-r0)
+(45/57) Installing libcrypto1.0 (1.0.2k-r0)
+(46/57) Installing libssl1.0 (1.0.2k-r0)
+(47/57) Installing openssl-dev (1.0.2k-r0)
+(48/57) Installing libbz2 (1.0.6-r5)
+(49/57) Installing gdbm (1.12-r0)
+(50/57) Installing sqlite-libs (3.18.0-r0)
+(51/57) Installing python2 (2.7.13-r1)
+(52/57) Installing mariadb-client-libs (10.1.26-r0)
+(53/57) Installing py-mysqldb (1.2.5-r0)
+(54/57) Installing py-setuptools (33.1.1-r1)
+(55/57) Installing py2-pip (9.0.1-r1)
+(56/57) Installing python2-dev (2.7.13-r1)
+(57/57) Installing wget (1.19.1-r2)
 Executing busybox-1.26.2-r5.trigger
 Executing ca-certificates-20161130-r2.trigger
-OK: 129 MiB in 50 packages
+OK: 304 MiB in 66 packages
 + rm -rf /var/cache/apk/APKINDEX.24d64ab1.tar.gz /var/cache/apk/APKINDEX.84815163.tar.gz
-+ pip install MySQL-python redis
++ pip install MySQL-python redis MultipartPostHandler scp pyquery multipart_encode poster
 Requirement already satisfied: MySQL-python in /usr/lib/python2.7/site-packages
 Collecting redis
   Downloading redis-2.10.6-py2.py3-none-any.whl (64kB)
-Installing collected packages: redis
-Successfully installed redis-2.10.6
-+ ln -sf /usr/bin/php5 /usr/bin/php
-+ wget https://raw.githubusercontent.com/composer/getcomposer.org/master/web/installer -O - -q
-+ php -- --quiet
-Some settings on your machine may cause stability issues with Composer.
-If you encounter issues, try to change the following:
-
-The zlib extension is not loaded, this can slow down Composer a lot.
-If possible, install it or recompile php with --with-zlib
-
-The php.ini used by your command-line PHP is: /etc/php5/php.ini
-If you can not modify the ini file, you can also run `php -d option=value` to modify ini values on the fly. You can use -d multiple times.
-
+Collecting MultipartPostHandler
+  Downloading MultipartPostHandler-0.1.0.tar.gz
+Collecting scp
+  Downloading scp-0.10.2-py2.py3-none-any.whl
+Collecting pyquery
+  Downloading pyquery-1.2.17-py2.py3-none-any.whl
+Collecting multipart_encode
+  Downloading multipart-encode-0.1.0.tar.gz
+Collecting poster
+  Downloading poster-0.8.1.tar.gz
+Collecting paramiko (from scp)
+  Downloading paramiko-2.3.1-py2.py3-none-any.whl (182kB)
+Collecting lxml>=2.1 (from pyquery)
+  Downloading lxml-4.0.0.tar.gz (4.2MB)
+Collecting cssselect>0.7.9 (from pyquery)
+  Downloading cssselect-1.0.1-py2.py3-none-any.whl
+Collecting pyasn1>=0.1.7 (from paramiko->scp)
+  Downloading pyasn1-0.3.6-py2.py3-none-any.whl (63kB)
+Collecting bcrypt>=3.1.3 (from paramiko->scp)
+  Downloading bcrypt-3.1.3.tar.gz (40kB)
+Collecting cryptography>=1.5 (from paramiko->scp)
+  Downloading cryptography-2.0.3.tar.gz (427kB)
+Collecting pynacl>=1.0.1 (from paramiko->scp)
+  Downloading PyNaCl-1.1.2.tar.gz (3.1MB)
+Collecting cffi>=1.1 (from bcrypt>=3.1.3->paramiko->scp)
+  Downloading cffi-1.11.0.tar.gz (434kB)
+Collecting six>=1.4.1 (from bcrypt>=3.1.3->paramiko->scp)
+  Downloading six-1.11.0-py2.py3-none-any.whl
+Collecting idna>=2.1 (from cryptography>=1.5->paramiko->scp)
+  Downloading idna-2.6-py2.py3-none-any.whl (56kB)
+Collecting asn1crypto>=0.21.0 (from cryptography>=1.5->paramiko->scp)
+  Downloading asn1crypto-0.23.0-py2.py3-none-any.whl (99kB)
+Collecting enum34 (from cryptography>=1.5->paramiko->scp)
+  Downloading enum34-1.1.6-py2-none-any.whl
+Collecting ipaddress (from cryptography>=1.5->paramiko->scp)
+  Downloading ipaddress-1.0.18-py2-none-any.whl
+Collecting pycparser (from cffi>=1.1->bcrypt>=3.1.3->paramiko->scp)
+  Downloading pycparser-2.18.tar.gz (245kB)
+Installing collected packages: redis, MultipartPostHandler, pyasn1, pycparser, cffi, six, bcrypt, idna, asn1crypto, enum34, ipaddress, cryptography, pynacl, paramiko, scp, lxml, cssselect, pyquery, multipart-encode, poster
+  Running setup.py install for MultipartPostHandler: started
+    Running setup.py install for MultipartPostHandler: finished with status 'done'
+  Running setup.py install for pycparser: started
+    Running setup.py install for pycparser: finished with status 'done'
+  Running setup.py install for cffi: started
+    Running setup.py install for cffi: finished with status 'done'
+  Running setup.py install for bcrypt: started
+    Running setup.py install for bcrypt: finished with status 'done'
+  Running setup.py install for cryptography: started
+    Running setup.py install for cryptography: finished with status 'done'
+  Running setup.py install for pynacl: started
+    Running setup.py install for pynacl: still running...
+    Running setup.py install for pynacl: finished with status 'done'
+  Running setup.py install for lxml: started
+    Running setup.py install for lxml: still running...
+    Running setup.py install for lxml: finished with status 'done'
+  Running setup.py install for multipart-encode: started
+    Running setup.py install for multipart-encode: finished with status 'done'
+  Running setup.py install for poster: started
+    Running setup.py install for poster: finished with status 'done'
+Successfully installed MultipartPostHandler-0.1.0 asn1crypto-0.23.0 bcrypt-3.1.3 cffi-1.11.0 cryptography-2.0.3 cssselect-1.0.1 enum34-1.1.6 idna-2.6 ipaddress-1.0.18 lxml-4.0.0 multipart-encode-0.1.0 paramiko-2.3.1 poster-0.8.1 pyasn1-0.3.6 pycparser-2.18 pynacl-1.1.2 pyquery-1.2.17 redis-2.10.6 scp-0.10.2 six-1.11.0
 + echo
 
- ---> 7fa7e9ddb00b
-Removing intermediate container 288c510e8e06
-Step 4 : COPY bin/ program/ /
- ---> 0f56ed79331a
-Removing intermediate container 732545d123db
+ ---> 0d97bfaea804
+Removing intermediate container 35e7fd9b5d28
+Step 4 : COPY bin/checkalive program/ /
+ ---> 0594b39c19ef
+Removing intermediate container de1dbcb5d550
 Step 5 : VOLUME /examples
- ---> Running in 76aa72449097
- ---> 6b273bae4db4
-Removing intermediate container 76aa72449097
+ ---> Running in 01dfed34a8a9
+ ---> b22f484a189c
+Removing intermediate container 01dfed34a8a9
 Step 6 : EXPOSE 10061 10062
- ---> Running in 7059f79de59f
- ---> 7f620583301d
-Removing intermediate container 7059f79de59f
-Step 7 : ENTRYPOINT /target-cm serve
- ---> Running in ec06533fff32
- ---> e333179d9852
-Removing intermediate container ec06533fff32
+ ---> Running in 89f8de7c802f
+ ---> 86e52c28d445
+Removing intermediate container 89f8de7c802f
+Step 7 : ENTRYPOINT /checkalive serve
+ ---> Running in 3a6cfe1de0ba
+ ---> a66ff4f2c697
+Removing intermediate container 3a6cfe1de0ba
 Step 8 : CMD --v=2 --logtostderr=true
- ---> Running in 8bec407b9e90
- ---> 15826af34826
-Removing intermediate container 8bec407b9e90
-Successfully built 15826af34826
+ ---> Running in 1239dbf4b15b
+ ---> a5eaa7e275b5
+Removing intermediate container 1239dbf4b15b
+Successfully built a5eaa7e275b5
 ```
 
 Image
 ```
 [vagrant@bogon go-to-docker]$ docker images tangfeixiong/target-cm
-REPOSITORY                                             TAG                                     IMAGE ID            CREATED              SIZE
-docker.io/tangfeixiong/target-cm                       0.1-1709080032-git_0c88f84              15826af34826        About a minute ago   132.9 MB
+REPOSITORY                         TAG                 IMAGE ID            CREATED             SIZE
+docker.io/tangfeixiong/target-cm   0.1                 a5eaa7e275b5        3 seconds ago       337.7 MB
 ```
 
 ## Test
 
+### Via curl
+
+Using [runtests_curl.sh](./runtests_curl.sh)
+
 Create
 ```
-{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"bG9jYWxob3N0Cg=="},"periodic":3,"destination_path":"examples/python/checkalive/web1check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd10-nothing
+{"name":"awd10_nothing_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd11-maccms
+{"error":"Dispatcher exists, delete or update first. name=awd10_nothing_check.py","code":2}[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd11-maccms
+{"name":"awd11_maccms_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd11_maccms/awd11_maccms_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd12-phpsqllitecms
+{"name":"awd12_phpsqllitecms_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd12_phpsqllitecms/awd12_phpsqllitecms_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd1-lemon-cms
+{"name":"awd1_lemon_cms_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd1_lemon_cms/awd1_lemon_cms_check.py"}[vagrant@localhost go-to-docker]
+$ checkalive/runtests_curl.sh start-awd1-xmanweb2
+{"name":"awd1_xmanweb2_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd1_xmanweb2/awd1_xmanweb2_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd2-daydayweb-check
+{"error":"Command file awd1_daydayweb_check.py not found","code":2}[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd2-daydayweb-check
+{"name":"awd2_daydayweb_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd2_daydayweb/awd2_daydayweb_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd2-dynpage-check
+{"name":"awd2_dynpage_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd2_dynpage/awd2_dynpage_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd3-electronics-check
+{"name":"awd3_electronics_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd3_electronics/awd3_electronics_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd3-shadow-check
+{"name":"awd3_shadow_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd3_shadow/awd3_shadow_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd4-chinaz-check
+{"name":"awd4_chinaz_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd4_chinaz/awd4_chinaz_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd4-tomcat-check
+{"name":"awd4_tomcat_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd4_tomcat/awd4_tomcat_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd5-babyblog-check
+{"name":"awd5_babyblog_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd5_babyblog/awd5_babyblog_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd5-gracer-check
+{"name":"awd5_gracer_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd5_gracer/awd5_gracer_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd6-cms-check
+{"name":"awd6_cms_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd6_cms/awd6_cms_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd7-upload-check
+{"name":"awd7_upload_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd7_upload/awd7_upload_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd8-blog-check
+{"name":"awd8_blog_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd8_blog/awd8_blog_check.py"}
+[vagrant@localhost go-to-docker]$ checkalive/runtests_curl.sh start-awd9-money-check
+{"name":"awd9_money_check.py","args":["--host=localhost","--port=80"],"periodic":3,"duration":10,"dest_configurations":{"env1":{"name":"team1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"}}},"destination_path":"examples/python/check-alive/awd9_money/awd9_money_check.py"}
 ```
 
 Reap
 ```
 fanhonglingdeMacBook-Pro:checkalive fanhongling$ ./runtests_curl.sh reap
-{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"bG9jYWxob3N0Cg=="},"periodic":3,"state_message":"---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n\n---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n","timestamp":"2017-09-07T23:13:56Z","destination_path":"examples/python/checkalive/web1check.py"}
+{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"bG9jYWxob3N0Cg=="},"periodic":3,"state_message":"---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n\n---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n","timestamp":"2017-09-07T23:13:56Z","destination_path":"examples/python/check-alive/web1check.py"}
 ```
 
 Update
 ```
 fanhonglingdeMacBook-Pro:checkalive fanhongling$ ./runtests_curl.sh update
-{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"MTI3LjAuMC4xCg=="},"periodic":5,"state_message":"---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n\n---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n","timestamp":"2017-09-07T23:13:59Z","destination_path":"examples/python/checkalive/web1check.py"}
+{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"MTI3LjAuMC4xCg=="},"periodic":5,"state_message":"---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n\n---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n","timestamp":"2017-09-07T23:13:59Z","destination_path":"examples/python/check-alive/web1check.py"}
 ```
 
 Delete
 ```
 fanhonglingdeMacBook-Pro:checkalive fanhongling$ ./runtests_curl.sh delete
-{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"MTI3LjAuMC4xCg=="},"periodic":5,"state_message":"---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n\n---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n","timestamp":"2017-09-07T23:13:59Z","destination_path":"examples/python/checkalive/web1check.py"}
+{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"MTI3LjAuMC4xCg=="},"periodic":5,"state_message":"---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n\n---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n","timestamp":"2017-09-07T23:13:59Z","destination_path":"examples/python/check-alive/web1check.py"}
 ```
 
+### Server
 
-Server output
+output (Note: By default, server must be tested at repository home dir)
 ```
-[vagrant@bogon go-to-docker]$ ./checkalive/bin/target-cm serve --v=2 --logtostderr
+[vagrant@bogon go-to-docker]$ ./checkalive/bin/checkalive serve --v=2 --logtostderr
 Start gRPC Gateway into host :10061
 http on host: [::]:10062
 Start gRPC on host [::]:10061
 go to create check
 check path
 destination path
-Visited: examples/python/checkalive/web1check.py
+Visited: examples/python/check-alive/web1check.py
 filepath.Walk() returned Stop recursive searching
 config file
 Tick at 2017-09-07 23:13:53.42750264 +0000 UTC
@@ -193,9 +305,9 @@ Ticker stopped
 
 ```
 
-### Docker run
+### Via docker
 
-For example
+Refer to `docker-compose.yml` or `Dockerfile` for details
 ```
 [vagrant@bogon go-to-docker]$ docker run --rm -ti --name target-cm -p 10062:10062 tangfeixiong/target-cm:0.1-1709080032-git_0c88f84
 Start gRPC Gateway into host :10061
@@ -250,56 +362,78 @@ Ticker stopped
 ^C
 ```
 
-__Redis__
+### Redis pub/sub
 
-Config
+Container
 ```
-[vagrant@bogon go-to-docker]$ export DATABUS_REDIS_HOST=172.18.0.3:6379
+[vagrant@bogon checkalive]$ docker inspect -f {{.NetworkSettings.IPAddress}} redis
+172.17.0.9
+```
+
+Or export environment to execute
+```
+[vagrant@bogon go-to-docker]$ export DATABUS_REDIS_HOST=172.17.0.9:6379
 [vagrant@bogon go-to-docker]$ export DATABUS_REDIS_DB=15
 ```
 
-Server
+Or execute server with process-only environment  (Note: By default, server must be tested at repository home dir)
 ```
-[vagrant@bogon go-to-docker]$ ./checkalive/bin/target-cm serve --v=2 --logtostderr
+[vagrant@bogon go-to-docker]$ DATABUS_REDIS_HOST=172.17.0.9:6379 DATABUS_REDIS_DB=15 ./checkalive/bin/checkalive serve --v=2 --logtostderr
 Start gRPC Gateway into host :10061
 Start gRPC on host [::]:10061
 http on host: [::]:10062
-I0908 09:07:52.097088    6031 daemon.go:265] go to create check: "name:\"web1check.py\" command:\"python\" command:\"web1check.py\" conf:<key:\"hosts.list\" value:\"bG9jYWxob3N0Cg==\" > work_dir:\"web1check\" periodic:3 "
-I0908 09:07:52.097935    6031 daemon.go:290] path: web1check.py
-Visited: examples/python/checkalive/web1check/web1check.py
+I1002 09:18:53.465940   22062 server.go:267] go to create check: "name:\"awd10_nothing_check.py\" command:\"python\" command:\"awd10_nothing_check.py\" args:\"--host=$(ip)\" args:\"--port=$(port)\" work_dir:\"awd10_nothing\" periodic:3 duration:10 dest_configurations:<key:\"env1\" value:<name:\"team1\" tpl:<key:\"ip\" value:\"localhost\" > tpl:<key:\"port\" value:\"80\" > > > "
+Visited: examples/python/check-alive/awd10_nothing/awd10_nothing_check.py
 filepath.Walk() returned Stop recursive searching
-config file
-Tick at 2017-09-08 09:07:55.110137239 +0000 UTC
----------------------------------------------------------------
-checking host: localhost
-global name 'headers' is not defined
-Host: localhost seems down
+command: awd10_nothing_check.py
+Dest tpl: env1
+name:"awd10_nothing_check.py" command:"python" command:"awd10_nothing_check.py" args:"--host=localhost" args:"--port=80" work_dir:"awd10_nothing" periodic:3 duration:10 dest_configurations:<key:"env1" value:<name:"team1" args:"--host=localhost" args:"--port=80" tpl:<key:"ip" value:"localhost" > tpl:<key:"port" value:"80" > > > destination_path:"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py" 
+Tick at 2017-10-02 09:18:56.480039322 +0000 UTC -> key: env1
+HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f343dcba490>: Failed to establish a new connection: [Errno 111] Connection refused',))
+(False, 'check login page exception')
 
-I0908 09:07:55.286601    6031 daemon.go:478] write cm into cache
-I0908 09:07:55.290580    6031 daemon.go:508] Set CM checkalive.web1check.py: OK
-I0908 09:07:55.290867    6031 daemon.go:560] publish check...
-I0908 09:07:55.291846    6031 daemon.go:585] Published subject checkalive.web1check.py: 0
-Tick at 2017-09-08 09:07:58.11035487 +0000 UTC
----------------------------------------------------------------
-checking host: localhost
-global name 'headers' is not defined
-Host: localhost seems down
+I1002 09:18:56.939705   22062 server.go:556] write cm into cache
+I1002 09:18:56.943085   22062 server.go:584] Set CM checkalive.awd10_nothing_check.py: OK
+I1002 09:18:56.943873   22062 server.go:636] publish check...
+I1002 09:18:56.944706   22062 server.go:657] Published subject checkalive.awd10_nothing_check.py: 0
+name:"awd10_nothing_check.py" command:"python" command:"awd10_nothing_check.py" args:"--host=localhost" args:"--port=80" work_dir:"awd10_nothing" periodic:3 duration:10 dest_configurations:<key:"env1" value:<name:"team1" args:"--host=localhost" args:"--port=80" tpl:<key:"ip" value:"localhost" > tpl:<key:"port" value:"80" > state_code:1 state_message:"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f343dcba490>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\n\n" timestamp:"2017-10-02T09:18:56Z" > > destination_path:"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py" 
+Tick at 2017-10-02 09:18:59.479471649 +0000 UTC -> key: env1
+HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f222f1e5490>: Failed to establish a new connection: [Errno 111] Connection refused',))
+(False, 'check login page exception')
 
-I0908 09:07:58.306364    6031 daemon.go:478] write cm into cache
-I0908 09:07:58.307305    6031 daemon.go:508] Set CM checkalive.web1check.py: OK
-I0908 09:07:58.307997    6031 daemon.go:560] public check...
-I0908 09:07:58.308896    6031 daemon.go:585] Published subject checkalive.web1check.py: 0
-^C[vagrant@bogon go-to-docker]$ 
+I1002 09:18:59.942978   22062 server.go:556] write cm into cache
+I1002 09:18:59.944269   22062 server.go:584] Set CM checkalive.awd10_nothing_check.py: OK
+I1002 09:18:59.944922   22062 server.go:636] publish check...
+I1002 09:18:59.945772   22062 server.go:657] Published subject checkalive.awd10_nothing_check.py: 0
+name:"awd10_nothing_check.py" command:"python" command:"awd10_nothing_check.py" args:"--host=localhost" args:"--port=80" work_dir:"awd10_nothing" periodic:3 duration:10 dest_configurations:<key:"env1" value:<name:"team1" args:"--host=localhost" args:"--port=80" tpl:<key:"ip" value:"localhost" > tpl:<key:"port" value:"80" > state_code:2 state_message:"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f343dcba490>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f222f1e5490>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\n\n" timestamp:"2017-10-02T09:18:59Z" > > destination_path:"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py" 
+Tick at 2017-10-02 09:19:02.479418088 +0000 UTC -> key: env1
+HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f7160112490>: Failed to establish a new connection: [Errno 111] Connection refused',))
+(False, 'check login page exception')
+
+I1002 09:19:03.203510   22062 server.go:556] write cm into cache
+I1002 09:19:03.204326   22062 server.go:584] Set CM checkalive.awd10_nothing_check.py: OK
+I1002 09:19:03.204915   22062 server.go:636] publish check...
+I1002 09:19:03.205872   22062 server.go:657] Published subject checkalive.awd10_nothing_check.py: 0
+name:"awd10_nothing_check.py" command:"python" command:"awd10_nothing_check.py" args:"--host=localhost" args:"--port=80" work_dir:"awd10_nothing" periodic:3 duration:10 dest_configurations:<key:"env1" value:<name:"team1" args:"--host=localhost" args:"--port=80" tpl:<key:"ip" value:"localhost" > tpl:<key:"port" value:"80" > state_code:3 state_message:"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f343dcba490>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f222f1e5490>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<requests.packages.urllib3.connection.HTTPConnection object at 0x7f7160112490>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\n\n" timestamp:"2017-10-02T09:19:02Z" > > destination_path:"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py" 
+Stopped
+^C
 ```
 
-Client
+Or
 ```
-[vagrant@localhost go-to-docker]$ docker exec -ti gitlab_redis_1 bash
+[vagrant@bogon go-to-docker]$ docker run --rm -ti --name check-alive -p 10062:10062 -e DATABUS_REDIS_HOST=172.17.0.9:6379 -e DATABUS_REDIS_DB=15 docker.io/tangfeixiong/target-cm:0.1
+```
+
+Redis cli
+```
+[vagrant@localhost go-to-docker]$ docker exec -ti redis bash
 root@fe0ae27989c4:/# redis-cli 
 127.0.0.1:6379> select 15
 OK
-127.0.0.1:6379[15]> get checkalive.web1check.py
-"{\"name\":\"web1check.py\",\"command\":[\"python\",\"web1check.py\"],\"conf\":{\"hosts.list\":\"bG9jYWxob3N0Cg==\"},\"work_dir\":\"web1check\",\"periodic\":3,\"state_message\":\"---------------------------------------------------------------\\nchecking host: localhost\\nglobal name 'headers' is not defined\\nHost: localhost seems down\\n\\n---------------------------------------------------------------\\nchecking host: localhost\\nglobal name 'headers' is not defined\\nHost: localhost seems down\\n\",\"timestamp\":\"2017-09-08T09:08:46Z\",\"destination_path\":\"examples/python/checkalive/web1check/web1check.py\"}"
+127.0.0.1:6379[15]> keys *
+1) "checkalive.awd10_nothing_check.py"
+127.0.0.1:6379[15]> get "checkalive.awd10_nothing_check.py"
+"{\"name\":\"awd10_nothing_check.py\",\"command\":[\"python\",\"awd10_nothing_check.py\"],\"args\":[\"--host=localhost\",\"--port=80\"],\"work_dir\":\"awd10_nothing\",\"periodic\":3,\"duration\":10,\"dest_configurations\":{\"env1\":{\"name\":\"team1\",\"args\":[\"--host=localhost\",\"--port=80\"],\"tpl\":{\"ip\":\"localhost\",\"port\":\"80\"},\"state_code\":3,\"state_message\":\"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\\u003crequests.packages.urllib3.connection.HTTPConnection object at 0x7f343dcba490\\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\\n(False, 'check login page exception')\\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\\u003crequests.packages.urllib3.connection.HTTPConnection object at 0x7f222f1e5490\\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\\n(False, 'check login page exception')\\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\\u003crequests.packages.urllib3.connection.HTTPConnection object at 0x7f7160112490\\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\\n(False, 'check login page exception')\\n\\n\",\"timestamp\":\"2017-10-02T09:19:02Z\"}},\"destination_path\":\"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py\"}"
 127.0.0.1:6379[15]> quit
 root@fe0ae27989c4:/# exit
 exit

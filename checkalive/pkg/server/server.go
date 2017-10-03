@@ -59,6 +59,7 @@ func Run() {
 	mc := new(myCounselor)
 	mc.grpcHost = ":10061"
 	mc.httpHost = ":10062"
+	mc.packgesHome = "examples/python/check-alive"
 	mc.checkermanager = make(map[string]*counselor.CheckerController)
 	mc.redisAddresses = make([]string, 0)
 	mc.pubSubject = "checkalive"
@@ -82,7 +83,6 @@ func Run() {
 		}
 	}
 
-	mc.packgesHome = "examples/python/checkalive"
 	if v, ok := os.LookupEnv("CHECKALIVE_PACKAGE_HOME"); ok && 0 != len(v) {
 		mc.packgesHome = v
 	}

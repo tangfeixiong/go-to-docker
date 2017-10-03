@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	// "runtime"
 	"strings"
 	"sync"
 	"time"
@@ -269,6 +270,7 @@ func (cc *CheckerController) Dispatch(pkgHome string, req *checkalivepb.CheckAct
 		cc.messages[ck] = make([]Message, 0)
 	}
 	cc.ActionReqResp = req
+	cc.RootPath = pkgHome
 	return resp, nil
 }
 
@@ -291,6 +293,7 @@ func (cc *CheckerController) Start() {
 		for t := range ticker.C {
 			elapsed := time.Since(ts).Seconds()
 			amount := 0
+			fmt.Println(cc.ActionReqResp)
 			for k, _ := range cc.ActionReqResp.DestConfigurations {
 				switch {
 				case cc.ActionReqResp.Periodic <= 0:
@@ -303,7 +306,7 @@ func (cc *CheckerController) Start() {
 					amount += 1
 				default:
 					if elapsed < duration+1 {
-						fmt.Println("Tick at", t, "key:", k)
+						fmt.Println("Tick at", t, "-> key:", k)
 						go func() {
 							cc.doCheck(k)
 						}()
@@ -317,7 +320,9 @@ func (cc *CheckerController) Start() {
 				break
 			}
 		}
+		// runtime.Goexit()
 		ticker.Stop()
+		fmt.Println("Stopped")
 	}()
 
 	time.Sleep(time.Millisecond * 100)
@@ -340,8 +345,8 @@ func (cc *CheckerController) doCheck(key string) {
 	cc.mutex.Lock()
 	defer cc.mutex.Unlock()
 
-	workdir := cc.ActionReqResp.WorkDir
 	destinationPath := cc.ActionReqResp.DestinationPath
+	workdir := filepath.Join(cc.RootPath, cc.ActionReqResp.WorkDir)
 	timestamp := time.Now()
 	value := cc.ActionReqResp.DestConfigurations[key]
 
@@ -350,6 +355,14 @@ func (cc *CheckerController) doCheck(key string) {
 	prev := cc.ActionReqResp.DestConfigurations[key].StateCode
 	switch filepath.Base(destinationPath) {
 	case "awd1-4-checker.py", "awd1-8-checker.py":
+		fallthrough
+	case "awd1_lemon_cms_check.py", "awd2_dynpage_check.py", "awd4_tomcat_check.py", "awd5_gracer_check.py":
+		fallthrough
+	case "awd6_cms_check.py", "awd7_upload_check.py", "awd8_blog_check.py", "awd9_money_check.py":
+		fallthrough
+	case "awd10_nothing_check.py", "awd11_maccms_check.py", "awd12_phpsqllitecms_check.py":
+		fallthrough
+	case "awd2_daydayweb_check.py", "awd4_chinaz_check.py", "awd5_babyblog_check.py":
 		opts := append(append([]string{}, cc.ActionReqResp.Command[1:]...), value.Args...)
 		result, err = manipulate.Client.Python_00_check(workdir, opts...)
 		if err != nil {
@@ -379,8 +392,67 @@ func (cc *CheckerController) doCheck(key string) {
 		if err = scanner.Err(); err != nil {
 			fmt.Fprintln(os.Stderr, "Faild to reading standard input:", err)
 		}
-		// fallthrough
-	case "web1-2-checker.py", "web1-2_checker-imgtag1.py":
+	case "awd3_electronics_check.py", "awd1_xmanweb2_check.py":
+		opts := append(append([]string{}, cc.ActionReqResp.Command[1:]...), value.Args...)
+		result, err = manipulate.Client.Python_00_check(workdir, opts...)
+		if err != nil {
+			glog.Infof("Failed to execute: %s", err.Error())
+			return
+		}
+		scanner := bufio.NewScanner(bytes.NewReader(result))
+		for scanner.Scan() {
+			if ok, _ := regexp.MatchString(`.*\[Errno.+\] Connection refused.*`, scanner.Text()); ok {
+				cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+				break
+			}
+			if ok, _ := regexp.MatchString(`\('.*', 'error:', '.*'\)`, scanner.Text()); ok {
+				cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+				break
+			}
+			if ok, _ := regexp.MatchString(`{'status': *'down', *'msg':.*}`, scanner.Text()); ok {
+				cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+				break
+			}
+			if ok, _ := regexp.MatchString(`{'status': *'up', *'msg':.*}`, scanner.Text()); ok {
+				cc.ActionReqResp.DestConfigurations[key].StateCode = 0
+				break
+			}
+			fmt.Println("Unkown content:", scanner.Text())
+		}
+		if err = scanner.Err(); err != nil {
+			fmt.Fprintln(os.Stderr, "Faild to reading standard input:", err)
+		}
+	case "awd3_shadow_check.py":
+		opts := append(append([]string{}, cc.ActionReqResp.Command[1:]...), value.Args...)
+		result, err = manipulate.Client.Python_00_check(workdir, opts...)
+		if err != nil {
+			glog.Infof("Failed to execute: %s", err.Error())
+			return
+		}
+		scanner := bufio.NewScanner(bytes.NewReader(result))
+		for scanner.Scan() {
+			if ok, _ := regexp.MatchString(`.*\[Errno.+\] Connection refused.*`, scanner.Text()); ok {
+				cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+				break
+			}
+			if ok, _ := regexp.MatchString(`\('.*', 'error:', '.*'\)`, scanner.Text()); ok {
+				cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+				break
+			}
+			if ok, _ := regexp.MatchString(`\[no\].*`, scanner.Text()); ok {
+				cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+				break
+			}
+			if ok, _ := regexp.MatchString(`\[ok\].*`, scanner.Text()); ok {
+				cc.ActionReqResp.DestConfigurations[key].StateCode = 0
+				break
+			}
+			fmt.Println("Unkown content:", scanner.Text())
+		}
+		if err = scanner.Err(); err != nil {
+			fmt.Fprintln(os.Stderr, "Faild to reading standard input:", err)
+		}
+	case "web1-checker.py", "web2-checker.py":
 		opts := append(append([]string{}, cc.ActionReqResp.Command[1:]...), value.Args...)
 		result, err = manipulate.Client.Python_00_check(workdir, opts...)
 		if err != nil {

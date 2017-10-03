@@ -7,12 +7,12 @@ pushd $DIR
 #if [[ 0 -lt $# ]]; then
 case $1 in
   cgo|--cgo)
-	echo "build with CGO_ENABLED=1"
-	go build -v -o ./bin/target-cm ./
+	echo "CGO_ENABLED"
+	go build -v -o ./bin/checkalive ./
   ;;
   *)
-	echo "build with static link"
-	CGO_ENABLED=0 go build -v -a -o ./bin/target-cm --installsuffix cgo -ldflags "-s" ./
+	echo "build with static link (CGO_ENABLED=0)"
+	CGO_ENABLED=0 go build -v -a -o ./bin/checkalive --installsuffix cgo -ldflags "-s" ./
   ;;
 esac
 #fi
