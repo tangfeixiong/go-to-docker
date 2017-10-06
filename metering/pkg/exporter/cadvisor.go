@@ -58,15 +58,15 @@ func (cm *cAdvisorManager) RPC(clientrpc CollectorClientRPC) MeterDispatcher {
 func (cm *cAdvisorManager) StartMetering() map[string]Job {
 	resp := make(map[string]Job)
 	wg := sync.WaitGroup{}
-	wg.Add(1)
 	cm.ticker = time.NewTicker(cm.periodic)
 	ticker := cm.ticker
 	go func() {
-		defer wg.Done()
 		for t := range ticker.C {
 			fmt.Println("Tick at", t)
 			for k, v := range cm.jobs {
+				wg.Add(1)
 				go func() {
+					defer wg.Done()
 					v.result, v.Err = cm.ReapMetrics(k)
 					if cm.clientrpc != nil {
 						cm.clientrpc.Transit(v.result)

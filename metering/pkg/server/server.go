@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	// goruntime "runtime"
+	goruntime "runtime"
 	"strings"
 	"sync"
 	"syscall"
@@ -115,11 +115,12 @@ func RunExporter(meterdriver, collectorrpc string) {
 	m.run()
 }
 
-func RunCollector() {
+func RunCollector(storage string) {
 	m := new(myCollector)
 	m.grpcHost = ":12305"
 	m.httpHost = ":12306"
 	m.collectormanager = new(collector.CollectorManager)
+	m.collectormanager.MetricsStorageDuration = time.Second * 10
 
 	if v, ok := os.LookupEnv("METERINGCOLLECTOR_GRPC_PORT"); ok && 0 != len(v) {
 		if strings.Contains(v, ":") {
@@ -133,6 +134,19 @@ func RunCollector() {
 			m.httpHost = v
 		} else {
 			m.httpHost = ":" + v
+		}
+	}
+
+	if storage != "" {
+		if err := os.Setenv("METRICS_STORAGE_DRIVER", storage); err != nil {
+			fmt.Println("Environment not set, error:", err)
+		}
+	}
+	if v, ok := os.LookupEnv("METRICS_STORAGE_DRIVER"); ok && 0 != len(v) {
+		if strings.HasPrefix(v, "elasticsearch=") {
+			m.collectormanager.MetricsStorageDriver = v
+		} else {
+			fmt.Println("RPC driver not support,", v)
 		}
 	}
 
@@ -163,16 +177,14 @@ func (m *myExporter) run() {
 	}()
 
 	m.dispatchersignal = make(chan bool)
-	// wg.Add(1)
+	wg.Add(1)
 	go func() {
-		// defer wg.Done()
+		defer wg.Done()
 		/*
 		   default to read from 'docker stats'?
 		*/
 		m.exportermanager.Dispatch(m.dispatchersignal)
 	}()
-
-	// wg.Wait()
 
 	/*
 	   https://github.com/kubernetes/kubernetes/blob/release-1.1/build/pause/pause.go
@@ -180,12 +192,18 @@ func (m *myExporter) run() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
 
-	// Block until a signal is received.
-	<-c
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		// Block until a signal is received.
+		<-c
 
-	// to stop stuff...
-	m.dispatchersignal <- false
-	// goruntime.Goexit()
+		// to stop stuff...
+		m.dispatchersignal <- false
+		goruntime.Goexit()
+	}()
+
+	wg.Wait()
 }
 
 func (m *myExporter) startGRPC(ch chan<- bool) {
@@ -293,16 +311,14 @@ func (m *myCollector) run() {
 	}()
 
 	m.dispatchersignal = make(chan bool)
-	// wg.Add(1)
+	wg.Add(1)
 	go func() {
-		// defer wg.Done()
+		defer wg.Done()
 		/*
-		   default to read from 'docker stats'?
+		   default to write to stdout?
 		*/
 		m.collectormanager.Start(m.dispatchersignal)
 	}()
-
-	// wg.Wait()
 
 	/*
 	   https://github.com/kubernetes/kubernetes/blob/release-1.1/build/pause/pause.go
@@ -310,12 +326,18 @@ func (m *myCollector) run() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
 
-	// Block until a signal is received.
-	<-c
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		// Block until a signal is received.
+		<-c
 
-	// to stop stuff...
-	m.dispatchersignal <- false
-	// goruntime.Goexit()
+		// to stop stuff...
+		m.dispatchersignal <- false
+		goruntime.Goexit()
+	}()
+
+	wg.Wait()
 }
 
 func (m *myCollector) startGRPC(ch chan<- bool) {

@@ -35,7 +35,7 @@ func (m *myCollector) Transit(ctx context.Context, req *pb.MeteringReqResp) (*pb
 	if req.MeterUrl == "" {
 		return req, fmt.Errorf("Meter not available")
 	}
-	return new(pb.MeteringReqResp), nil
+	return m.collectormanager.Store(req)
 }
 
 func (m *myCollector) BatchTransit(streamer pb.CollectorService_BatchTransitServer) error {

@@ -64,3 +64,47 @@ Tick at 2017-10-06 05:20:44.610224173 +0000 UTC
 ### Deploy
 
 Via _docker-compose_
+
+
+### Check elasticsearch
+
+Via _curl_
+```
+[vagrant@localhost elastic.v5]$ docker exec -ti metering_elasticsearch_1 curl -u elastic:changeme http://172.17.4.50:39200/_nodes/http?pretty
+{
+  "_nodes" : {
+    "total" : 1,
+    "successful" : 1,
+    "failed" : 0
+  },
+  "cluster_name" : "docker-cluster",
+  "nodes" : {
+    "nGVvgYeATV2HC_gDoQIiJA" : {
+      "name" : "nGVvgYe",
+      "transport_address" : "172.19.0.2:9300",
+      "host" : "172.19.0.2",
+      "ip" : "172.19.0.2",
+      "version" : "5.6.2",
+      "build_hash" : "57e20f3",
+      "roles" : [
+        "master",
+        "data",
+        "ingest"
+      ],
+      "attributes" : {
+        "ml.max_open_jobs" : "10",
+        "ml.enabled" : "true"
+      },
+      "http" : {
+        "bound_address" : [
+          "[::]:9200"
+        ],
+        "publish_address" : "172.19.0.2:9200",
+        "max_content_length_in_bytes" : 104857600
+      }
+    }
+  }
+}
+```
+
+Refer to https://github.com/olivere/elastic/wiki/Connection-Problems#how-to-figure-out-connection-problems

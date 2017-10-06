@@ -62,6 +62,7 @@ func createExporterCommand() *cobra.Command {
 }
 
 func createCollectorCommand() *cobra.Command {
+	var storage string
 	var loglevel string
 
 	command := &cobra.Command{
@@ -71,10 +72,11 @@ func createCollectorCommand() *cobra.Command {
 			// pflag.Parse()
 			flag.Set("v", loglevel)
 			flag.Parse()
-			server.RunCollector()
+			server.RunCollector(storage)
 		},
 	}
 
+	command.Flags().StringVar(&storage, "storage", "", "for storage address, e.g. elasticsearch=http://localhost:9200")
 	command.Flags().StringVar(&loglevel, "loglevel", "2", "for glog")
 	// command.Flags().AddGoFlagSet(flag.CommandLine)
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)

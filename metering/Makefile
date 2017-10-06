@@ -31,18 +31,19 @@ go-build:
 	#@CGO_ENABLED=0 go build -v -o ./bin/metering -tags netgo -installsuffix netgo -ldflags "-s" ./
 
 docker-build: go-build
-	@docker build -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) ./
+	#@docker build --no-cache --force-rm -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) ./
+	@docker build --no-cache --force-rm -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) -f $(DOCKER_FILE) ./
 
 docker-push: docker-build
 	@docker push $(IMG_NS)/$(IMG_REPO):$(IMG_TAG)
 
 docker-build-exporter:
 	@sed 's/^# \(CMD \["export".*\]\)/\1/; s/^\(CMD \["collect".*\]\)/# \1/; s/^# \(EXPOSE 12315.*\)/\1/; s/^\(EXPOSE 12305.*\)/# \1/' $(DOCKER_FILE) > Dockerfile.exporter
-	@docker build -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) -f Dockerfile.exporter ./
+	@docker build --no-cache --force-rm -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) -f Dockerfile.exporter ./
 
 docker-build-collector:
 	@sed 's/^\(CMD \["export".*\]\)/# \1/; s/^# \(CMD \["collect".*\]\)/\1/; s/^\(EXPOSE 12315.*\)/# \1/; s/^# \(EXPOSE 12305.*\)/\1/' $(DOCKER_FILE) > Dockerfile.collecotr
-	@docker build -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) -f Dockerfile.exporter ./ 
+	@docker build --no-cache --force-rm -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) -f Dockerfile.exporter ./ 
 
 docker-cgo:
 	@go build -v -a -o ./bin/metering ./
@@ -50,6 +51,9 @@ docker-cgo:
 	@docker push $(IMG_NS)/$(IMG_REPO):$(IMG_TAG)
 
 docker-run:
-	$(info $(shell ./bootstrap.sh $(REGISTRY_HOST) "/etc/docker/certs.d/$(REGISTRY_HOST)/ca.crt"))
+	$(info $(shell ./bootstrap.sh cadvisor=http://localhost:8080 elasticsearch=http://localhost:9200))
+
+docker-compose:
+	@docker-compose --project-name=metering up --force-recreate
 
 .PHONY: all protoc-grpc go-install go-build docker-build docker-push docker-build-exporter docker-build-collector docker-cgo docker-run
