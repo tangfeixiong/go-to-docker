@@ -1,0 +1,44 @@
+version: '2'
+
+services:
+  cadvisor:
+    image: google/cadvisor
+    ports:
+    - "8080:38080"
+    privileged: true
+    restart: always
+    volumes:
+    - /:/rooffs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+    # - /dev/disk/:/dev/disk:ro
+
+  metering-exporter:
+    command: 
+    - export
+    - logtostderr
+    depends_on:
+    - cadvisor
+    environment: 
+    - METERING_DRIVER_LIST=cadvisor=http://cadvisor:8080
+    - METRICS_COLLECTOR_RPC=grpc=metering-collector:12305
+    image: tangfeixiong/metering
+    ports:
+    - "12315:12315"
+    - "12316:12316"
+    restart: always
+
+  metering-collector:
+    command: 
+    - collect
+    - logtostderr
+    depends_on:
+    - elasticsearch
+    environment: 
+    - METRICS_STORAGE_DRIVER=elasticsearch=http://localhost:9200
+    image: tangfeixiong/metering
+    ports:
+    - "12305:12305"
+    - "12306:12306"
+    restart: always

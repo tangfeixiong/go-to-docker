@@ -28,7 +28,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 func request_CollectorService_Transit_0(ctx context.Context, marshaler runtime.Marshaler, client CollectorServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MetricReqResp
+	var protoReq MeteringReqResp
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
@@ -49,7 +49,7 @@ func request_CollectorService_BatchTransit_0(ctx context.Context, marshaler runt
 	}
 	dec := marshaler.NewDecoder(req.Body)
 	handleSend := func() error {
-		var protoReq MetricReqResp
+		var protoReq MeteringReqResp
 		err = dec.Decode(&protoReq)
 		if err == io.EOF {
 			return err
@@ -184,7 +184,7 @@ func RegisterCollectorServiceHandler(ctx context.Context, mux *runtime.ServeMux,
 var (
 	pattern_CollectorService_Transit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "metering"}, ""))
 
-	pattern_CollectorService_BatchTransit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "stream"}, ""))
+	pattern_CollectorService_BatchTransit_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "meteringstream"}, ""))
 )
 
 var (

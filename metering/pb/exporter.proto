@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "pb/metric.proto";
 
 service ExporterService {
-  rpc Measure(pb.MetricReqResp) returns (pb.MetricReqResp) {
+  rpc Measure(pb.MeteringReqResp) returns (pb.MeteringReqResp) {
     option (google.api.http) = {
 	  post: "/v1/metering"
       body: "*"

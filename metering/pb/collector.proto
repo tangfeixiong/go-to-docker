@@ -6,16 +6,16 @@ import "google/api/annotations.proto";
 import "pb/metric.proto";
 
 service CollectorService {
-  rpc Transit (pb.MetricReqResp) returns (pb.MetricReqResp) {
+  rpc Transit (pb.MeteringReqResp) returns (pb.MeteringReqResp) {
     option (google.api.http) = {
 	  post: "/v1/metering"
       body: "*"
     };
   }
 
-  rpc BatchTransit (stream pb.MetricReqResp) returns (stream pb.MetricReqResp) {
+  rpc BatchTransit (stream pb.MeteringReqResp) returns (stream pb.MeteringReqResp) {
     option (google.api.http) = {
-	  post: "/v1/stream"
+	  post: "/v1/meteringstream"
       body: "*"
     };
   }

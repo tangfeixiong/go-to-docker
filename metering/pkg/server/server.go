@@ -56,11 +56,15 @@ type myCollector struct {
 	collectormanager *collector.CollectorManager
 }
 
-func RunExporter() {
+func RunExporter(meterdriver, collectorrpc string) {
 	m := new(myExporter)
 	m.grpcHost = ":12315"
 	m.httpHost = ":12316"
 	m.exportermanager = new(exporter.ExporterManager)
+	m.exportermanager.Dispatchers = make(map[string]exporter.MeterDispatcher)
+	m.exportermanager.MeteringNameURLs = make(map[string][]string)
+	// m.exportermanager.MetricsCollectorRPC = "localhost:12305"
+	// m.exportermanager.MeteringNameURLs["docker"] = []string{"unix:///var/run/docker.sock"}
 
 	if v, ok := os.LookupEnv("METERINGEXPORTER_GRPC_PORT"); ok && 0 != len(v) {
 		if strings.Contains(v, ":") {
@@ -77,17 +81,37 @@ func RunExporter() {
 		}
 	}
 
-	if v, ok := os.LookupEnv("METERING_NAME_URLS"); ok && 0 != len(v) {
-		m.exportermanager.MeteringNameURLs = make(map[string]string)
+	if meterdriver != "" {
+		if err := os.Setenv("METERING_DRIVER_LIST", meterdriver); err != nil {
+			fmt.Println("Environment not set, error:", err)
+		}
+	}
+	if v, ok := os.LookupEnv("METERING_DRIVER_LIST"); ok && 0 != len(v) {
 		for _, pair := range strings.Split(v, ",") {
 			nu := strings.Split(pair, "=")
 			if len(nu) != 2 {
-				panic("Invalid environment value: METERING_NAME_URLS")
+				panic("Invalid environment value: METERING_DRIVER_LIST")
 			}
-			m.exportermanager.MeteringNameURLs[nu[0]] = nu[1]
+			m.exportermanager.MeteringNameURLs[nu[0]] = strings.Split(nu[1], ";")
 		}
 	}
 
+	if collectorrpc != "" {
+		if err := os.Setenv("METRICS_COLLECTOR_RPC", collectorrpc); err != nil {
+			fmt.Println("Environment not set, error:", err)
+		}
+	}
+	if v, ok := os.LookupEnv("METRICS_COLLECTOR_RPC"); ok && 0 != len(v) {
+		if strings.HasPrefix(v, "grpc=") {
+			m.exportermanager.MetricsCollectorRPC = v[5:]
+		} else {
+			fmt.Println("RPC driver not support,", v)
+		}
+	}
+
+	if len(m.exportermanager.MeteringNameURLs) == 0 {
+		panic("Meters were not available")
+	}
 	m.run()
 }
 
@@ -145,7 +169,7 @@ func (m *myExporter) run() {
 		/*
 		   default to read from 'docker stats'?
 		*/
-		m.exportermanager.Start(m.dispatchersignal)
+		m.exportermanager.Dispatch(m.dispatchersignal)
 	}()
 
 	// wg.Wait()

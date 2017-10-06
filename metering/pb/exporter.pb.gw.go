@@ -28,7 +28,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
 func request_ExporterService_Measure_0(ctx context.Context, marshaler runtime.Marshaler, client ExporterServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq MetricReqResp
+	var protoReq MeteringReqResp
 	var metadata runtime.ServerMetadata
 
 	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {

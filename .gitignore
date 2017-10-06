@@ -6,6 +6,8 @@ docs/*.txt
 *.cert
 *.crt
 *.key
+metering/Dockerfile.exporter
+metering/Dockerfile.collector
 
 /examples/java/**/.classpath
 /examples/java/**/.DS_Store

@@ -1,15 +1,17 @@
 syntax = "proto3";
 package pb;
 
-message MetricReqResp {
-    KnownMeter meter = 1;
-    RequestType request_type = 2;
-    bytes request_info = 3;
-    MetricType metric_type = 4;
-    bytes metric_data = 5;
+message MeteringReqResp {
+    MeterDriver meter_driver = 1;
+	string meter_url = 2;
+    map<int32, bytes> meter_request = 3;
+	int64 timestamp_nanosec = 4;
+    map<int32, bytes> meter_response = 5;
+	int32 state_code = 6;
+	string state_message = 7;
 }
 
-enum KnownMeter {
+enum MeterDriver {
     CADVISOR = 0;
     DOCKER = 1;
     HEAPSTER = 2;
@@ -17,13 +19,21 @@ enum KnownMeter {
 }
 
 enum RequestType {
-    CADVISOR_V1_ContainerInfoRequest = 0;
-    CADVISOR_V2_ContainerInfoRequest = 1;
-    
+    CADVISOR_V1_MACHINEINFOREQUEST = 0;
+    CADVISOR_V1_ContainerInfoRequest = 1;
+    CADVISOR_V1_EVENTINFOREQUEST = 2;
+    CADVISOR_V2_MACHINESTATSREQUEST = 3;
+    CADVISOR_V2_ATTRIBUTESREQUEST = 4;
+    CADVISOR_V2_RequestOptions = 5;
+    CADVISOR_VERSIONINFOREQUEST = 6;
 }
 
 enum MetricType {
-    CADVISOR_V1_CpuUsage = 0;
-    CADVISOR_V1_CpuCFS = 1;
-    
+    CADVISOR_V1_MACHINEINFO = 0;
+    CADVISOR_V1_CONTAINERINFO = 1;
+	CADVISOR_V1_EVENT = 2;
+    CADVISOR_V2_MACHINESTATS = 3;
+	CADVISOR_V2_ATTRIBUTES = 4;
+	CADVISOR_V2_CONTAINERINFO = 5;
+	CADVISOR_VERSION = 6;
 }

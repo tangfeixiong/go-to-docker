@@ -38,6 +38,7 @@ func RootCommandFor(name string) *cobra.Command {
 }
 
 func createExporterCommand() *cobra.Command {
+	var meterdriver, collectorrpc string
 	var loglevel string
 
 	command := &cobra.Command{
@@ -47,10 +48,12 @@ func createExporterCommand() *cobra.Command {
 			// pflag.Parse()
 			flag.Set("v", loglevel)
 			flag.Parse()
-			server.RunExporter()
+			server.RunExporter(meterdriver, collectorrpc)
 		},
 	}
 
+	command.Flags().StringVar(&meterdriver, "meter", "", "for meter driver, e.g. cadvisor=http://localhost:8080;http://...,...")
+	command.Flags().StringVar(&collectorrpc, "collector", "", "for collector rpc address, e.g. colletorrpc=localhost:12305")
 	command.Flags().StringVar(&loglevel, "loglevel", "2", "for glog")
 	// command.Flags().AddGoFlagSet(flag.CommandLine)
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)

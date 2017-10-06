@@ -1,0 +1,6 @@
+cmd/
+pb/
+pkg/
+docker-compose.yml
+*.go
+Makefile

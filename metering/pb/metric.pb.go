@@ -15,47 +15,62 @@ var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
 
-type KnownMeter int32
+type MeterDriver int32
 
 const (
-	KnownMeter_CADVISOR   KnownMeter = 0
-	KnownMeter_DOCKER     KnownMeter = 1
-	KnownMeter_HEAPSTER   KnownMeter = 2
-	KnownMeter_PROMETHEUS KnownMeter = 3
+	MeterDriver_CADVISOR   MeterDriver = 0
+	MeterDriver_DOCKER     MeterDriver = 1
+	MeterDriver_HEAPSTER   MeterDriver = 2
+	MeterDriver_PROMETHEUS MeterDriver = 3
 )
 
-var KnownMeter_name = map[int32]string{
+var MeterDriver_name = map[int32]string{
 	0: "CADVISOR",
 	1: "DOCKER",
 	2: "HEAPSTER",
 	3: "PROMETHEUS",
 }
-var KnownMeter_value = map[string]int32{
+var MeterDriver_value = map[string]int32{
 	"CADVISOR":   0,
 	"DOCKER":     1,
 	"HEAPSTER":   2,
 	"PROMETHEUS": 3,
 }
 
-func (x KnownMeter) String() string {
-	return proto.EnumName(KnownMeter_name, int32(x))
+func (x MeterDriver) String() string {
+	return proto.EnumName(MeterDriver_name, int32(x))
 }
-func (KnownMeter) EnumDescriptor() ([]byte, []int) { return fileDescriptorMetric, []int{0} }
+func (MeterDriver) EnumDescriptor() ([]byte, []int) { return fileDescriptorMetric, []int{0} }
 
 type RequestType int32
 
 const (
-	RequestType_CADVISOR_V1_ContainerInfoRequest RequestType = 0
-	RequestType_CADVISOR_V2_ContainerInfoRequest RequestType = 1
+	RequestType_CADVISOR_V1_MACHINEINFOREQUEST   RequestType = 0
+	RequestType_CADVISOR_V1_ContainerInfoRequest RequestType = 1
+	RequestType_CADVISOR_V1_EVENTINFOREQUEST     RequestType = 2
+	RequestType_CADVISOR_V2_MACHINESTATSREQUEST  RequestType = 3
+	RequestType_CADVISOR_V2_ATTRIBUTESREQUEST    RequestType = 4
+	RequestType_CADVISOR_V2_RequestOptions       RequestType = 5
+	RequestType_CADVISOR_VERSIONINFOREQUEST      RequestType = 6
 )
 
 var RequestType_name = map[int32]string{
-	0: "CADVISOR_V1_ContainerInfoRequest",
-	1: "CADVISOR_V2_ContainerInfoRequest",
+	0: "CADVISOR_V1_MACHINEINFOREQUEST",
+	1: "CADVISOR_V1_ContainerInfoRequest",
+	2: "CADVISOR_V1_EVENTINFOREQUEST",
+	3: "CADVISOR_V2_MACHINESTATSREQUEST",
+	4: "CADVISOR_V2_ATTRIBUTESREQUEST",
+	5: "CADVISOR_V2_RequestOptions",
+	6: "CADVISOR_VERSIONINFOREQUEST",
 }
 var RequestType_value = map[string]int32{
-	"CADVISOR_V1_ContainerInfoRequest": 0,
-	"CADVISOR_V2_ContainerInfoRequest": 1,
+	"CADVISOR_V1_MACHINEINFOREQUEST":   0,
+	"CADVISOR_V1_ContainerInfoRequest": 1,
+	"CADVISOR_V1_EVENTINFOREQUEST":     2,
+	"CADVISOR_V2_MACHINESTATSREQUEST":  3,
+	"CADVISOR_V2_ATTRIBUTESREQUEST":    4,
+	"CADVISOR_V2_RequestOptions":       5,
+	"CADVISOR_VERSIONINFOREQUEST":      6,
 }
 
 func (x RequestType) String() string {
@@ -66,17 +81,32 @@ func (RequestType) EnumDescriptor() ([]byte, []int) { return fileDescriptorMetri
 type MetricType int32
 
 const (
-	MetricType_CADVISOR_V1_CpuUsage MetricType = 0
-	MetricType_CADVISOR_V1_CpuCFS   MetricType = 1
+	MetricType_CADVISOR_V1_MACHINEINFO   MetricType = 0
+	MetricType_CADVISOR_V1_CONTAINERINFO MetricType = 1
+	MetricType_CADVISOR_V1_EVENT         MetricType = 2
+	MetricType_CADVISOR_V2_MACHINESTATS  MetricType = 3
+	MetricType_CADVISOR_V2_ATTRIBUTES    MetricType = 4
+	MetricType_CADVISOR_V2_CONTAINERINFO MetricType = 5
+	MetricType_CADVISOR_VERSION          MetricType = 6
 )
 
 var MetricType_name = map[int32]string{
-	0: "CADVISOR_V1_CpuUsage",
-	1: "CADVISOR_V1_CpuCFS",
+	0: "CADVISOR_V1_MACHINEINFO",
+	1: "CADVISOR_V1_CONTAINERINFO",
+	2: "CADVISOR_V1_EVENT",
+	3: "CADVISOR_V2_MACHINESTATS",
+	4: "CADVISOR_V2_ATTRIBUTES",
+	5: "CADVISOR_V2_CONTAINERINFO",
+	6: "CADVISOR_VERSION",
 }
 var MetricType_value = map[string]int32{
-	"CADVISOR_V1_CpuUsage": 0,
-	"CADVISOR_V1_CpuCFS":   1,
+	"CADVISOR_V1_MACHINEINFO":   0,
+	"CADVISOR_V1_CONTAINERINFO": 1,
+	"CADVISOR_V1_EVENT":         2,
+	"CADVISOR_V2_MACHINESTATS":  3,
+	"CADVISOR_V2_ATTRIBUTES":    4,
+	"CADVISOR_V2_CONTAINERINFO": 5,
+	"CADVISOR_VERSION":          6,
 }
 
 func (x MetricType) String() string {
@@ -84,61 +114,77 @@ func (x MetricType) String() string {
 }
 func (MetricType) EnumDescriptor() ([]byte, []int) { return fileDescriptorMetric, []int{2} }
 
-type MetricReqResp struct {
-	Meter       KnownMeter  `protobuf:"varint,1,opt,name=meter,proto3,enum=pb.KnownMeter" json:"meter,omitempty"`
-	RequestType RequestType `protobuf:"varint,2,opt,name=request_type,json=requestType,proto3,enum=pb.RequestType" json:"request_type,omitempty"`
-	RequestInfo []byte      `protobuf:"bytes,3,opt,name=request_info,json=requestInfo,proto3" json:"request_info,omitempty"`
-	MetricType  MetricType  `protobuf:"varint,4,opt,name=metric_type,json=metricType,proto3,enum=pb.MetricType" json:"metric_type,omitempty"`
-	MetricData  []byte      `protobuf:"bytes,5,opt,name=metric_data,json=metricData,proto3" json:"metric_data,omitempty"`
+type MeteringReqResp struct {
+	MeterDriver      MeterDriver      `protobuf:"varint,1,opt,name=meter_driver,json=meterDriver,proto3,enum=pb.MeterDriver" json:"meter_driver,omitempty"`
+	MeterUrl         string           `protobuf:"bytes,2,opt,name=meter_url,json=meterUrl,proto3" json:"meter_url,omitempty"`
+	MeterRequest     map[int32][]byte `protobuf:"bytes,3,rep,name=meter_request,json=meterRequest" json:"meter_request,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	TimestampNanosec int64            `protobuf:"varint,4,opt,name=timestamp_nanosec,json=timestampNanosec,proto3" json:"timestamp_nanosec,omitempty"`
+	MeterResponse    map[int32][]byte `protobuf:"bytes,5,rep,name=meter_response,json=meterResponse" json:"meter_response,omitempty" protobuf_key:"varint,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	StateCode        int32            `protobuf:"varint,6,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage     string           `protobuf:"bytes,7,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
 }
 
-func (m *MetricReqResp) Reset()                    { *m = MetricReqResp{} }
-func (m *MetricReqResp) String() string            { return proto.CompactTextString(m) }
-func (*MetricReqResp) ProtoMessage()               {}
-func (*MetricReqResp) Descriptor() ([]byte, []int) { return fileDescriptorMetric, []int{0} }
+func (m *MeteringReqResp) Reset()                    { *m = MeteringReqResp{} }
+func (m *MeteringReqResp) String() string            { return proto.CompactTextString(m) }
+func (*MeteringReqResp) ProtoMessage()               {}
+func (*MeteringReqResp) Descriptor() ([]byte, []int) { return fileDescriptorMetric, []int{0} }
 
-func (m *MetricReqResp) GetMeter() KnownMeter {
+func (m *MeteringReqResp) GetMeterDriver() MeterDriver {
 	if m != nil {
-		return m.Meter
+		return m.MeterDriver
 	}
-	return KnownMeter_CADVISOR
+	return MeterDriver_CADVISOR
 }
 
-func (m *MetricReqResp) GetRequestType() RequestType {
+func (m *MeteringReqResp) GetMeterUrl() string {
 	if m != nil {
-		return m.RequestType
+		return m.MeterUrl
 	}
-	return RequestType_CADVISOR_V1_ContainerInfoRequest
+	return ""
 }
 
-func (m *MetricReqResp) GetRequestInfo() []byte {
+func (m *MeteringReqResp) GetMeterRequest() map[int32][]byte {
 	if m != nil {
-		return m.RequestInfo
+		return m.MeterRequest
+	}
+	return nil
+}
+
+func (m *MeteringReqResp) GetTimestampNanosec() int64 {
+	if m != nil {
+		return m.TimestampNanosec
+	}
+	return 0
+}
+
+func (m *MeteringReqResp) GetMeterResponse() map[int32][]byte {
+	if m != nil {
+		return m.MeterResponse
 	}
 	return nil
 }
 
-func (m *MetricReqResp) GetMetricType() MetricType {
+func (m *MeteringReqResp) GetStateCode() int32 {
 	if m != nil {
-		return m.MetricType
+		return m.StateCode
 	}
-	return MetricType_CADVISOR_V1_CpuUsage
+	return 0
 }
 
-func (m *MetricReqResp) GetMetricData() []byte {
+func (m *MeteringReqResp) GetStateMessage() string {
 	if m != nil {
-		return m.MetricData
+		return m.StateMessage
 	}
-	return nil
+	return ""
 }
 
 func init() {
-	proto.RegisterType((*MetricReqResp)(nil), "pb.MetricReqResp")
-	proto.RegisterEnum("pb.KnownMeter", KnownMeter_name, KnownMeter_value)
+	proto.RegisterType((*MeteringReqResp)(nil), "pb.MeteringReqResp")
+	proto.RegisterEnum("pb.MeterDriver", MeterDriver_name, MeterDriver_value)
 	proto.RegisterEnum("pb.RequestType", RequestType_name, RequestType_value)
 	proto.RegisterEnum("pb.MetricType", MetricType_name, MetricType_value)
 }
-func (m *MetricReqResp) Marshal() (dAtA []byte, err error) {
+func (m *MeteringReqResp) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalTo(dAtA)
@@ -148,37 +194,81 @@ func (m *MetricReqResp) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *MetricReqResp) MarshalTo(dAtA []byte) (int, error) {
+func (m *MeteringReqResp) MarshalTo(dAtA []byte) (int, error) {
 	var i int
 	_ = i
 	var l int
 	_ = l
-	if m.Meter != 0 {
+	if m.MeterDriver != 0 {
 		dAtA[i] = 0x8
 		i++
-		i = encodeVarintMetric(dAtA, i, uint64(m.Meter))
+		i = encodeVarintMetric(dAtA, i, uint64(m.MeterDriver))
 	}
-	if m.RequestType != 0 {
-		dAtA[i] = 0x10
+	if len(m.MeterUrl) > 0 {
+		dAtA[i] = 0x12
 		i++
-		i = encodeVarintMetric(dAtA, i, uint64(m.RequestType))
+		i = encodeVarintMetric(dAtA, i, uint64(len(m.MeterUrl)))
+		i += copy(dAtA[i:], m.MeterUrl)
 	}
-	if len(m.RequestInfo) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintMetric(dAtA, i, uint64(len(m.RequestInfo)))
-		i += copy(dAtA[i:], m.RequestInfo)
+	if len(m.MeterRequest) > 0 {
+		for k, _ := range m.MeterRequest {
+			dAtA[i] = 0x1a
+			i++
+			v := m.MeterRequest[k]
+			byteSize := 0
+			if len(v) > 0 {
+				byteSize = 1 + len(v) + sovMetric(uint64(len(v)))
+			}
+			mapSize := 1 + sovMetric(uint64(k)) + byteSize
+			i = encodeVarintMetric(dAtA, i, uint64(mapSize))
+			dAtA[i] = 0x8
+			i++
+			i = encodeVarintMetric(dAtA, i, uint64(k))
+			if len(v) > 0 {
+				dAtA[i] = 0x12
+				i++
+				i = encodeVarintMetric(dAtA, i, uint64(len(v)))
+				i += copy(dAtA[i:], v)
+			}
+		}
 	}
-	if m.MetricType != 0 {
+	if m.TimestampNanosec != 0 {
 		dAtA[i] = 0x20
 		i++
-		i = encodeVarintMetric(dAtA, i, uint64(m.MetricType))
+		i = encodeVarintMetric(dAtA, i, uint64(m.TimestampNanosec))
 	}
-	if len(m.MetricData) > 0 {
-		dAtA[i] = 0x2a
+	if len(m.MeterResponse) > 0 {
+		for k, _ := range m.MeterResponse {
+			dAtA[i] = 0x2a
+			i++
+			v := m.MeterResponse[k]
+			byteSize := 0
+			if len(v) > 0 {
+				byteSize = 1 + len(v) + sovMetric(uint64(len(v)))
+			}
+			mapSize := 1 + sovMetric(uint64(k)) + byteSize
+			i = encodeVarintMetric(dAtA, i, uint64(mapSize))
+			dAtA[i] = 0x8
+			i++
+			i = encodeVarintMetric(dAtA, i, uint64(k))
+			if len(v) > 0 {
+				dAtA[i] = 0x12
+				i++
+				i = encodeVarintMetric(dAtA, i, uint64(len(v)))
+				i += copy(dAtA[i:], v)
+			}
+		}
+	}
+	if m.StateCode != 0 {
+		dAtA[i] = 0x30
 		i++
-		i = encodeVarintMetric(dAtA, i, uint64(len(m.MetricData)))
-		i += copy(dAtA[i:], m.MetricData)
+		i = encodeVarintMetric(dAtA, i, uint64(m.StateCode))
+	}
+	if len(m.StateMessage) > 0 {
+		dAtA[i] = 0x3a
+		i++
+		i = encodeVarintMetric(dAtA, i, uint64(len(m.StateMessage)))
+		i += copy(dAtA[i:], m.StateMessage)
 	}
 	return i, nil
 }
@@ -210,23 +300,47 @@ func encodeVarintMetric(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return offset + 1
 }
-func (m *MetricReqResp) Size() (n int) {
+func (m *MeteringReqResp) Size() (n int) {
 	var l int
 	_ = l
-	if m.Meter != 0 {
-		n += 1 + sovMetric(uint64(m.Meter))
+	if m.MeterDriver != 0 {
+		n += 1 + sovMetric(uint64(m.MeterDriver))
 	}
-	if m.RequestType != 0 {
-		n += 1 + sovMetric(uint64(m.RequestType))
-	}
-	l = len(m.RequestInfo)
+	l = len(m.MeterUrl)
 	if l > 0 {
 		n += 1 + l + sovMetric(uint64(l))
 	}
-	if m.MetricType != 0 {
-		n += 1 + sovMetric(uint64(m.MetricType))
+	if len(m.MeterRequest) > 0 {
+		for k, v := range m.MeterRequest {
+			_ = k
+			_ = v
+			l = 0
+			if len(v) > 0 {
+				l = 1 + len(v) + sovMetric(uint64(len(v)))
+			}
+			mapEntrySize := 1 + sovMetric(uint64(k)) + l
+			n += mapEntrySize + 1 + sovMetric(uint64(mapEntrySize))
+		}
 	}
-	l = len(m.MetricData)
+	if m.TimestampNanosec != 0 {
+		n += 1 + sovMetric(uint64(m.TimestampNanosec))
+	}
+	if len(m.MeterResponse) > 0 {
+		for k, v := range m.MeterResponse {
+			_ = k
+			_ = v
+			l = 0
+			if len(v) > 0 {
+				l = 1 + len(v) + sovMetric(uint64(len(v)))
+			}
+			mapEntrySize := 1 + sovMetric(uint64(k)) + l
+			n += mapEntrySize + 1 + sovMetric(uint64(mapEntrySize))
+		}
+	}
+	if m.StateCode != 0 {
+		n += 1 + sovMetric(uint64(m.StateCode))
+	}
+	l = len(m.StateMessage)
 	if l > 0 {
 		n += 1 + l + sovMetric(uint64(l))
 	}
@@ -246,7 +360,7 @@ func sovMetric(x uint64) (n int) {
 func sozMetric(x uint64) (n int) {
 	return sovMetric(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *MetricReqResp) Unmarshal(dAtA []byte) error {
+func (m *MeteringReqResp) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -269,17 +383,17 @@ func (m *MetricReqResp) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: MetricReqResp: wiretype end group for non-group")
+			return fmt.Errorf("proto: MeteringReqResp: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: MetricReqResp: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: MeteringReqResp: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Meter", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MeterDriver", wireType)
 			}
-			m.Meter = 0
+			m.MeterDriver = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMetric
@@ -289,35 +403,16 @@ func (m *MetricReqResp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.Meter |= (KnownMeter(b) & 0x7F) << shift
+				m.MeterDriver |= (MeterDriver(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RequestType", wireType)
-			}
-			m.RequestType = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowMetric
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.RequestType |= (RequestType(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RequestInfo", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MeterUrl", wireType)
 			}
-			var byteLen int
+			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMetric
@@ -327,28 +422,133 @@ func (m *MetricReqResp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
+				stringLen |= (uint64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
 				return ErrInvalidLengthMetric
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + intStringLen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.RequestInfo = append(m.RequestInfo[:0], dAtA[iNdEx:postIndex]...)
-			if m.RequestInfo == nil {
-				m.RequestInfo = []byte{}
+			m.MeterUrl = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MeterRequest", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetric
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMetric
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetric
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			var mapkey int32
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetric
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				mapkey |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if m.MeterRequest == nil {
+				m.MeterRequest = make(map[int32][]byte)
+			}
+			if iNdEx < postIndex {
+				var valuekey uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowMetric
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					valuekey |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				var mapbyteLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowMetric
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					mapbyteLen |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intMapbyteLen := int(mapbyteLen)
+				if intMapbyteLen < 0 {
+					return ErrInvalidLengthMetric
+				}
+				postbytesIndex := iNdEx + intMapbyteLen
+				if postbytesIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				mapvalue := make([]byte, mapbyteLen)
+				copy(mapvalue, dAtA[iNdEx:postbytesIndex])
+				iNdEx = postbytesIndex
+				m.MeterRequest[mapkey] = mapvalue
+			} else {
+				var mapvalue []byte
+				m.MeterRequest[mapkey] = mapvalue
 			}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MetricType", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field TimestampNanosec", wireType)
 			}
-			m.MetricType = 0
+			m.TimestampNanosec = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMetric
@@ -358,16 +558,16 @@ func (m *MetricReqResp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.MetricType |= (MetricType(b) & 0x7F) << shift
+				m.TimestampNanosec |= (int64(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
 		case 5:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field MetricData", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field MeterResponse", wireType)
 			}
-			var byteLen int
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowMetric
@@ -377,22 +577,146 @@ func (m *MetricReqResp) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
+				msglen |= (int(b) & 0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			if byteLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthMetric
 			}
-			postIndex := iNdEx + byteLen
+			postIndex := iNdEx + msglen
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.MetricData = append(m.MetricData[:0], dAtA[iNdEx:postIndex]...)
-			if m.MetricData == nil {
-				m.MetricData = []byte{}
+			var keykey uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetric
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				keykey |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
 			}
+			var mapkey int32
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetric
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				mapkey |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if m.MeterResponse == nil {
+				m.MeterResponse = make(map[int32][]byte)
+			}
+			if iNdEx < postIndex {
+				var valuekey uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowMetric
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					valuekey |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				var mapbyteLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowMetric
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					mapbyteLen |= (uint64(b) & 0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intMapbyteLen := int(mapbyteLen)
+				if intMapbyteLen < 0 {
+					return ErrInvalidLengthMetric
+				}
+				postbytesIndex := iNdEx + intMapbyteLen
+				if postbytesIndex > l {
+					return io.ErrUnexpectedEOF
+				}
+				mapvalue := make([]byte, mapbyteLen)
+				copy(mapvalue, dAtA[iNdEx:postbytesIndex])
+				iNdEx = postbytesIndex
+				m.MeterResponse[mapkey] = mapvalue
+			} else {
+				var mapvalue []byte
+				m.MeterResponse[mapkey] = mapvalue
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StateCode", wireType)
+			}
+			m.StateCode = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetric
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.StateCode |= (int32(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StateMessage", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMetric
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthMetric
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.StateMessage = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -523,26 +847,42 @@ var (
 func init() { proto.RegisterFile("pb/metric.proto", fileDescriptorMetric) }
 
 var fileDescriptorMetric = []byte{
-	// 332 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x91, 0xc1, 0x6a, 0xf2, 0x40,
-	0x14, 0x85, 0x33, 0xfa, 0x2b, 0x3f, 0x57, 0xab, 0xc3, 0xa5, 0x94, 0xac, 0x52, 0x5b, 0x5c, 0x88,
-	0x0b, 0xa5, 0x76, 0x5f, 0xb0, 0x49, 0x8a, 0x22, 0xa2, 0x4c, 0x54, 0xe8, 0x4a, 0x92, 0x76, 0x2c,
-	0x2e, 0xcc, 0x8c, 0xe3, 0x48, 0xf1, 0x4d, 0xfa, 0x48, 0x5d, 0xf6, 0x09, 0x4a, 0xb1, 0x2f, 0x52,
-	0x92, 0xd8, 0xa4, 0x96, 0xee, 0x92, 0x73, 0xbe, 0x7b, 0x38, 0x87, 0x81, 0xaa, 0x0c, 0xda, 0x2b,
-	0xae, 0xd5, 0xf2, 0xa1, 0x25, 0x95, 0xd0, 0x02, 0x73, 0x32, 0xb8, 0x7c, 0x27, 0x70, 0x32, 0x8c,
-	0x45, 0xc6, 0xd7, 0x8c, 0x6f, 0x24, 0xd6, 0xa1, 0xb0, 0xe2, 0x9a, 0x2b, 0x93, 0xd4, 0x48, 0xa3,
-	0xd2, 0xa9, 0xb4, 0x64, 0xd0, 0x1a, 0x84, 0xe2, 0x39, 0x1c, 0x46, 0x2a, 0x4b, 0x4c, 0xec, 0x40,
-	0x59, 0xf1, 0xf5, 0x96, 0x6f, 0xf4, 0x5c, 0xef, 0x24, 0x37, 0x73, 0x31, 0x5c, 0x8d, 0x60, 0x96,
-	0xe8, 0x93, 0x9d, 0xe4, 0xac, 0xa4, 0xb2, 0x1f, 0xbc, 0xc8, 0x6e, 0x96, 0xe1, 0x42, 0x98, 0xf9,
-	0x1a, 0x69, 0x94, 0x53, 0xa4, 0x1f, 0x2e, 0x04, 0xb6, 0xa1, 0x94, 0x54, 0x4c, 0x52, 0xff, 0x65,
-	0x15, 0x92, 0x92, 0x71, 0x28, 0xac, 0xd2, 0x6f, 0x3c, 0x4f, 0x0f, 0x1e, 0x7d, 0xed, 0x9b, 0x85,
-	0x38, 0xf2, 0x00, 0x38, 0xbe, 0xf6, 0x9b, 0x0e, 0x40, 0xd6, 0x1e, 0xcb, 0xf0, 0xdf, 0xee, 0x3a,
-	0xb3, 0xbe, 0x37, 0x62, 0xd4, 0x40, 0x80, 0xa2, 0x33, 0xb2, 0x07, 0x2e, 0xa3, 0x24, 0x72, 0x7a,
-	0x6e, 0x77, 0xec, 0x4d, 0x5c, 0x46, 0x73, 0x58, 0x01, 0x18, 0xb3, 0xd1, 0xd0, 0x9d, 0xf4, 0xdc,
-	0xa9, 0x47, 0xf3, 0xcd, 0x7b, 0x28, 0xfd, 0x98, 0x85, 0x75, 0xa8, 0x7d, 0xc7, 0xcc, 0x67, 0x57,
-	0x73, 0x5b, 0x84, 0xda, 0x5f, 0x86, 0x5c, 0x45, 0x1b, 0x0e, 0x1c, 0x35, 0x8e, 0xa9, 0xce, 0xdf,
-	0x14, 0x69, 0xde, 0x00, 0x64, 0xdb, 0xd0, 0x84, 0xd3, 0xa3, 0x64, 0xb9, 0x9d, 0x6e, 0xfc, 0x27,
-	0x4e, 0x0d, 0x3c, 0x03, 0xfc, 0xe5, 0xd8, 0x77, 0x1e, 0x25, 0xb7, 0xf4, 0x75, 0x6f, 0x91, 0xb7,
-	0xbd, 0x45, 0x3e, 0xf6, 0x16, 0x79, 0xf9, 0xb4, 0x8c, 0xa0, 0x18, 0x3f, 0xef, 0xf5, 0x57, 0x00,
-	0x00, 0x00, 0xff, 0xff, 0xb3, 0xaa, 0x04, 0x0b, 0xf1, 0x01, 0x00, 0x00,
+	// 584 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0xdd, 0x4e, 0xd4, 0x5c,
+	0x14, 0x9d, 0xd3, 0x32, 0xf3, 0xc1, 0x9e, 0x01, 0x0e, 0x3b, 0x7c, 0x5a, 0x07, 0x28, 0x15, 0xd4,
+	0x4c, 0x30, 0xc1, 0x38, 0xde, 0x18, 0x6f, 0xb4, 0x0c, 0xc7, 0x50, 0x4d, 0x5b, 0x3c, 0xed, 0x70,
+	0x3b, 0xe9, 0xc0, 0x91, 0x34, 0xd2, 0x1f, 0xda, 0x42, 0xc2, 0xad, 0x4f, 0xe1, 0x23, 0x79, 0x65,
+	0x7c, 0x04, 0x83, 0x4f, 0xe0, 0x1b, 0x18, 0x4e, 0x67, 0x98, 0xc2, 0x88, 0x89, 0x77, 0xb3, 0xd7,
+	0x5a, 0xb3, 0xd7, 0x5e, 0xab, 0x69, 0x61, 0x31, 0x1d, 0x3e, 0x8b, 0x44, 0x91, 0x85, 0x87, 0xdb,
+	0x69, 0x96, 0x14, 0x09, 0x2a, 0xe9, 0x70, 0xe3, 0x97, 0x0a, 0x8b, 0xb6, 0x28, 0x44, 0x16, 0xc6,
+	0xc7, 0x5c, 0x9c, 0x72, 0x91, 0xa7, 0xd8, 0x85, 0x56, 0x74, 0x05, 0x0d, 0x8e, 0xb2, 0xf0, 0x5c,
+	0x64, 0x1a, 0x31, 0x48, 0x67, 0xa1, 0xbb, 0xb8, 0x9d, 0x0e, 0xb7, 0xa5, 0x74, 0x57, 0xc2, 0xbc,
+	0x19, 0x4d, 0x06, 0x5c, 0x81, 0xb9, 0xf2, 0x3f, 0x67, 0xd9, 0x89, 0xa6, 0x18, 0xa4, 0x33, 0xc7,
+	0x67, 0x25, 0xd0, 0xcf, 0x4e, 0xf0, 0x1d, 0xcc, 0x97, 0x64, 0x26, 0x4e, 0xcf, 0x44, 0x5e, 0x68,
+	0xaa, 0xa1, 0x76, 0x9a, 0xdd, 0xc7, 0xd7, 0x1b, 0x27, 0xe6, 0xe5, 0xcc, 0x4b, 0x1d, 0x8b, 0x8b,
+	0xec, 0x82, 0x97, 0xc7, 0x8c, 0x20, 0x7c, 0x0a, 0x4b, 0x45, 0x18, 0x89, 0xbc, 0x08, 0xa2, 0x74,
+	0x10, 0x07, 0x71, 0x92, 0x8b, 0x43, 0x6d, 0xc6, 0x20, 0x1d, 0x95, 0xd3, 0x6b, 0xc2, 0x29, 0x71,
+	0xb4, 0x61, 0x61, 0x6c, 0x9c, 0xa7, 0x49, 0x9c, 0x0b, 0xad, 0x2e, 0x9d, 0x9f, 0xfc, 0xc5, 0xb9,
+	0x14, 0x96, 0xd6, 0xf3, 0x51, 0x15, 0xc3, 0x35, 0x80, 0xbc, 0x08, 0x0a, 0x31, 0x38, 0x4c, 0x8e,
+	0x84, 0xd6, 0x30, 0x48, 0xa7, 0xce, 0xe7, 0x24, 0xd2, 0x4b, 0x8e, 0x04, 0x6e, 0xc2, 0x7c, 0x49,
+	0x47, 0x22, 0xcf, 0x83, 0x63, 0xa1, 0xfd, 0x27, 0x7b, 0x68, 0x49, 0xd0, 0x2e, 0xb1, 0xf6, 0x6b,
+	0x58, 0x9a, 0x8a, 0x88, 0x14, 0xd4, 0x4f, 0xe2, 0x42, 0x16, 0x5d, 0xe7, 0x57, 0x3f, 0x71, 0x19,
+	0xea, 0xe7, 0xc1, 0xc9, 0x99, 0x90, 0x5d, 0xb6, 0x78, 0x39, 0xbc, 0x52, 0x5e, 0x92, 0xf6, 0x1b,
+	0xc0, 0xe9, 0x4b, 0xff, 0x65, 0xc3, 0x16, 0x83, 0x66, 0xe5, 0x39, 0x62, 0x0b, 0x66, 0x7b, 0xe6,
+	0xee, 0x81, 0xe5, 0xb9, 0x9c, 0xd6, 0x10, 0xa0, 0xb1, 0xeb, 0xf6, 0xde, 0x33, 0x4e, 0xc9, 0x15,
+	0xb3, 0xc7, 0xcc, 0x7d, 0xcf, 0x67, 0x9c, 0x2a, 0xb8, 0x00, 0xb0, 0xcf, 0x5d, 0x9b, 0xf9, 0x7b,
+	0xac, 0xef, 0x51, 0x75, 0xeb, 0xb3, 0x02, 0xcd, 0x51, 0x0a, 0xff, 0x22, 0x15, 0xb8, 0x01, 0xfa,
+	0x78, 0xcf, 0xe0, 0xe0, 0xf9, 0xc0, 0x36, 0x7b, 0x7b, 0x96, 0xc3, 0x2c, 0xe7, 0xad, 0xcb, 0xd9,
+	0x87, 0x3e, 0xf3, 0x7c, 0x5a, 0xc3, 0x47, 0x60, 0x54, 0x35, 0xbd, 0x24, 0x2e, 0x82, 0x30, 0x16,
+	0x99, 0x15, 0x7f, 0x4c, 0x46, 0xbb, 0x28, 0x41, 0x03, 0x56, 0xab, 0x2a, 0x76, 0xc0, 0x1c, 0xbf,
+	0xba, 0x47, 0xc1, 0x4d, 0x58, 0x9f, 0x28, 0xba, 0x63, 0x2f, 0xcf, 0x37, 0x7d, 0x6f, 0x2c, 0x52,
+	0xf1, 0x21, 0xac, 0x55, 0x45, 0xa6, 0xef, 0x73, 0x6b, 0xa7, 0xef, 0xb3, 0x6b, 0xc9, 0x0c, 0xea,
+	0xd0, 0xae, 0x4a, 0x46, 0x27, 0xb8, 0x69, 0x11, 0x26, 0x71, 0x4e, 0xeb, 0xb8, 0x0e, 0x2b, 0x13,
+	0x9e, 0x71, 0xcf, 0x72, 0x9d, 0xea, 0x21, 0x8d, 0xad, 0x6f, 0x04, 0xc0, 0x96, 0x2f, 0x95, 0xec,
+	0x60, 0x05, 0xee, 0xdf, 0xd1, 0x01, 0xad, 0xe1, 0x1a, 0x3c, 0xb8, 0x11, 0xde, 0x75, 0x7c, 0xd3,
+	0x72, 0x18, 0x97, 0x34, 0xc1, 0xff, 0x61, 0x69, 0x2a, 0x35, 0x55, 0x70, 0x15, 0xb4, 0xbb, 0xa2,
+	0x52, 0x15, 0xdb, 0x70, 0xef, 0xcf, 0x19, 0xe9, 0xcc, 0x4d, 0xbf, 0xee, 0x2d, 0xbf, 0x3a, 0x2e,
+	0x03, 0xbd, 0x9d, 0x8d, 0x36, 0x76, 0xe8, 0xd7, 0x4b, 0x9d, 0x7c, 0xbf, 0xd4, 0xc9, 0x8f, 0x4b,
+	0x9d, 0x7c, 0xf9, 0xa9, 0xd7, 0x86, 0x0d, 0xf9, 0xb5, 0x78, 0xf1, 0x3b, 0x00, 0x00, 0xff, 0xff,
+	0x13, 0xc2, 0xb5, 0xbb, 0x40, 0x04, 0x00, 0x00,
 }
