@@ -4,3 +4,4 @@ pkg/
 docker-compose.yml
 *.go
 Makefile
+*.md

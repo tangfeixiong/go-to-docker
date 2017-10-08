@@ -1,0 +1,21 @@
+syntax = "proto3";
+package pb;
+
+import "google/api/annotations.proto";
+
+import "pb/span.proto";
+
+service TracingAgentService {
+  rpc Sample(TracingReqResp) returns (TracingReqResp) {
+    option (google.api.http) = {
+	  post: "/v1/tracing"
+      body: "*"
+    };
+  }
+}
+
+message TracingReqResp {
+	pb.Span span = 1;
+	int32 state_code = 2;
+	string state_message = 3;
+}

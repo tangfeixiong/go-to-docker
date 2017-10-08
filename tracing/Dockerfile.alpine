@@ -1,0 +1,21 @@
+# FROM busybox
+FROM alpine
+LABEL "maintainer"="tangfeixiong <tangfx128@gmail.com>" \
+    "project"="https://github.com/tangfeixiong/go-to-docker" \
+    "name"="tracing" \
+    "version"="alpha" \
+    "namespace"="stackdocker" \
+    "annotation"='{"stackdocker.io/created-by":"n/a"}' \
+    "tag"="alpine golang"
+
+COPY bin/tracing /
+
+### Default agent
+EXPOSE 5775/udp 6831/udp 6832/udp 5778
+
+### Default collector
+# EXPOSE 14267
+
+ENTRYPOINT ["/tracing", "--v=2", "--logtostderr"]
+CMD ["jaeger-agent", "--collector.host-port=localhost:14267"]
+# CMD ["jaeger-collector", "--dependency-storage.type=elasticsearch", "--span-storage.type=elasticsearch", "--es.server-urls=http://localhost:9200", "--es.username=elastic", "--es.password=changeme"]

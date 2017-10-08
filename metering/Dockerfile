@@ -5,7 +5,7 @@ LABEL "maintainer"="tangfeixiong <tangfx128@gmail.com>" \
     "version"="alpha" \
     "namespace"="stackdocker" \
     "annotation"='{"stackdocker.io/created-by":"n/a"}' \
-    "tag"="busybox golang"
+    "tag"="linux golang"
 
 COPY bin/metering /
 

@@ -1,0 +1,86 @@
+syntax = "proto3";
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+// Trace is a directed acyclic graph of Spans
+message Trace {
+	repeated Span spans = 1;
+	repeated string warnings = 2;
+}
+
+// Span represents a unit of work in an application, such as an RPC, a database call, etc.
+message Span {
+    TraceID trace_id = 1;
+	uint64 span_id = 2;
+    uint64 parent_span_id = 3;
+	repeated SpanRef references = 4;
+    uint32 flags = 5;
+	// google.protobuf.Timestamp start_time = 6;
+	int64 start_time = 6;
+	int64 duration = 7;
+	repeated KeyValue tags = 8;
+	repeated Log logs = 9;
+	Process process = 10;
+	repeated string warnings = 11;
+}
+
+// TraceID is a random 128bit identifier for a trace
+message TraceID {
+	uint64 low = 1;
+	uint64 high = 2;
+}
+
+// SpanRef describes a reference from one span to another
+message SpanRef {
+	SpanRefType ref_type = 1;
+	TraceID trace_id = 2;
+	uint64  span_id = 3;
+	
+}
+
+enum SpanRefType {
+	ChildOf = 0;
+	FollowsFrom = 1;
+}
+
+// KeyValue describes a tag or a log field that consists of a key and a typed value.
+// Before accessing a value, the caller must check the type. Boolean and numeric
+// values should be accessed via accessor methods Bool(), Int64(), and Float64().
+//
+// This struct is designed to minimize heap allocations.
+message KeyValue {
+	string key = 1; 
+	ValueType v_type = 2;
+	string v_str = 3;
+	int64 v_num = 4;
+	bytes v_blob = 5;
+}
+
+enum ValueType {
+	StringType = 0;
+	BoolType = 1;
+	Int64Type = 2;
+	Float64Type = 3;
+	BinaryType = 4;
+}
+
+// Log describes a micro-log entry that consists of a timestamp and one or more key-value fields
+message Log {
+	// google.protobuf.Timestamp timestamp = 1;
+	int64 timestamp = 1;
+	repeated KeyValue fields = 2;
+}
+
+// Process describes an instance of an application or service that emits tracing data.
+message Process {
+	string service_name = 1;
+	repeated KeyValue tags = 2;
+}
+
+// DependencyLink shows dependencies between services
+message DependencyLink {
+	string parent = 1;
+	string child = 2;
+	uint64 call_count = 3;
+}

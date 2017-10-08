@@ -42,8 +42,8 @@ docker-build-exporter:
 	@docker build --no-cache --force-rm -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) -f Dockerfile.exporter ./
 
 docker-build-collector:
-	@sed 's/^\(CMD \["export".*\]\)/# \1/; s/^# \(CMD \["collect".*\]\)/\1/; s/^\(EXPOSE 12315.*\)/# \1/; s/^# \(EXPOSE 12305.*\)/\1/' $(DOCKER_FILE) > Dockerfile.collecotr
-	@docker build --no-cache --force-rm -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) -f Dockerfile.exporter ./ 
+	@sed 's/^\(CMD \["export".*\]\)/# \1/; s/^# \(CMD \["collect".*\]\)/\1/; s/^\(EXPOSE 12315.*\)/# \1/; s/^# \(EXPOSE 12305.*\)/\1/' $(DOCKER_FILE) > Dockerfile.collector
+	@docker build --no-cache --force-rm -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) -f Dockerfile.collector ./ 
 
 docker-cgo:
 	@go build -v -a -o ./bin/metering ./
