@@ -264,7 +264,7 @@ func (m *myCounselor) startGateway(ch <-chan bool) {
 }
 
 func (m *myCounselor) CreateCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
-	glog.Infof("go to create check: %q", req)
+	glog.Infof("go to create: %q", req)
 	if req == nil || req.Name == "" {
 		return req, fmt.Errorf("Request name is required")
 	}
@@ -475,11 +475,25 @@ LOOPM:
 }
 
 func (m *myCounselor) UpdateCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
-	return m.UpdateWebXCheck(ctx, req)
+	glog.Infof("go to update: %q", req)
+	if req == nil || req.Name == "" {
+		return req, fmt.Errorf("Request name is required")
+	}
+	if _, ok := m.checkermanager[req.Name]; !ok {
+		return req, fmt.Errorf("Job does not exists. name=%s", req.Name)
+	}
+	if req.Periodic < 1 {
+		return req, fmt.Errorf("Periodic must be greater than one second, name: %s", req.Name)
+	}
+	if req.Duration < 1 {
+		return req, fmt.Errorf("Total duration must be greater than one second, name: %s", req.Name)
+	}
+
+	//return m.UpdateLeagcy(ctx, req)
+	return m.checkermanager[req.Name].Refresh(req)
 }
 
-func (m *myCounselor) UpdateWebXCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
-	println("go to update check")
+func (m *myCounselor) UpdateLeagcy(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
 	resp := new(healthcheckerpb.CheckActionReqResp)
 	if req == nil || req.Name == "" {
 		return resp, fmt.Errorf("Request required")
@@ -523,31 +537,27 @@ func (m *myCounselor) UpdateWebXCheck(ctx context.Context, req *healthcheckerpb.
 }
 
 func (m *myCounselor) ReapCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
-	println("go to reap check")
-	resp := new(healthcheckerpb.CheckActionReqResp)
+	glog.Infof("go to reap: %q", req)
 	if req == nil || req.Name == "" {
-		return resp, fmt.Errorf("Request required")
+		return req, fmt.Errorf("Request name is required")
 	}
-	v, ok := m.checkermanager[req.Name]
-	if !ok {
-		return resp, fmt.Errorf("CM of %s does not exists", req.Name)
+	if _, ok := m.checkermanager[req.Name]; !ok {
+		return req, fmt.Errorf("Job does not exists. name=%s", req.Name)
 	}
-	resp = v.ActionReqResp
+	resp := m.checkermanager[req.Name].ActionReqResp
 	return resp, nil
 }
 
 func (m *myCounselor) DeleteCheck(ctx context.Context, req *healthcheckerpb.CheckActionReqResp) (*healthcheckerpb.CheckActionReqResp, error) {
-	println("go to delete check")
-	resp := new(healthcheckerpb.CheckActionReqResp)
+	glog.Infof("go to delete: %q", req)
 	if req == nil || req.Name == "" {
-		return resp, fmt.Errorf("Request required")
+		return req, fmt.Errorf("Request name is required")
 	}
-	v, ok := m.checkermanager[req.Name]
-	if !ok {
-		return resp, fmt.Errorf("CM of %s does not exists", req.Name)
+	if _, ok := m.checkermanager[req.Name]; !ok {
+		return req, fmt.Errorf("Job does not exists. name=%s", req.Name)
 	}
-	v.DestroyTicker()
-	resp = v.ActionReqResp
+	resp := m.checkermanager[req.Name].ActionReqResp
+	m.checkermanager[req.Name].Stop()
 	delete(m.checkermanager, req.Name)
 	return resp, nil
 }

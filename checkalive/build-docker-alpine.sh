@@ -9,7 +9,7 @@ source `dirname $0`/dirtest.sh
 IMG_NS=docker.io/tangfeixiong
 IMG_REPO=target-cm
 IMG_TAG=0.1
-GIT_COMMIT=$(date +%y%m%d%H%M)-git_$(git rev-parse --short=7 HEAD)
+GIT_COMMIT=$(date +%y%m%dT%H%M%SZ)-git_$(git rev-parse --short=7 HEAD)
 
 CTX=$(mktemp -d)
 cp -r $DIR/Dockerfile $DIR/bin $CTX
@@ -49,10 +49,10 @@ cp -r $SRC_DIR/web2check  $DEST_DIR
 if [[ $# -gt 0 ]]; then
 case $1 in
   build|--build)
-	docker build -t $IMG_NS/$IMG_REPO:$IMG_TAG -f $CTX/Dockerfile $CTX
+	docker build --no-cache --force-rm -t $IMG_NS/$IMG_REPO:$IMG_TAG -f $CTX/Dockerfile $CTX
   ;;
   push|--push)
-	docker build -t $IMG_NS/$IMG_REPO:$IMG_TAG -f $CTX/Dockerfile $CTX
+	docker build --no-cache --force-rm -t $IMG_NS/$IMG_REPO:$IMG_TAG -f $CTX/Dockerfile $CTX
 	docker push $IMG_NS/$IMG_REPO:$IMG_TAG
   ;;
   *)

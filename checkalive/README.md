@@ -247,19 +247,19 @@ $ checkalive/runtests_curl.sh start-awd1-xmanweb2
 Reap
 ```
 fanhonglingdeMacBook-Pro:checkalive fanhongling$ ./runtests_curl.sh reap
-{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"bG9jYWxob3N0Cg=="},"periodic":3,"state_message":"---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n\n---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n","timestamp":"2017-09-07T23:13:56Z","destination_path":"examples/python/check-alive/web1check.py"}
+{"name":"awd10_nothing_check.py","command":["python","awd10_nothing_check.py"],"args":["--host=localhost","--port=80"],"work_dir":"awd10_nothing","periodic":6,"duration":12,"dest_configurations":{"team1":{"name":"container1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"},"state_code":3,"state_message":"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\u003curllib3.connection.HTTPConnection object at 0x7f85c0acaa90\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\u003curllib3.connection.HTTPConnection object at 0x7fc19a4c7a90\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\u003curllib3.connection.HTTPConnection object at 0x7f75b80a9a90\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\n\n","timestamp":"2017-10-16T07:54:34Z"}},"destination_path":"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py"}
 ```
 
 Update
 ```
 fanhonglingdeMacBook-Pro:checkalive fanhongling$ ./runtests_curl.sh update
-{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"MTI3LjAuMC4xCg=="},"periodic":5,"state_message":"---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n\n---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n","timestamp":"2017-09-07T23:13:59Z","destination_path":"examples/python/check-alive/web1check.py"}
+{"name":"awd10_nothing_check.py","command":["python","awd10_nothing_check.py"],"args":["--host=localhost","--port=80"],"work_dir":"awd10_nothing","periodic":6,"duration":12,"dest_configurations":{"team1":{"name":"container1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"},"state_code":1,"state_message":"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\u003curllib3.connection.HTTPConnection object at 0x7f85c0acaa90\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\n\n","timestamp":"2017-10-16T07:54:21Z"}},"destination_path":"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py"}
 ```
 
 Delete
 ```
 fanhonglingdeMacBook-Pro:checkalive fanhongling$ ./runtests_curl.sh delete
-{"name":"web1check.py","command":["python","web1check.py"],"conf":{"hosts.list":"MTI3LjAuMC4xCg=="},"periodic":5,"state_message":"---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n\n---------------------------------------------------------------\nchecking host: localhost\nglobal name 'headers' is not defined\nHost: localhost seems down\n","timestamp":"2017-09-07T23:13:59Z","destination_path":"examples/python/check-alive/web1check.py"}
+{"name":"awd10_nothing_check.py","command":["python","awd10_nothing_check.py"],"args":["--host=localhost","--port=80"],"work_dir":"awd10_nothing","periodic":6,"duration":12,"dest_configurations":{"team1":{"name":"container1","args":["--host=localhost","--port=80"],"tpl":{"ip":"localhost","port":"80"},"state_code":3,"state_message":"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\u003curllib3.connection.HTTPConnection object at 0x7f85c0acaa90\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\u003curllib3.connection.HTTPConnection object at 0x7fc19a4c7a90\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('\u003curllib3.connection.HTTPConnection object at 0x7f75b80a9a90\u003e: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\n\n","timestamp":"2017-10-16T07:54:34Z"}},"destination_path":"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py"}
 ```
 
 ### Server
@@ -270,39 +270,45 @@ output (Note: By default, server must be tested at repository home dir)
 Start gRPC Gateway into host :10061
 http on host: [::]:10062
 Start gRPC on host [::]:10061
-go to create check
-check path
-destination path
-Visited: examples/python/check-alive/web1check.py
-filepath.Walk() returned Stop recursive searching
-config file
-Tick at 2017-09-07 23:13:53.42750264 +0000 UTC
----------------------------------------------------------------
-checking host: localhost
-global name 'headers' is not defined
-Host: localhost seems down
-
-Tick at 2017-09-07 23:13:56.427504027 +0000 UTC
----------------------------------------------------------------
-checking host: localhost
-global name 'headers' is not defined
-Host: localhost seems down
-
-go to reap check
-Tick at 2017-09-07 23:13:59.430029891 +0000 UTC
----------------------------------------------------------------
-checking host: localhost
-global name 'headers' is not defined
-Host: localhost seems down
-
-go to update check
-workdir
-config file
-Ticker stopped
-go to delete check
-Ticker stopped
-
-
+checker-cm_1  | I1016 07:54:18.576679       1 server.go:267] go to create: "name:\"awd10_nothing_check.py\" command:\"python\" command:\"awd10_nothing_check.py\" args:\"--host=$(ip)\" args:\"--port=$(port)\" work_dir:\"awd10_nothing\" periodic:3 duration:10 dest_configurations:<key:\"team1\" value:<name:\"container1\" tpl:<key:\"ip\" value:\"localhost\" > tpl:<key:\"port\" value:\"80\" > > > "
+checker-cm_1  | Visited: examples/python/check-alive/awd10_nothing/awd10_nothing_check.py
+checker-cm_1  | filepath.Walk() returned Stop recursive searching
+checker-cm_1  | command: awd10_nothing_check.py
+checker-cm_1  | Dest tpl: team1
+checker-cm_1  | name:"awd10_nothing_check.py" command:"python" command:"awd10_nothing_check.py" args:"--host=localhost" args:"--port=80" work_dir:"awd10_nothing" periodic:3 duration:10 dest_configurations:<key:"team1" value:<name:"container1" args:"--host=localhost" args:"--port=80" tpl:<key:"ip" value:"localhost" > tpl:<key:"port" value:"80" > > > destination_path:"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py" 
+checker-cm_1  | Tick at 2017-10-16 07:54:21.580857208 +0000 UTC -> key: team1
+checker-cm_1  | HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f85c0acaa90>: Failed to establish a new connection: [Errno 111] Connection refused',))
+checker-cm_1  | (False, 'check login page exception')
+checker-cm_1  | 
+checker-cm_1  | I1016 07:54:21.668922       1 server.go:566] write cm into cache
+checker-cm_1  | I1016 07:54:21.910763       1 server.go:594] Set CM checkalive.awd10_nothing_check.py: OK
+checker-cm_1  | I1016 07:54:21.911660       1 server.go:646] publish check...
+checker-cm_1  | I1016 07:54:22.253355       1 server.go:667] Published subject checkalive.awd10_nothing_check.py: 0
+checker-cm_1  | I1016 07:54:22.631953       1 server.go:478] go to update: "name:\"awd10_nothing_check.py\" periodic:6 duration:12 "
+checker-cm_1  | Ticker stopped
+checker-cm_1  | name:"awd10_nothing_check.py" command:"python" command:"awd10_nothing_check.py" args:"--host=localhost" args:"--port=80" work_dir:"awd10_nothing" periodic:6 duration:12 dest_configurations:<key:"team1" value:<name:"container1" args:"--host=localhost" args:"--port=80" tpl:<key:"ip" value:"localhost" > tpl:<key:"port" value:"80" > state_code:1 state_message:"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f85c0acaa90>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\n\n" timestamp:"2017-10-16T07:54:21Z" > > destination_path:"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py" 
+checker-cm_1  | Tick at 2017-10-16 07:54:28.635395148 +0000 UTC -> key: team1
+checker-cm_1  | HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc19a4c7a90>: Failed to establish a new connection: [Errno 111] Connection refused',))
+checker-cm_1  | (False, 'check login page exception')
+checker-cm_1  | 
+checker-cm_1  | I1016 07:54:28.741270       1 server.go:566] write cm into cache
+checker-cm_1  | I1016 07:54:28.966716       1 server.go:594] Set CM checkalive.awd10_nothing_check.py: OK
+checker-cm_1  | I1016 07:54:28.966770       1 server.go:646] publish check...
+checker-cm_1  | I1016 07:54:29.196228       1 server.go:667] Published subject checkalive.awd10_nothing_check.py: 0
+checker-cm_1  | name:"awd10_nothing_check.py" command:"python" command:"awd10_nothing_check.py" args:"--host=localhost" args:"--port=80" work_dir:"awd10_nothing" periodic:6 duration:12 dest_configurations:<key:"team1" value:<name:"container1" args:"--host=localhost" args:"--port=80" tpl:<key:"ip" value:"localhost" > tpl:<key:"port" value:"80" > state_code:2 state_message:"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f85c0acaa90>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc19a4c7a90>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\n\n" timestamp:"2017-10-16T07:54:28Z" > > destination_path:"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py" 
+checker-cm_1  | Tick at 2017-10-16 07:54:34.635623057 +0000 UTC -> key: team1
+checker-cm_1  | HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f75b80a9a90>: Failed to establish a new connection: [Errno 111] Connection refused',))
+checker-cm_1  | (False, 'check login page exception')
+checker-cm_1  | 
+checker-cm_1  | I1016 07:54:34.730975       1 server.go:566] write cm into cache
+checker-cm_1  | I1016 07:54:34.958241       1 server.go:594] Set CM checkalive.awd10_nothing_check.py: OK
+checker-cm_1  | I1016 07:54:34.958468       1 server.go:646] publish check...
+checker-cm_1  | I1016 07:54:35.184389       1 server.go:667] Published subject checkalive.awd10_nothing_check.py: 0
+checker-cm_1  | name:"awd10_nothing_check.py" command:"python" command:"awd10_nothing_check.py" args:"--host=localhost" args:"--port=80" work_dir:"awd10_nothing" periodic:6 duration:12 dest_configurations:<key:"team1" value:<name:"container1" args:"--host=localhost" args:"--port=80" tpl:<key:"ip" value:"localhost" > tpl:<key:"port" value:"80" > state_code:3 state_message:"HTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f85c0acaa90>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7fc19a4c7a90>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\nHTTPConnectionPool(host='localhost', port=80): Max retries exceeded with url: /login.html (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7f75b80a9a90>: Failed to establish a new connection: [Errno 111] Connection refused',))\n(False, 'check login page exception')\n\n" timestamp:"2017-10-16T07:54:34Z" > > destination_path:"examples/python/check-alive/awd10_nothing/awd10_nothing_check.py" 
+checker-cm_1  | Stopped
+checker-cm_1  | I1016 07:58:35.547362       1 server.go:540] go to reap: "name:\"awd10_nothing_check.py\" "
+checker-cm_1  | Ticker stopped
+checker-cm_1  | I1016 07:59:09.681736       1 server.go:552] go to delete: "name:\"awd10_nothing_check.py\" "
 ```
 
 ### Via docker

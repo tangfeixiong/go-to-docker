@@ -14,7 +14,7 @@ LABEL maintainer='tangfeixiong <tangfx128@gmail.com>' \
       name="tickerjobcm" \
       namespace="stackdocker" \
       annotation='{"stackdocker.io/created-by":"n/a"}' \
-      tag="alpine php python"
+      tag="alpine python"
 
 RUN set -x \
     && apk add --update \
@@ -36,6 +36,7 @@ RUN set -x \
     && rm -rf /var/cache/apk/* \
 # python 
     && pip install \
+		requests \
 	    MySQL-python \
 		redis \
 		MultipartPostHandler \
@@ -43,7 +44,6 @@ RUN set -x \
 		pyquery \
 		multipart_encode \
 		poster \
-		requests \
 # finally
     && echo    
 

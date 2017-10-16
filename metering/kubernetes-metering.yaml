@@ -1,0 +1,115 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: metering-exporter
+  namespace: monitoring-system
+  labels:
+    monitoring-app: metering-exporter
+    stackdocker.io/project: "https://github.com/tangfeixiong/go-to-docker"
+    version: v0.1.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      monitoring-app: metering-exporter
+      version: v0.1.0
+  template:
+    metadata:
+      labels:
+        monitoring-app: metering-exporter
+        version: v0.1.0
+      # annotations:
+      #   scheduler.alpha.kubernetes.io/critical-pod: ''
+      #   scheduler.alpha.kubernetes.io/tolerations: '[{"key":"CriticalAddonsOnly", "operator":"Exists"}]'
+    spec:
+      containers:
+        - image: docker.io/tangfeixiong/metering
+          name: metering
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 12316
+              scheme: HTTP
+            initialDelaySeconds: 180
+            timeoutSeconds: 5
+          command:
+            - /metering
+            - --v=2
+            - --logtostderr
+            - export
+            - --meter=cadvisor=http://localhost:8080
+            - --collector=grpc=localhost:12305"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: metering-exporter
+  namespace: monitoring-system
+  labels:
+    stackdocker.io/project: "https://github.com/tangfeixiong/go-to-docker"
+    stackdocker.io/project: "metering"
+spec: 
+  ports: 
+    - port: 12316
+      targetPort: 12316
+  selector: 
+    monitoring-app: metering-exporter
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: metering-collector
+  namespace: monitoring-system
+  labels:
+    monitoring-app: metering-collector
+    stackdocker.io/project: "https://github.com/tangfeixiong/go-to-docker"
+    version: v0.1.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      monitoring-app: metering-collector
+      version: v0.1.0
+  template:
+    metadata:
+      labels:
+        monitoring-app: metering-collector
+        version: v0.1.0
+      # annotations:
+      #   scheduler.alpha.kubernetes.io/critical-pod: ''
+      #   scheduler.alpha.kubernetes.io/tolerations: '[{"key":"CriticalAddonsOnly", "operator":"Exists"}]'
+    spec:
+      containers:
+        - image: docker.io/tangfeixiong/metering
+          name: metering
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 12306
+              scheme: HTTP
+            initialDelaySeconds: 180
+            timeoutSeconds: 5
+          command:
+            - /metering
+            - --v=2
+            - --logtostderr
+            - collect
+            - --storage=elasticsearch=http://elasticsearch:9200
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: metering-collector
+  namespace: monitoring-system
+  labels:
+    stackdocker.io/project: "https://github.com/tangfeixiong/go-to-docker"
+    stackdocker.io/project: "metering"
+spec: 
+  ports: 
+    - port: 12305
+      targetPort: 12305
+    - port: 12306
+      targetPort: 12306
+  selector: 
+    monitoring-app: metering-collector

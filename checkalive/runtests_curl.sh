@@ -648,26 +648,18 @@ case $1 in
 }'
         ;;
     reap)
-	    curl -X GET http://172.17.4.50:10062/v1/checkactions/web1-check.py
+	    curl -X GET http://172.17.4.50:10062/v1/checkactions/awd10_nothing_check.py
 		;;
     update)
-	    curl -X PUT http://172.17.4.50:10062/v1/checkactions/web1-check.py -d \
+	    curl -X PUT http://172.17.4.50:10062/v1/checkactions/awd10_nothing_check.py -d \
 '{
-  "name": "web1-check.py",
-  "args": [
-    ],
-  "env": [
-  ],
-  "conf":
-    {
-      "hosts.list": "MTI3LjAuMC4xCg=="
-    },
-  "work_dir": "web1check",
-  "periodic": 5
+  "name": "awd10_nothing_check.py",
+  "periodic": 6,
+  "duration": 12
 }'
         ;;
     delete)
-	    curl -X DELETE http://172.17.4.50:10062/v1/checkactions/web1-check.py
+	    curl -X DELETE http://172.17.4.50:10062/v1/checkactions/awd10_nothing_check.py
 		;;
     *)
         echo "Valid test: create, reap, update, delete"

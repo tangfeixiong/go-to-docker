@@ -10,6 +10,7 @@ import (
 	"math"
 	"os"
 	"path/filepath"
+	// "reflect"
 	"regexp"
 	// "runtime"
 	"strings"
@@ -328,6 +329,28 @@ func (cc *CheckerController) Start() {
 	time.Sleep(time.Millisecond * 100)
 }
 
+func (cc *CheckerController) Refresh(req *checkalivepb.CheckActionReqResp) (*checkalivepb.CheckActionReqResp, error) {
+	//	resp := &checkalivepb.CheckActionReqResp{
+	//		Name:     req.Name,
+	//		Periodic: req.Periodic,
+	//		Duration: req.Duration,
+	//	}
+	//	resp.Command = req.Command
+	//	resp.Args = req.Args
+	//	resp.Env = req.Env
+	//	resp.Conf = req.Conf
+	//	resp.DestConfigurations = req.DestConfigurations
+	if cc.ActionReqResp.Periodic == req.Periodic && cc.ActionReqResp.Duration == req.Duration {
+		println("Identical papameters")
+		return cc.ActionReqResp, nil
+	}
+	cc.Stop()
+	cc.ActionReqResp.Periodic = req.Periodic
+	cc.ActionReqResp.Duration = req.Duration
+	defer cc.Start()
+	return cc.ActionReqResp, nil
+}
+
 func (cc *CheckerController) Restart() {
 	cc.Stop()
 	cc.Start()
@@ -492,7 +515,7 @@ func (cc *CheckerController) doCheck(key string) {
 	fmt.Println(string(result))
 
 	cc.messages[key] = append(cc.messages[key], Message{timestamp, result})
-	if len(cc.messages) > 3 {
+	if len(cc.messages[key]) > 3 {
 		cc.messages[key] = cc.messages[key][1:]
 	}
 
