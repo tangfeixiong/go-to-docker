@@ -31,21 +31,6 @@ public class RefreshConfig implements Serializable {
 	// @GeneratedValue(generator = "city_generator")
 	// @GeneratedValue(strategy=GenerationType.AUTO)
 	// private Integer id;
-	
-	// @Column(nullable = true)
-	// private Integer env;
-
-	// @Column(nullable = true)
-	// private Integer TeamNo;
-
-	// @Column(nullable = true)
-	// private String Token;
-
-	// @Column(nullable = true)
-	// private Integer Round;
-
-	// @Column(nullable = true)
-	// private String md5String;
 
     @JsonProperty("container_id")	
     private Integer containerId;
@@ -68,9 +53,24 @@ public class RefreshConfig implements Serializable {
     @JsonProperty("state_message")	
 	private String stateMessage;
 
-    // @NotEmpty(message = "Flag is required.")
     @JsonProperty("flag")	
+    // @NotEmpty(message = "Flag is required.")
 	private Flag flag;
+	
+	// @Column(nullable = true)
+	// private Integer env;
+
+	// @Column(nullable = true)
+	// private Integer TeamNo;
+
+	// @Column(nullable = true)
+	// private String Token;
+
+	// @Column(nullable = true)
+	// private Integer Round;
+
+	// @Column(nullable = true)
+	// private String md5String;
     
     private Integer projectId;
     private Integer imageId;

@@ -65,7 +65,13 @@ public class RefreshReqResp implements Serializable {
 
     @JsonProperty("count")	
 	private Integer count;
-
+    
+    @JsonProperty("begin")	    
+    private String begin;
+    
+    @JsonProperty("elapsed")	    
+    private Long elapsed;
+    
     @JsonProperty("data_store")	
 	private String dataStore;
 
@@ -96,6 +102,8 @@ public class RefreshReqResp implements Serializable {
         this.minusSeconds = 10;
         this.rounds = 1;
         this.count = 0;
+        this.begin = "";
+        this.elapsed = 0L;
         this.dataStore = "";
         this.stateCode = 0;
         this.stateMessage = "";
@@ -164,10 +172,6 @@ public class RefreshReqResp implements Serializable {
         }
 		return "";
 	}
-    
-    public Date getRefreshingDatetime() {
-        return refreshingAt;
-    }
 	
     @JsonSetter("refreshing_rfc3339")
 	public void setRefreshingAt(String datetime) {
@@ -179,6 +183,14 @@ public class RefreshReqResp implements Serializable {
             }
         }
 	}
+    
+    public Date getRefreshingDatetime() {
+        return refreshingAt;
+    }
+    
+    public void setRefreshingDatetime(Date datetime) {
+        this.refreshingAt = datetime;
+    }
 	
 	public Integer getRounds() {
 		return rounds;
@@ -201,7 +213,27 @@ public class RefreshReqResp implements Serializable {
 	public void setCount(Integer count) {
 		this.count = count;
 	}
+
+    @JsonGetter("begin")
+    public String getBegin() {
+        return begin;
+    }
     
+    @JsonSetter("begin")
+    public void setBegin(String begin) {
+        this.begin = begin;
+    }
+    
+    @JsonGetter("elapsed")
+    public Long getElapsed() {
+        return elapsed;
+    }
+    
+    @JsonSetter("elapsed")
+    public void setElapsed(Long elapsed) {
+        this.elapsed = elapsed;
+    }
+        
     @JsonGetter("data_store")
 	public String getDataStore() {
 		return dataStore;

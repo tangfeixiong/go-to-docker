@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.security.MessageDigest;
+import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.concurrent.ScheduledFuture;
 import java.util.ArrayList;
@@ -157,6 +158,12 @@ public class RefreshScheduler {
             resp.setRounds(1);
         if (req.getCount() != null && req.getCount() > 0) {
             resp.setCount(req.getCount());
+        }
+        if (req.getBegin() != null && req.getBegin().trim() != "") {
+            resp.setBegin(req.getBegin());
+        }
+        if (req.getElapsed() != null && req.getElapsed() > 0) {
+            resp.setElapsed(req.getElapsed());
         }
         if (req.getDataStore() != null && req.getDataStore().trim() != "") {
             resp.setDataStore(req.getDataStore().trim());
@@ -321,7 +328,11 @@ public class RefreshScheduler {
 
     RefreshReqResp todo(String message) {
         RefreshReqResp resp = works.get(message).getContext();
+        Date dt = Calendar.getInstance().getTime();
         resp.incrementsCount();
+        String datetime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(dt);
+        resp.setBegin(datetime);
+        resp.setElapsed(0L);
         if (resp.getCount() > resp.getRounds()) {
 	        System.out.println("Game over, bout : " + resp.getRounds());
             works.remove(resp.getName()).getJob().cancel(false);
@@ -352,6 +363,7 @@ public class RefreshScheduler {
             }               
 			
             value.setRefreshFlag(result);
+            resp.addRefreshConfig(key, value);
 		}
         
         return resp;
@@ -376,12 +388,28 @@ public class RefreshScheduler {
     }
     
     public RefreshReqResp findByProject(Integer projectId) {
+        RefreshReqResp resp = new RefreshReqResp();
         for (Work value : works.values()) {
             System.out.println("projectId:" + value.getContext().getProjectId());
-            if (value.getContext().getProjectId() == projectId) return value.getContext();
+            if (value.getContext().getProjectId() == projectId){
+                resp.setId(value.getContext().getId());
+                resp.setProjectId(value.getContext().getProjectId());
+                resp.setName(value.getContext().getName());
+                resp.setPeriodic(value.getContext().getPeriodic());
+                resp.setRefreshingDatetime(value.getContext().getRefreshingDatetime());
+                resp.setRounds(value.getContext().getRounds());
+                resp.setCount(value.getContext().getCount());
+                String datetime = value.getContext().getBegin();
+                resp.setBegin(datetime);
+                Date dt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(datetime, new ParsePosition(0));
+                long elapsed = (Calendar.getInstance().getTimeInMillis() - dt.getTime())/1000;
+                resp.setElapsed(elapsed);
+                resp.setDataStore(value.getContext().getDataStore());
+        		resp.setInfo(value.getContext().getInfo());
+                return resp;
+            }
         }
         System.out.println("Not found, projectId=" + projectId);
-        RefreshReqResp resp = new RefreshReqResp();
         resp.setStateCode(404);
         resp.setStateMessage("Not Found");
         return resp;
