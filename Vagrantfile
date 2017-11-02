@@ -12,8 +12,8 @@ Vagrant.configure("2") do |config|
 
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://atlas.hashicorp.com/search.
+  config.vm.box = "openshift3_fedora_21-nov-2016"
   config.vm.box_url = "https://mirror.openshift.com/pub/vagrant/boxes/openshift3/fedora_virtualbox_inst.box"
-  #config.vm.box = "openshift3_fedora_21-nov-2016"
   #config.vm.box = "fedora/25-cloud-base"
 
   # Disable automatic box update checking. If you disable this, then
