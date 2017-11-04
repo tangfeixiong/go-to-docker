@@ -1,0 +1,229 @@
+[vagrant@localhost go-to-docker]$ ./runtests_curl.sh test-runcontainer
+{"config":{"exposed_ports":{"value":{"80":"webui"}},"env":["GOAPTH=/home/vagrant/go","JAVA_HOME=/opt/jdk1.8.0_112"],"cmd":["-c","printenv \u0026\u0026 ls /usr/share/nginx/html \u0026\u0026 nginx -g \"daemon off;\""],"image":"nginx","volumes":{"/usr/share/nginx/html/":"usertest"},"entrypoint":["/bin/bash"]},"host_config":{"binds":["/home/vagrant/:/usr/share/nginx/html/:ro"],"port_bindings":{"value":{"80":{"host_port":"80"}}},"resources":{"memory":"300000000"}},"network_config":{},"container_id":"a83ee88e614261394456a36801f9b57907363d0c69223878c42b992522748e0a"}
+[vagrant@localhost go-to-docker]$ docker ps -l
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                NAMES
+a83ee88e6142        nginx               "/bin/bash -c 'printe"   2 minutes ago       Up 2 minutes        0.0.0.0:80->80/tcp   nginx
+[vagrant@localhost go-to-docker]$ docker logs nginx
+GOAPTH=/home/vagrant/go
+HOSTNAME=a83ee88e6142
+NJS_VERSION=1.13.3.0.1.11-1~stretch
+NGINX_VERSION=1.13.3-1~stretch
+JAVA_HOME=/opt/jdk1.8.0_112
+PWD=/
+HOME=/root
+SHLVL=1
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+_=/usr/bin/printenv
+[vagrant@localhost go-to-docker]$ docker exec -ti nginx ls /usr/share/nginx/html
+clearwater-docker  go  go.rc  java.rc  kube  kube.rc  openrc  openshift.rc  openssl.cnf  server.key  server.pem  tmp  vagrant  vagrant.pub
+[vagrant@localhost go-to-docker]$ ls ~
+clearwater-docker  go  go.rc  java.rc  kube  kube.rc  openrc  openshift.rc  openssl.cnf  server.key  server.pem  tmp  vagrant  vagrant.pub
+[vagrant@localhost go-to-docker]$ curl localhost
+<html>
+<head><title>403 Forbidden</title></head>
+<body bgcolor="white">
+<center><h1>403 Forbidden</h1></center>
+<hr><center>nginx/1.13.3</center>
+</body>
+</html>
+[vagrant@localhost go-to-docker]$ docker inspect nginx
+[
+    {
+        "Id": "a83ee88e614261394456a36801f9b57907363d0c69223878c42b992522748e0a",
+        "Created": "2017-08-22T03:16:26.640672867Z",
+        "Path": "/bin/bash",
+        "Args": [
+            "-c",
+            "printenv \u0026\u0026 ls /usr/share/nginx/html \u0026\u0026 nginx -g \"daemon off;\""
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 2277,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2017-08-22T03:16:27.831093207Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:b8efb18f159bd948486f18bd8940b56fd2298b438229f5bd2bcf4cedcf037448",
+        "ResolvConfPath": "/var/lib/docker/containers/a83ee88e614261394456a36801f9b57907363d0c69223878c42b992522748e0a/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/a83ee88e614261394456a36801f9b57907363d0c69223878c42b992522748e0a/hostname",
+        "HostsPath": "/var/lib/docker/containers/a83ee88e614261394456a36801f9b57907363d0c69223878c42b992522748e0a/hosts",
+        "LogPath": "",
+        "Name": "/nginx",
+        "RestartCount": 0,
+        "Driver": "devicemapper",
+        "MountLabel": "system_u:object_r:svirt_sandbox_file_t:s0:c66,c491",
+        "ProcessLabel": "system_u:system_r:svirt_lxc_net_t:s0:c66,c491",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": [
+                "/home/vagrant/:/usr/share/nginx/html/:ro"
+            ],
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "journald",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {
+                "80": [
+                    {
+                        "HostIp": "",
+                        "HostPort": "80"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "none",
+                "MaximumRetryCount": 3
+            },
+            "VolumeDriver": "",
+            "VolumesFrom": [],
+            "CapAdd": [],
+            "CapDrop": [],
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": [],
+            "GroupAdd": [],
+            "IpcMode": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": [],
+            "UTSMode": "",
+            "ShmSize": 67108864,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": [],
+            "BlkioDeviceWriteBps": [],
+            "BlkioDeviceReadIOps": [],
+            "BlkioDeviceWriteIOps": [],
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "KernelMemory": 0,
+            "Memory": 300000000,
+            "MemoryReservation": 0,
+            "MemorySwap": -1,
+            "MemorySwappiness": 0,
+            "OomKillDisable": false,
+            "PidsLimit": 0,
+            "Ulimits": []
+        },
+        "GraphDriver": {
+            "Name": "devicemapper",
+            "Data": {
+                "DeviceId": "15194",
+                "DeviceName": "docker-253:0-1310998-556826d83cf8e170fcff1ad1ccfaba54f03867828999f237b67e8c6087a4cbe8",
+                "DeviceSize": "107374182400"
+            }
+        },
+        "Mounts": [
+            {
+                "Source": "/home/vagrant",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "ro",
+                "RW": false,
+                "Propagation": "rslave"
+            }
+        ],
+        "Config": {
+            "Hostname": "a83ee88e6142",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "80": {},
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "GOAPTH=/home/vagrant/go",
+                "JAVA_HOME=/opt/jdk1.8.0_112",
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NGINX_VERSION=1.13.3-1~stretch",
+                "NJS_VERSION=1.13.3.0.1.11-1~stretch"
+            ],
+            "Cmd": [
+                "-c",
+                "printenv \u0026\u0026 ls /usr/share/nginx/html \u0026\u0026 nginx -g \"daemon off;\""
+            ],
+            "Image": "nginx",
+            "Volumes": {
+                "/usr/share/nginx/html/": {}
+            },
+            "WorkingDir": "",
+            "Entrypoint": [
+                "/bin/bash"
+            ],
+            "OnBuild": [],
+            "Labels": {},
+            "StopSignal": "SIGTERM"
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "ada324833c76e300d3041acb97d64cb719bc694c41e73dddd93b1a2da74048ae",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {
+                "80/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "80"
+                    }
+                ]
+            },
+            "SandboxKey": "/var/run/docker/netns/ada324833c76",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "a200e360d59d2bd7a2c9aa9b97da8f68b0aa743466dd021941f7b5773cbff76e",
+            "Gateway": "172.17.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.17.0.11",
+            "IPPrefixLen": 22,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:11:00:0b",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "d8f1ae76632275e074c5a4ec6c7a3ea669b0c4cbbd8adcaa52ba0f4913d9095b",
+                    "EndpointID": "a200e360d59d2bd7a2c9aa9b97da8f68b0aa743466dd021941f7b5773cbff76e",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.11",
+                    "IPPrefixLen": 22,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:0b"
+                }
+            }
+        }
+    }
+]

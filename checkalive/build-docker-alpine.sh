@@ -22,29 +22,8 @@ cp -r $DIR/Dockerfile $DIR/bin $CTX
 SRC_DIR=$DIR/../examples/python/check-alive
 DEST_DIR=$CTX/program/examples/python/check-alive
 mkdir -p $DEST_DIR
-cp -r $SRC_DIR/awd10_nothing  $DEST_DIR
-cp -r $SRC_DIR/awd11_maccms  $DEST_DIR
-cp -r $SRC_DIR/awd12_phpsqllitecms  $DEST_DIR
-cp -r $SRC_DIR/awd1_lemon_cms  $DEST_DIR
-cp -r $SRC_DIR/awd1_xmanweb2  $DEST_DIR
-cp -r $SRC_DIR/awd2_daydayweb  $DEST_DIR
-cp -r $SRC_DIR/awd2_dynpage  $DEST_DIR
-cp -r $SRC_DIR/awd3_electronics  $DEST_DIR
-cp -r $SRC_DIR/awd3_shadow  $DEST_DIR
-cp -r $SRC_DIR/awd4_chinaz  $DEST_DIR
-cp -r $SRC_DIR/awd4_tomcat  $DEST_DIR
-cp -r $SRC_DIR/awd5_babyblog  $DEST_DIR
-cp -r $SRC_DIR/awd5_gracer  $DEST_DIR
-cp -r $SRC_DIR/awd6_cms  $DEST_DIR
-cp -r $SRC_DIR/awd7_upload  $DEST_DIR
-cp -r $SRC_DIR/awd8_blog  $DEST_DIR
-cp -r $SRC_DIR/awd9_money  $DEST_DIR
-cp -r $SRC_DIR/awd1-4  $DEST_DIR
-cp -r $SRC_DIR/awd1-8  $DEST_DIR
-cp -r $SRC_DIR/web1-1  $DEST_DIR
-cp -r $SRC_DIR/web2-1  $DEST_DIR
-cp -r $SRC_DIR/web1check  $DEST_DIR
-cp -r $SRC_DIR/web2check  $DEST_DIR
+cp -r $SRC_DIR/awd*  $DEST_DIR
+cp -r $SRC_DIR/web*  $DEST_DIR
 
 if [[ $# -gt 0 ]]; then
 case $1 in
@@ -56,8 +35,9 @@ case $1 in
 	docker push $IMG_NS/$IMG_REPO:$IMG_TAG
   ;;
   *)
-    echo "Usage: $0 [push|--push]"
-	docker build -t $IMG_NS/$IMG_REPO:$IMG_TAG-$GIT_COMMIT -f $CTX/Dockerfile $CTX
+    echo "Usage: $0 [build|--build|push|--push]
+        Warning: using cache..."
+	docker build -t $IMG_NS/$IMG_REPO:$IMG_TAG -f $CTX/Dockerfile $CTX
   ;;
 esac	
 else

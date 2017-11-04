@@ -509,8 +509,73 @@ func (cc *CheckerController) doCheck(key string) {
 		}
 		// fallthrough
 	default:
-		fmt.Println("Not implemented bin:", destinationPath)
-		return
+		switch {
+		case cc.ActionReqResp.Command[0] == "python":
+			opts := append(append([]string{}, cc.ActionReqResp.Command[1:]...), value.Args...)
+			result, err = manipulate.Client.Python_00_check(workdir, opts...)
+			if err != nil {
+				glog.Infof("Failed to execute: %s", err.Error())
+				return
+			}
+			scanner := bufio.NewScanner(bytes.NewReader(result))
+			for scanner.Scan() {
+				if ok, _ := regexp.MatchString(`\(False, '.*'\)`, scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+					break
+				}
+				if ok, _ := regexp.MatchString(`\(True, '.*'\)`, scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode = 0
+					break
+				}
+				if ok, _ := regexp.MatchString(`{'status': *'down', *'msg':.*}`, scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+					break
+				}
+				if ok, _ := regexp.MatchString(`{'status': *'up', *'msg':.*}`, scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode = 0
+					break
+				}
+				if ok, _ := regexp.MatchString(`\[no\].*`, scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+					break
+				}
+				if ok, _ := regexp.MatchString(`\[ok\].*`, scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode = 0
+					break
+				}
+				if ok, _ := regexp.MatchString("Host:.+seems down", scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+					break
+				}
+				if ok, _ := regexp.MatchString("Host:.+seems ok", scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode = 0
+					break
+				}
+				// runtime error
+				if ok, _ := regexp.MatchString(`.*\[Errno.+\] Connection refused.*`, scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+					break
+				}
+				if ok, _ := regexp.MatchString(`\('.*', 'error:', '.*'\)`, scanner.Text()); ok {
+					cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+					break
+				}
+				// treat as information
+				if ok, _ := regexp.MatchString("-+", scanner.Text()); ok {
+					continue
+				}
+				if ok, _ := regexp.MatchString("checking host:.+", scanner.Text()); ok {
+					continue
+				}
+				fmt.Println("Unkown content:", scanner.Text())
+			}
+			if err = scanner.Err(); err != nil {
+				fmt.Fprintln(os.Stderr, "Faild to reading standard input:", err)
+			}
+		default:
+			fmt.Println("Not implemented bin:", destinationPath)
+			return
+		}
 	}
 	fmt.Println(string(result))
 

@@ -2,7 +2,6 @@ bin/
 .vagrant/
 temp*
 tmp*
-/*.txt
 docs/*.txt
 *.cert
 *.crt
@@ -18,6 +17,7 @@ tracing/Dockerfile.collector
 /examples/java/**/.metadata
 /examples/java/**/.project
 /examples/java/**/.settings
+
 /examples/java/flag/RemoteSystemsTempFiles
 /examples/java/flag/src/main/java/cn/com/isc/config
 /examples/java/flag/src/main/java/cn/com/isc/controller
@@ -25,13 +25,12 @@ tracing/Dockerfile.collector
 /examples/java/flag/src/main/java/cn/com/isc/filter
 /examples/java/flag/src/main/java/cn/com/isc/repository
 /examples/java/flag/src/main/java/cn/com/isc/server
-/examples/java/flag/src/main/java/cn/com/isc/until
+/examples/java/flag/src/main/java/cn/com/isc/until/
 /examples/java/flag/src/main/resources/static
 /examples/java/flag/src/main/webapp
 /examples/java/flag/target
 
-/examples/python/**/*.py
-/examples/python/**/hosts.list
+/examples/python/check-alive/
 
 /examples/php/dynamic
 /examples/php/edusoho

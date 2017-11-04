@@ -67,7 +67,7 @@ COPY bin/checkalive program/ /
 #    DATABUS_PRIORITY_CMDB="sentinel redis etcd mysql" \
 #    DATABUS_PRIORITY_MQ="sentinel redis gnatsd kafka rabbit"
 
-VOLUME ["/examples"]
+#VOLUME ["/examples"]
 
 EXPOSE 10061 10062
 
