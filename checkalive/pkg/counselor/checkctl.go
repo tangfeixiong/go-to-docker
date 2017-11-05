@@ -218,8 +218,10 @@ func (cc *CheckerController) Dispatch(pkgHome string, req *checkalivepb.CheckAct
 	resp.DestinationPath = req.DestinationPath
 
 	for ck, _ := range req.DestConfigurations {
-		req.DestConfigurations[ck].Args = req.Args
-		req.DestConfigurations[ck].Env = req.Env
+		req.DestConfigurations[ck].Args = make([]string, len(req.Args))
+		copy(req.DestConfigurations[ck].Args, req.Args)
+		req.DestConfigurations[ck].Env = make([]string, len(req.Env))
+		copy(req.DestConfigurations[ck].Env, req.Env)
 		req.DestConfigurations[ck].Conf = make(map[string]string, len(req.Conf))
 	}
 	for k, v := range req.Conf {
@@ -234,13 +236,13 @@ func (cc *CheckerController) Dispatch(pkgHome string, req *checkalivepb.CheckAct
 			req.DestConfigurations[ck].Conf[k] = string(bdec)
 		}
 	}
+	resp.Command = req.Command
 	resp.Args = req.Args
 	resp.Env = req.Env
 	resp.Conf = req.Conf
 	resp.DestConfigurations = req.DestConfigurations
 
 	for ck, cv := range req.DestConfigurations {
-		fmt.Println("Dest tpl:", ck)
 		for tk, tv := range cv.Tpl {
 			r := regexp.MustCompile(`\$\(` + tk + `\)`)
 			for i, v := range req.DestConfigurations[ck].Args {
@@ -253,6 +255,7 @@ func (cc *CheckerController) Dispatch(pkgHome string, req *checkalivepb.CheckAct
 				req.DestConfigurations[ck].Conf[k] = r.ReplaceAllString(v, tv)
 			}
 		}
+		fmt.Printf("Dest config of %s: %v", ck, req.DestConfigurations[ck])
 	}
 
 	for _, cv := range req.DestConfigurations {

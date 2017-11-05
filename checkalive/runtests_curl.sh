@@ -1,6 +1,39 @@
 #!/bin/bash -e
 
 case $1 in
+    start-awd01-lemon-cms-check)
+	    curl -X POST http://172.17.4.50:10062/v1/checkactions -d \
+'{
+  "name": "awd01_lemon_cms_check.py",
+  "command": [
+      "python", "awd01_lemon_cms_check.py"
+    ],
+  "args": [
+      "--host=$(ip)",
+      "--port=$(port)"
+    ],
+  "env": [
+  ],
+  "conf":
+    {
+    },
+  "work_dir": "awd01_lemon_cms",
+  "periodic": 3,
+  "duration": 10,
+  "dest_configurations":
+    {
+      "team1":
+        {
+          "name": "container1",
+          "tpl":
+            {
+              "ip": "localhost",
+              "port": "80"
+            }
+        }
+    }
+}'
+        ;;
     start-awd10-nothing-check)
 	    curl -X POST http://172.17.4.50:10062/v1/checkactions -d \
 '{
