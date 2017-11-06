@@ -291,6 +291,7 @@ func (cc *CheckerController) Start() {
 	ticker := time.NewTicker(time.Second * time.Duration(periodic))
 	cc.ticker = ticker
 
+	ch := make(chan string, 16)
 	go func() {
 		var count int64 = 0
 		ts := time.Now()
@@ -311,9 +312,13 @@ func (cc *CheckerController) Start() {
 				default:
 					if elapsed < duration+1 {
 						fmt.Println("Tick at", t, "-> key:", k)
-						go func() {
-							cc.doCheck(k)
-						}()
+						ch <- k
+						go func(<-chan string) {
+							cc.mutex.Lock()
+							defer cc.mutex.Unlock()
+							key := <-ch
+							cc.doCheck(key)
+						}(ch)
 					} else {
 						amount += 1
 					}
@@ -368,9 +373,6 @@ func (cc *CheckerController) Stop() {
 }
 
 func (cc *CheckerController) doCheck(key string) {
-	cc.mutex.Lock()
-	defer cc.mutex.Unlock()
-
 	destinationPath := cc.ActionReqResp.DestinationPath
 	workdir := filepath.Join(cc.RootPath, cc.ActionReqResp.WorkDir)
 	timestamp := time.Now()
@@ -596,6 +598,7 @@ func (cc *CheckerController) doCheck(key string) {
 	buf.WriteByte('\n')
 	cc.ActionReqResp.DestConfigurations[key].StateMessage = buf.String()
 	cc.ActionReqResp.DestConfigurations[key].Timestamp = timestamp.Format(time.RFC3339)
+	glog.Infof("State (key=%s): %q", cc.ActionReqResp.DestConfigurations[key])
 
 	if cc.WriteCMDBFn != nil {
 		cc.WriteCMDBFn(cc.ActionReqResp)
