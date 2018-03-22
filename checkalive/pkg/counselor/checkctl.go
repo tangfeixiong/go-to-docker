@@ -395,7 +395,9 @@ func (cc *CheckerController) doCheck(key string) {
 		result, err = manipulate.Client.Python_00_check(workdir, opts...)
 		if err != nil {
 			glog.Infof("Failed to execute: %s", err.Error())
-			return
+			result = []byte(err.Error())
+			cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+			break
 		}
 		scanner := bufio.NewScanner(bytes.NewReader(result))
 		for scanner.Scan() {
@@ -425,7 +427,9 @@ func (cc *CheckerController) doCheck(key string) {
 		result, err = manipulate.Client.Python_00_check(workdir, opts...)
 		if err != nil {
 			glog.Infof("Failed to execute: %s", err.Error())
-			return
+			result = []byte(err.Error())
+			cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+			break
 		}
 		scanner := bufio.NewScanner(bytes.NewReader(result))
 		for scanner.Scan() {
@@ -455,7 +459,9 @@ func (cc *CheckerController) doCheck(key string) {
 		result, err = manipulate.Client.Python_00_check(workdir, opts...)
 		if err != nil {
 			glog.Infof("Failed to execute: %s", err.Error())
-			return
+			result = []byte(err.Error())
+			cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+			break
 		}
 		scanner := bufio.NewScanner(bytes.NewReader(result))
 		for scanner.Scan() {
@@ -485,7 +491,9 @@ func (cc *CheckerController) doCheck(key string) {
 		result, err = manipulate.Client.Python_00_check(workdir, opts...)
 		if err != nil {
 			glog.Infof("Failed to execute: %s", err.Error())
-			return
+			result = []byte(err.Error())
+			cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+			break
 		}
 		scanner := bufio.NewScanner(bytes.NewReader(result))
 		for scanner.Scan() {
@@ -520,7 +528,9 @@ func (cc *CheckerController) doCheck(key string) {
 			result, err = manipulate.Client.Python_00_check(workdir, opts...)
 			if err != nil {
 				glog.Infof("Failed to execute: %s", err.Error())
-				return
+				result = []byte(err.Error())
+				cc.ActionReqResp.DestConfigurations[key].StateCode += 1
+				break
 			}
 			scanner := bufio.NewScanner(bytes.NewReader(result))
 			for scanner.Scan() {

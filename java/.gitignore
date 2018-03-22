@@ -1,0 +1,16 @@
+.idea/
+
+.project
+.settings/
+
+.gradle
+
+target/
+
+*.war
+
+archetype-catalog.xml
+
+https0x3A0x2F0x2Fgist.github.com0x2Fferronrsmith0x2F9328204/src
+
+kotlin-project/
