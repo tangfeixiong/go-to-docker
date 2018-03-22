@@ -1,6 +1,6 @@
 # Development
 
-## CI (Continuously Integration)
+## Build and Run
 
 Maven (via aliyun mirror)
 ```
@@ -82,7 +82,7 @@ Downloaded from aliyun: http://maven.aliyun.com/nexus/content/groups/public/org/
 
 ```
 
-Then go __http://172.17.4.59:8080/__
+Then go __http://<your machine IP>:8080/__
 
 Terminate CI (via ctrl-c)
 ```
@@ -93,7 +93,7 @@ Terminate CI (via ctrl-c)
 [INFO] ------------------------------------------------------------------------
 ```
 
-## CD (Continuously Delivery)
+## CI/CD (Continuously Integration & Continuously Delivery)
 
 Docker
 ```
