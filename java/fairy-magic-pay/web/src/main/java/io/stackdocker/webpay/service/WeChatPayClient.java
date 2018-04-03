@@ -25,8 +25,8 @@ import org.springframework.stereotype.Service;
 import io.stackdocker.webpay.api.Payment;
 import io.stackdocker.webpay.help.WeChatUnifiedOrderApiException;
 
-@Service
-public class WeChatPayClient extends WeChatPayApi {
+//@Service
+public class WeChatPayClient {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final AtomicInteger counter = new AtomicInteger();
@@ -37,16 +37,41 @@ public class WeChatPayClient extends WeChatPayApi {
     //   https://pay.weixin.qq.com/wechatpay_guide/help_docs.shtml
     
     // application identity
-    @Value("${wechart.pay.app_id}") public String appId;
+    @Value("${wechat.pay.app_id}") private String appId;
 	
     // vender id
-    @Value("${wechart.pay.mch_id") public String mchId;
+    @Value("${wechat.pay.mch_id") private String mchId;
     
-    @Value("${wxpay.partner_key}") public String partnerKey;
+    @Value("${wxpay.partner_key}") private String partnerKey;
     
-    @Value("${wxpay.cert_path") public String certPath;
+    @Value("${wxpay.cert_path") private String certPath;
     
-    @Value("${wxpay.notify_url") public String notifyUrl;
+    @Value("${wxpay.notify_url") private String notifyUrl;
+
+    public WeChatPayClient() {
+        logger.info("props=" + appId + ";" + mchId + ";" + partnerKey + ";" + certPath + ";" + notifyUrl);
+    }
+
+    public String getAppId() {
+    	return appId;
+	}
+
+	public String getMchId() {
+    	return mchId;
+	}
+
+	public String getPartnerKey() {
+    	return partnerKey;
+	}
+
+	public String getCertPath() {
+    	return certPath;
+	}
+
+	public String getNotifyUrl() {
+    	return notifyUrl;
+	}
+
 	
 	public WxPayApiConfig getApiConfig() {
 		return WxPayApiConfig.New()

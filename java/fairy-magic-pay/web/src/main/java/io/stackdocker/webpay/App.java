@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 import io.stackdocker.webpay.api.Payment;
+import io.stackdocker.webpay.service.WeChatPayClient;
 
 @SpringBootApplication
 @ComponentScan("io.stackdocker.webpay")
@@ -24,8 +25,8 @@ public class App {
     }
 
 //	@Bean
-//	public WxPayService wxPayService() {
-//		return new WxPayService();
+//	public WeChatPayClient wxpayClient() {
+//		return new WeChatPayClient();
 //	}
 
 //	@Bean
@@ -38,10 +39,10 @@ public class App {
 //		return new UnionPayService();
 //	}
 
-/*
-  Refer to
-    https://docs.spring.io/spring-boot/docs/current/reference/html/howto-traditional-deployment.html
-*/
+	/*
+	  Refer to
+		https://docs.spring.io/spring-boot/docs/current/reference/html/howto-traditional-deployment.html
+	*/
 //	@Override
 //	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
 //		return application.sources(App.class);

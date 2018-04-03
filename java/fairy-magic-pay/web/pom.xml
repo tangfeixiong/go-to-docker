@@ -42,22 +42,21 @@
 	</dependencyManagement>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-			<version>${spring-boot.version}</version>
-		</dependency>
 		<!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
+		<!--<dependency>-->
+			<!--<groupId>javax.validation</groupId>-->
+			<!--<artifactId>validation-api</artifactId>-->
+			<!--<version>1.0.0.GA</version>-->
+		<!--</dependency>-->
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-validator -->
 		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.0.0.GA</version>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.0.9.Final</version>
+			<!--<version>5.4.0.Final</version>-->
+			<!--<version>5.1.1.Final</version>-->
 		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -71,18 +70,27 @@
 			<artifactId>aspectjrt</artifactId>
 			<version>1.8.13</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-validator -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-validator</artifactId>
-			<version>6.0.9.Final</version>
-		</dependency>
-
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 			<version>3.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+			<version>${spring-boot.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<version>${spring-boot.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+			<version>${spring-boot.version}</version>
 		</dependency>
 
 		<dependency>
@@ -267,26 +275,26 @@
 		</plugins>
 
 	</build>
-	<profiles>
-		<!-- 默认激活 dev 开发环境 -->
-		<!-- production使用 mvn xxx -Pproduction -->
-		<profile>
-			<!-- 本地开发环境 -->
-			<id>development</id>
-			<properties>
-				<profiles.active>dev</profiles.active>
-			</properties>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-		</profile>
-		<profile>
-			<!-- 生产环境 -->
-			<id>production</id>
-			<properties>
-				<profiles.active>production</profiles.active>
-			</properties>
-		</profile>
-	</profiles>
+	<!--<profiles>-->
+		<!--&lt;!&ndash; 默认激活 dev 开发环境 &ndash;&gt;-->
+		<!--&lt;!&ndash; production使用 mvn xxx -Pproduction &ndash;&gt;-->
+		<!--<profile>-->
+			<!--&lt;!&ndash; 本地开发环境 &ndash;&gt;-->
+			<!--<id>development</id>-->
+			<!--<properties>-->
+				<!--<profiles.active>dev</profiles.active>-->
+			<!--</properties>-->
+			<!--<activation>-->
+				<!--<activeByDefault>true</activeByDefault>-->
+			<!--</activation>-->
+		<!--</profile>-->
+		<!--<profile>-->
+			<!--&lt;!&ndash; 生产环境 &ndash;&gt;-->
+			<!--<id>production</id>-->
+			<!--<properties>-->
+				<!--<profiles.active>production</profiles.active>-->
+			<!--</properties>-->
+		<!--</profile>-->
+	<!--</profiles>-->
 
 </project>

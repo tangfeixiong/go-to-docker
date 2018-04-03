@@ -42,7 +42,7 @@ public class WeChatPayApiInterceptor {
 //		}
 //	}
    @AfterReturning(
-      pointcut = "execution(* io.stackdocker.service.WxpayApiService.getApiConfig(..))",
+      pointcut = "execution(* io.stackdocker.service.WeChatPayClient.getApiConfig(..))",
       returning= "result")
    public void logAfterReturning(JoinPoint joinPoint, Object result) {
 

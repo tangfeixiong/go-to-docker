@@ -3,6 +3,7 @@ package io.stackdocker.webpay.controller;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -70,9 +71,12 @@ public class WechatPayParticipatingVendorController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Autowired private WeChatPayClient wxpayClient;
-    @Autowired private QrcodeClient qrcodeClient;
-    @Autowired private Map<UUID, Payment> cachedPayments;
+	private final AtomicLong counter = new AtomicLong();
+
+	//@Autowired WeChatPayClient wxpayClient;
+	WeChatPayClient wxpayClient = new WeChatPayClient();
+    @Autowired QrcodeClient qrcodeClient;
+    @Autowired Map<UUID, Payment> cachedPayments;
 
 	static Log log=Log.getLog(/*WxPayController*/WechatPayParticipatingVendorController.class);
 	private AjaxResult ajax = new AjaxResult();
@@ -83,11 +87,20 @@ public class WechatPayParticipatingVendorController {
 //	String partnerKey = prop.get("partnerKey");
 //	String certPath = prop.get("certPath");
 //	String notify_url = prop.get("domain")+"/wxpay/pay_notify";
-    String appid = wxpayClient.appId;
-    String mch_id = wxpayClient.mchId;
-    String partnerKey = wxpayClient.partnerKey;
-    String certPath = wxpayClient.certPath;
-    String notify_url = wxpayClient.notifyUrl;
+    private String appid;
+    private String mch_id;
+    private String partnerKey;
+    private String certPath;
+    private String notify_url;
+
+    public WechatPayParticipatingVendorController() {
+    	 logger.info(wxpayClient != null ? "ok": "fail");
+    	 appid = wxpayClient.getAppId();
+    	 mch_id = wxpayClient.getMchId();
+    	 partnerKey = wxpayClient.getPartnerKey();
+    	 certPath = wxpayClient.getCertPath();
+    	 notify_url = wxpayClient.getNotifyUrl();
+	}
 	
 	public WxPayApiConfig getApiConfig() {
 //		WxPayApiConfig apiConfig = WxPayApiConfig.New()
@@ -113,11 +126,12 @@ public class WechatPayParticipatingVendorController {
     
     @ModelAttribute("prepayment")
     PrePayment defaultPrePayment() {
+    	long id = counter.incrementAndGet();
         UUID billing = UUID.randomUUID();
         int leftLimit = 1;
         int rightLimit = 10;
         int generatedInteger = new RandomDataGenerator().nextInt(leftLimit, rightLimit);
-        return new PrePayment(billing, generatedInteger, Provider.WECHATPAY);
+        return new PrePayment(id, billing, generatedInteger, Provider.WECHATPAY);
     }
     
     @ModelAttribute("allProviders")
@@ -125,7 +139,7 @@ public class WechatPayParticipatingVendorController {
         return Arrays.asList(Provider.ALL);
     }
 
-    @RequestMapping(value = "/wxpay", params = "form", method = RequestMethod.GET)
+    @RequestMapping(value = "/wxpay", method = RequestMethod.GET)
 	public String index(@ModelAttribute("prepayment") PrePayment prePayment) {
 //		log.info("欢迎使用IJPay,商户模式下微信支付 - by Javen");
 //		renderText("欢迎使用IJPay 商户模式下微信支付  - by Javen");
@@ -134,7 +148,7 @@ public class WechatPayParticipatingVendorController {
         return "booking/form";
 	}
 
-    @RequestMapping(value = "/wxpay/prepay", method = RequestMethod.POST)
+    @RequestMapping(value = "/wxpay/prepay", params = "form", method = RequestMethod.POST)
     public String prepay(@Valid final PrePayment prePayment, final BindingResult bindingResult, final ModelMap model, 
                          HttpServletRequest request) {
         if (bindingResult.hasErrors()) {

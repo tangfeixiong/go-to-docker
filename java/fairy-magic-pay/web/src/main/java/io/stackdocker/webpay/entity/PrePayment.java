@@ -1,7 +1,7 @@
 package io.stackdocker.webpay.entity;
 
 import java.util.UUID;
-import javax.validation.constraints.Size;
+//import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -18,10 +18,13 @@ import org.hibernate.validator.constraints.NotEmpty;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PrePayment {
 
-    //private Long id;
+    @NotEmpty(message = "ID is required.")
+    @Getter
+    @Setter
+    private Long id;
 
     @NotEmpty(message = "Billing is required.")
-    @Size(min=4, max=35)
+    //@Size(min=4, max=35)
     @Getter
     @Setter
     private UUID billing;
@@ -36,7 +39,8 @@ public class PrePayment {
     @Setter
     private Provider provider;
     
-    public PrePayment(UUID billing, int summary, Provider provider) {
+    public PrePayment(long id, UUID billing, int summary, Provider provider) {
+        this.id = Long.valueOf(id);
         this.billing = billing;
         this.summary = summary;
         this.provider = provider;
