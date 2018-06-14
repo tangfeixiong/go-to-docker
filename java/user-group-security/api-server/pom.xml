@@ -1,0 +1,650 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker.fairymagic</groupId>
+		<artifactId>user-group-security</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+        <relativePath>..</relativePath> <!-- lookup parent from repository -->
+	</parent>
+<!--    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.1.RELEASE</version>
+        <relativePath />
+    </parent>
+ 	<version>0.0.1-SNAPSHOT</version> 
+	<groupId>https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker.magicbird</groupId>-->
+	<artifactId>api-server</artifactId>
+	<packaging>jar</packaging>
+    
+    <name>api server</name>
+    <description>Restful Server</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        
+        <java.version>1.8</java.version>
+        <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+        <mysql-connector.version>8.0.11</mysql-connector.version>
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependenies -->
+        <spring-boot.version>2.0.2.RELEASE</spring-boot.version>
+        <!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter -->
+        <mybatis-springboot.version>1.3.2</mybatis-springboot.version>
+        <!-- https://mvnrepository.com/artifact/org.apache.shiro/shiro-spring-boot-web-starter -->
+        <shiro-springboot.version>1.4.0</shiro-springboot.version>
+        <!-- https://mvnrepository.com/artifact/com.github.theborakompanioni/thymeleaf-extras-shiro -->
+        <thymeleaf-shiro.version>2.0.0</thymeleaf-shiro.version>
+        <!-- https://mvnrepository.com/artifact/io.fabric8/docker-maven-plugin -->
+        <fabric8io-dmp.version>0.26.0</fabric8io-dmp.version>
+        
+        <start-class>io.stackdocker.ugs.apiserver.App</start-class>
+        <skip.it>true</skip.it>
+        
+        <!-- http://www.mojohaus.org/sql-maven-plugin/examples/execute.html
+             http://hmkcode.com/sq-maven-plugin-mysql/ -->
+        <sql-jdbc.driver>com.mysql.jdbc.Driver</sql-jdbc.driver>
+        <sql-jdbc.connection>jdbc:mysql://localhost:3306/simple</sql-jdbc.connection>
+        <sql-jdbc.bootstrap>jdbc:mysql://localhost:3306/simplebootstrap</sql-jdbc.bootstrap>
+        <sql-db.username>root</sql-db.username>
+        <sql-db.password></sql-db.password>
+        <db.name>simple</db.name>
+        <db.remained-after-test>true</db.remained-after-test>
+        <sql-init.skip>true</sql-init.skip>
+        <!-- https://dmp.fabric8.io/#global-configuration -->
+        <docker-registry>docker.io/tangfeixiong</docker-registry>
+        <image-repository>${project.artifactId}</image-repository>
+        <image-tag>${project.version}</image-tag>
+<!--        <image-tag>latest</image-tag>-->
+        <docker.skip>true</docker.skip>
+        <docker.registry>docker.io</docker.registry>
+        <!-- https://maven.fabric8.io/#build-goal-configuration -->
+<!--        <docker.apiVersion>...</docker.apiVersion>
+        <docker.autoPull>on</docker.autoPull>
+        <docker.host>unix:///var/run/docker.sock</docker.host>
+        <docker.host>//./pipe/docker_engine</docker.host>
+        <docker.image>docker.io/tangfeixiong/${project.artifactId}:${project.version}</docker.image>-->
+        <fabric8.mode>kubernetes</fabric8.mode>
+        <fabric8.namespace>default</fabric8.namespace>
+        <oracle-java.url>http://localhost:40080/jdk-8u152-linux-x64.tar</oracle-java.url>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- Override Spring Data release train provided by Spring Boot -->
+<!--			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-releasetrain</artifactId>
+				<version>Fowler-SR2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>-->
+            
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+            
+            <!-- Override bom -->
+            <dependency>
+                <groupId>https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker.fairymagic</groupId>
+                <artifactId>common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker.fairymagic</groupId>
+			<artifactId>common</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		    <exclusions>
+		        <!-- 排除默认日志配置 -->
+		        <exclusion>
+		            <groupId>org.springframework.boot</groupId>
+		            <artifactId>spring-boot-starter-logging</artifactId>
+		        </exclusion>
+		    </exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+<!--		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>-->
+		<!-- 引入log4j依赖 -->
+<!--		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-log4j</artifactId>
+		    <version>1.3.8.RELEASE</version>
+		</dependency>-->
+		<dependency>
+		    <groupId>org.springframework.boot</groupId>
+		    <artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mybatis.spring.boot/mybatis-spring-boot-starter
+			mybatis与SpringBoot的结合
+		 -->
+		<dependency>
+		    <groupId>org.mybatis.spring.boot</groupId>
+		    <artifactId>mybatis-spring-boot-starter</artifactId>
+		    <version>${mybatis-springboot.version}</version>
+		</dependency>
+        <!-- https://mvnrepository.com/artifact/tk.mybatis/mapper-spring-boot-starter -->
+        <!--<dependency>
+            <groupId>tk.mybatis</groupId>
+            <artifactId>mapper-spring-boot-starter</artifactId>
+            <version>2.0.2</version>
+        </dependency>-->
+		
+		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
+		<dependency>
+		    <groupId>mysql</groupId>
+		    <artifactId>mysql-connector-java</artifactId>
+		    <version>${mysql-connector.version}</version>
+		</dependency>
+
+       <!-- https://github.com/apache/shiro/blob/master/samples/spring-boot/pom.xml -->
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring-boot-starter</artifactId>
+            <version>${shiro-springboot.version}</version>
+        </dependency>
+
+        <!-- Spring -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- https://github.com/pagehelper/pagehelper-spring-boot -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.2.5</version>
+        </dependency>        
+        
+        <!-- https://github.com/theborakompanioni/thymeleaf-extras-shiro -->
+        <dependency>
+            <groupId>com.github.theborakompanioni</groupId>
+            <artifactId>thymeleaf-extras-shiro</artifactId>
+            <version>${thymeleaf-shiro.version}</version>
+        </dependency>        
+        <!-- https://mvnrepository.com/artifact/org.crazycake/shiro-redis -->
+        <dependency>
+            <groupId>org.crazycake</groupId>
+            <artifactId>shiro-redis</artifactId>
+            <version>3.1.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.shiro</groupId>
+                    <artifactId>shiro-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+		<!-- https://mvnrepository.com/artifact/javax.validation/validation-api -->
+<!--		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.0.0.GA</version>
+		</dependency>-->
+		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate-validator -->
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.0.9.Final</version>
+			<!--<version>5.4.0.Final</version>-->
+			<!--<version>5.1.1.Final</version>-->
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.16.20</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.aspectj/aspectjrt -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.8.13</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+			<version>3.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.10</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.25</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.4</version>
+		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.json/json -->
+		<dependency>
+		    <groupId>org.json</groupId>
+		    <artifactId>json</artifactId>
+		    <version>20180130</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>net.sf.json-lib</groupId>
+		    <artifactId>json-lib</artifactId>
+		    <version>2.4</version>
+		    <classifier>jdk15</classifier>
+		</dependency>
+		
+		<!-- test -->
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+		<dependency>
+		    <groupId>junit</groupId>
+		    <artifactId>junit</artifactId>
+		    <version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		
+	</dependencies>
+
+
+	<build>		
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.xml</include>
+				</includes>			
+			</resource>
+
+            <!-- https://docs.spring.io/spring-boot/docs/current/reference/html/howto-properties-and-configuration.html -->
+        	<resource>
+        		<directory>src/main/resources</directory>
+        		<filtering>true</filtering>
+        	</resource>
+
+		</resources>
+		
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.7.0</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<version>2.21.0</version>
+				<configuration>
+					<skip>${skip.it}</skip>
+				</configuration>
+			</plugin>
+
+            <!-- force maven properties into spring boot application-dev.yml -->
+            <plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+            	<artifactId>maven-resources-plugin</artifactId>
+            	<version>2.7</version>
+            	<configuration>
+            		<delimiters>
+            			<delimiter>@</delimiter>
+            		</delimiters>
+            		<useDefaultDelimiters>false</useDefaultDelimiters>
+            	</configuration>
+            </plugin>
+
+            <!-- spring boot -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.version}</version>
+                <configuration>
+                  <mainClass>${start-class}</mainClass>
+<!--                  <layout>ZIP</layout>-->
+                </configuration>
+                <executions>
+                  <execution>
+                    <id>all-in-one</id>
+                    <goals>
+                      <goal>repackage</goal>
+                    </goals>
+                  </execution>
+                  <execution>
+                    <id>pre-integration-test</id>
+                    <goals>
+                      <goal>start</goal>
+                    </goals>
+                    <configuration>
+                      <skip>${skip.it}</skip>
+                    </configuration>
+                  </execution>
+                  <execution>
+                    <id>post-integration-test</id>
+                    <goals>
+                      <goal>stop</goal>
+                    </goals>
+                    <configuration>
+                      <skip>${skip.it}</skip>
+                    </configuration>
+                  </execution>
+                </executions>
+			</plugin>
+
+            <!-- TLS -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>keytool-maven-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <id>clean</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <id>generateKeyPair</id>
+                        <goals>
+                            <goal>generateKeyPair</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <keystore>${project.build.directory}/classes/ssl.keystore</keystore>
+                    <dname>cn=localhost</dname>
+                    <keypass>secret</keypass>
+                    <storepass>secret</storepass>
+                    <alias>localhost</alias>
+                    <keyalg>RSA</keyalg>
+                </configuration>
+            </plugin>
+
+            <!-- docker & kubernetes -->
+            <!-- https://github.com/fabric8io/docker-maven-plugin
+                 https://dmp.fabric8.io/ -->
+			<plugin>
+             <groupId>io.fabric8</groupId>
+             <artifactId>docker-maven-plugin</artifactId>
+             <version>0.24.0</version>
+             <extensions>true</extensions>
+			 <configuration>
+			   <images>
+			     <image>
+			       <name>${docker-registry}/${image-repository}:${image-tag}</name>
+                  <external> 
+                     <type>compose</type> 
+                     <composeFile>docker-compose.yml</composeFile>
+                     <basedir>src/main/docker</basedir> 
+                     <ignoreBuild>true</ignoreBuild>
+                  </external>
+			       <build>
+			         <assembly>
+<!--                       <descriptorRef>artifact-with-dependencies</descriptorRef>-->
+					    <descriptorRef>artifact</descriptorRef>
+                     </assembly>
+<!--			         <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>-->
+				     <dockerFileDir>io-dot-fabric8</dockerFileDir>
+<!--					 <dockerFile>Dockerfile.centos7</dockerFile>-->
+				     <args>
+				         <jarTgt>${project.build.finalName}.jar</jarTgt>
+				         <javaUri>${oracle-java.url}</javaUri>
+					 </args>
+					 <nocache>true</nocache>
+			       </build>
+			     </image>
+			   </images>
+			 </configuration>
+			 <executions>
+			   <execution>
+			     <id>docker-build</id>
+			     <goals>
+			       <goal>build</goal>
+			     </goals>
+			   </execution>
+			 </executions>
+			</plugin>
+
+            <!-- https://maven.fabric8.io/ -->
+<!--          <plugin>
+            <groupId>io.fabric8</groupId>
+            <artifactId>fabric8-maven-plugin</artifactId> 
+            <version>3.5.39</version>
+            
+            <executions>
+              <execution>
+                <id>docker-build</id>
+                <goals>
+                   <goal>build</goal>
+                </goals>  
+
+                <configuration>
+    			   <images>
+    			     <image>
+    			       <name>${docker-registry}/${image-repository}:${image-tag}</name>
+    			       <build>
+    			         <assembly>
+    					    <descriptorRef>artifact</descriptorRef>
+                         </assembly>
+    			         <dockerFileDir>${project.basedir}/src/main/docker/io-dot-fabric8</dockerFileDir>
+    					 <dockerFile>Dockerfile.centos7</dockerFile>
+    				     <args>
+    				         <jarTgt>${project.build.finalName}.jar</jarTgt>
+    				         <javaUri>${oracle-java-url}</javaUri>
+    					 </args>
+    					 <nocache>true</nocache>
+    			       </build>
+    			     </image>
+    			   </images>
+    			 </configuration>
+
+              </execution>
+            </executions>      
+          </plugin>-->
+
+            <!-- http://www.mybatis.org/generator/running/runningWithMaven.html -->
+            <plugin>
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <version>1.3.6</version>
+                <configuration>
+                    <configurationFile>${basedir}/src/main/resources/mybatis-gen-cfg/generatorConfig.xml</configurationFile>
+                    <!--                    <outputDirectory>${project.build.directory}/generated-sources/mybatis-generator</outputDirectory>-->
+                    <overwrite>true</overwrite>
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>Generate MyBatis Artifacts</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>${mysql-connector.version}</version>
+                    </dependency>
+                    <!--<dependency>
+                        <groupId>tk.mybatis</groupId>
+                        <artifactId>mapper</artifactId>
+                        <version>4.0.2</version>
+                    </dependency>-->
+                </dependencies>
+            </plugin>
+
+            <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>sql-maven-plugin</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+
+        <dependencies>
+          <!-- specify the dependent jdbc driver here -->
+<!--          <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>8.1-407.jdbc3</version>
+          </dependency>-->
+                <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>${mysql-connector.version}</version>
+                </dependency>
+        </dependencies>
+
+        <!-- common configuration shared by all executions -->
+        <configuration>
+<!--          <driver>org.postgresql.Driver</driver>
+          <url>jdbc:postgressql://localhost:5432:yourdb</url>
+          <username>postgres</username>
+          <password>password</password>-->
+          <!-- You can comment out username/password configurations and
+               have maven to look them up in your settings.xml using ${settingsKey}
+          -->
+          <settingsKey>sensibleKey</settingsKey>
+          <!--all executions are ignored if -Dmaven.test.skip=true-->
+<!--          <skip>${maven.test.skip}</skip>-->
+          <skip>${sql-init.skip}</skip>
+
+          <driver>${sql-jdbc.driver}</driver>
+          <url>${sql-jdbc.connection}</url>
+          <username>${sql-db.username}</username>
+          <password>${sql-db.password}</password>
+          <enableAnonymousPassword>true</enableAnonymousPassword>
+        </configuration>
+
+        <executions>
+          <execution>
+            <id>drop-db-before-test-if-any</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <!-- need another database to drop the targeted one -->
+<!--              <url>jdbc:postgressql://localhost:5432:bootstrapdb</url>-->
+              <url>${sql-jdbc.bootstrap}</url>
+              <autocommit>true</autocommit>
+              <sqlCommand>drop database ${db.name}</sqlCommand>
+              <!-- ignore error when database is not avaiable -->
+              <onError>continue</onError>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>create-db</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+<!--              <url>jdbc:postgressql://localhost:5432:yourdb</url>-->
+              <url>${sql-jdbc.connection}</url>
+              <!-- no transaction -->
+              <autocommit>true</autocommit>
+              <sqlCommand>create database ${db.name}</sqlCommand>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>create-schema</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <autocommit>true</autocommit>
+              <srcFiles>
+                <srcFile>src/main/resources/simple-schema.sql</srcFile>
+              </srcFiles>
+            </configuration>
+          </execution>
+
+          <execution>
+            <id>create-data</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <orderFile>ascending</orderFile>
+              <fileset>
+                <basedir>${basedir}</basedir>
+                <includes>
+                  <include>src/test/sql/test-data2.sql</include>
+                  <include>src/test/sql/test-data1.sql</include>
+                </includes>
+              </fileset>
+            </configuration>
+          </execution>
+
+          <!-- drop db after test -->
+          <execution>
+            <id>drop-db-after-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <skip>${db.remained-after-test}</skip>
+              <autocommit>true</autocommit>
+              <sqlCommand>drop database ${db.name}</sqlCommand>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+		</plugins>
+            
+	</build>
+
+</project>

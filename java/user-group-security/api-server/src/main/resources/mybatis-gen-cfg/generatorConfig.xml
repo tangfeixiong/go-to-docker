@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+
+<generatorConfiguration>
+    <properties resource="application.properties"/>
+    
+    <context id="MySQL_Tables" targetRuntime="MyBatis3">
+        <property name="beginningDelimiter" value="`"/>
+        <property name="endingDelimiter" value="`"/>
+  	
+        <jdbcConnection connectionURL="jdbc:mysql://localhost/ctftest" 
+                        driverClass="com.mysql.jdbc.Driver"
+                        password="root" userId="root">
+                <property name="nullCatalogMeansCurrent" value="true" />
+        </jdbcConnection>
+        <javaModelGenerator targetPackage="io.stackdocker.ugs.api.entity.mapper"
+                            targetProject="src/main/java" />
+        <sqlMapGenerator targetPackage="io.stackdocker.ugs.api.mapper"
+                         targetProject="src/main/resources/mybatis_mapper" />
+        <javaClientGenerator targetPackage="io.stackdocker.ugs.api.mapper"
+                             targetProject="src/main/java" type="XMLMAPPER" />
+
+<!--          <table tableName="ALLTYPES" >
+            <columnOverride column="UNSIGNED_BIGINT_FIELD" javaType="java.lang.Object" jdbcType="LONG" />
+          </table>-->
+     
+        <table tableName="user">
+        </table>
+        <table tableName="profile">
+        </table>
+        <table tableName="group">
+        </table>
+        <table tableName="member">
+        </table>
+        <table tableName="organization">
+        </table>
+        <table tableName="division">
+        </table>
+        <table tableName="team">
+        </table>
+        <table tableName="circle">
+        </table>
+        <table tableName="resource">
+        </table>
+        <table tableName="role">
+        </table>
+        <table tableName="default_role">
+        </table>
+        <table tableName="default_group_role">
+        </table>
+        <table tableName="custom_role">
+        </table>
+        <table tableName="custom_group_role">
+        </table>
+        <table tableName="rule">
+        </table>
+        <table tableName="role_binding">
+        </table>
+
+        <!--  <table schema="???" tableName="company">
+          <columnOverride column="???" property="true" />
+        </table>
+        <table schema="???" tableName="province">
+          <columnOverride column="???" property="true" />
+        </table> -->
+    
+    
+     <!-- <table schema="???" tableName="courseware">
+	<columnOverride column="???" property="true" />
+</table>
+
+	<table schema="???" tableName="article">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="article_type">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="code_message">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="code_status">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="code_style">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="courseware_rate">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="courseware_sort">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="courseware_type">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="courseware_vedio">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="customer">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="customer_rate">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="equipment">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="equipment_rate">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="equipment_sort">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="loophole">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="loophole_rate">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="loophole_sort">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="permission">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="project_name">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="project_type">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="questions">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="questions_purpose">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="questions_rate">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="questions_sort">
+		<columnOverride column="???" property="true" />
+	</table>
+	<table schema="???" tableName="questions_type">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="resource">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="resource_type">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="tender">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="user">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="user_dept">
+		<columnOverride column="???" property="true" />
+	</table>
+
+	<table schema="???" tableName="user_role">
+		<columnOverride column="???" property="true" />
+	</table>  -->
+	
+    
+    </context>
+  
+</generatorConfiguration>
