@@ -1,11 +1,11 @@
 package io.stackdocker.ugs.apiserver;
 
-import javax.inject.Qualifier;
 import javax.sql.DataSource;
 
-import at.pollux.thymeleaf.shiro.dialect.Dialect;
+import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 import io.stackdocker.ugs.apiserver.model.ErrMsg;
 import io.stackdocker.ugs.apiserver.model.NotFoundException;
+import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;
@@ -17,30 +17,39 @@ import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 
 import io.stackdocker.ugs.apiserver.security.ShiroAuthczRealm;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 @Configuration
 public class ShiroSecureConf {
+    private static Logger logger = LoggerFactory.getLogger(App.class);
+
 //    @Autowired(required = false)
 //    private ResourcesService resourcesService;
 
     @ExceptionHandler(UnauthenticatedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public void handleException(UnauthenticatedException e) {
-        log.debug("{} was thrown", e.getClass(), e);
+        logger.debug("{} was thrown", e.getClass(), e);
     }
 
     @ExceptionHandler(AuthorizationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public void handleException(AuthorizationException e) {
-        log.debug("{} was thrown", e.getClass(), e);
+        logger.debug("{} was thrown", e.getClass(), e);
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -133,7 +142,7 @@ public class ShiroSecureConf {
 //    public AbstractShiroFilter shiroFilter() throws Exception {
 //        ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
 //        Map<String, String> filterChainDefinitionMapping = new HashMap<>();
-//        filterChainDefinitionMapping.put("/api/health", "authc,roles[guest],ssl[8443]");
+//        filterChainDefinitionMapping.put("/cli/health", "authc,roles[guest],ssl[8443]");
 //        filterChainDefinitionMapping.put("/login", "authc");
 //        filterChainDefinitionMapping.put("/logout", "logout");
 //        shiroFilter.setFilterChainDefinitionMap(filterChainDefinitionMapping);

@@ -7,13 +7,13 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 
 
 public class CustomizedCredentialsMatcher extends SimpleCredentialsMatcher {
-    @Override
-    public boolean doCredentialsMatch(AuthenticationToken token, Authentication info) {
+
+    public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationToken info) {
         UsernamePasswordToken upt = (UsernamePasswordToken) token;
         // add salt if required
         String submitted = new String(upt.getPassword());
         // get from db
-        String saved = (String)info.getgetCredentials();
+        String saved = (String)info.getCredentials();
         return saved.equals(submitted);
 
 //        String tokenCredentials = charArrayToString(tok.getCredentials());

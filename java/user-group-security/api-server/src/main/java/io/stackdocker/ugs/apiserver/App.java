@@ -7,7 +7,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-@MapperScan("com.magicbird.api.mapper*")		//配置扫描Mapper包
+@MapperScan("com.magicbird.cli.mapper*")		// Packages of Mybatis Mapper
 public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 

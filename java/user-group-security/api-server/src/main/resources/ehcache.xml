@@ -15,12 +15,12 @@
         Hibernate Object Caches
         =================================================================-->
 
-    <cache name="io.fairymagic.auth.api.Role"
+    <cache name="Role"
         maxElementsInMemory="100"
         timeToLiveSeconds="0"
         overflowToDisk="true"/>
 
-    <cache name="io.fairymagic.auth.api.Role.permissions"
+    <cache name="Role.permissions"
         maxElementsInMemory="100"
         timeToLiveSeconds="0"
         overflowToDisk="true"/>

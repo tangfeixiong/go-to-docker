@@ -14,7 +14,7 @@
 	<modules>
         <module>api-server</module>
 <!-- 		<module>web-server</module> -->
-		<module>common</module>
+		<module>core</module>
 	</modules>
 
 	<properties>

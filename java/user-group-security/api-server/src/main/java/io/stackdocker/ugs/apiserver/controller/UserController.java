@@ -4,22 +4,20 @@ import java.util.List;
 
 import net.sf.json.JSONObject;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.Subject;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.UnauthenticatedException;
+import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import io.stackdocker.ugs.apiserver.service.UserService;
 import io.fairymagic.exam.api.dao.User;
@@ -42,28 +40,50 @@ public class UserController {
 		
 		return userList;
 	}
-	
-	@RequestMapping(value = "/v1/default/users", method = POST,
+
+	@RequestMapping(value = "/v1/default", method = RequestMethod.GET)
+	public ResponseEntity<Object> doSomething(@RequestHeader(name = "remote_addr")
+													  String remoteAddress) {
+		logger.debug("The Remote address added by WebFiler is :: {}", remoteAddress);
+		ResponseEntity<Object> response = null;
+		try {
+			response = new ResponseEntity<Object>("SUCCESS", HttpStatus.OK);
+		} catch (Exception ex) {
+			logger.error(ex.getMessage(), ex);
+			return new ResponseEntity<Object>(ex.getMessage(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		return response;
+	}
+
+	@RequestMapping(value = "/v1/default/users", method = RequestMethod.POST,
             headers = "Accept=application/json", produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<?> addOne(@RequestBody User user) {
-		UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
-        Subject subject = SecurityUtils.getSubject();
-        User saved;
+	public ResponseEntity<?> addOne(@RequestHeader(name = "shiro_security") String ssFlag, @RequestBody User user) {
+	    if (false == "disabled".equals(ssFlag.toLowerCase())) {
+            UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
+            Subject currentUser = SecurityUtils.getSubject();
+            PrincipalCollection principals = currentUser.getPrincipals();
+            if (principals != null && !principals.isEmpty()) {
+                throw new AuthorizationException("User existed: " + user.getUsername());
+            }
+        }
+
+        int id;
         try {
-            saved = userService.registerUser(user);
+            id = userService.addOne(user);
         } catch (Exception e) {
-		    logger.Warn("Failed to register: " + e.getMessage())
+		    logger.warn("Failed to register: " + e.getMessage());
             return new ResponseEntity<String>("Bad Request", HttpStatus.BAD_REQUEST);
         }
 		
 		return new ResponseEntity<Integer>(Integer.valueOf(user.getId()), HttpStatus.OK);
 	}
     
-	@RequestMapping(value = "/v1/default/credentials", method = POST,
+	@RequestMapping(value = "/v1/default/credentials", method = RequestMethod.POST,
             headers = "Accept=application/json", produces = "application/json")
 	@ResponseBody
-	public ResponseEntity<?> signIn(@RequestBody User user) {
+	public ResponseEntity<?> verifyOne(@RequestBody User user) {
 		UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
         Subject subject = SecurityUtils.getSubject();
         User saved;
@@ -71,12 +91,12 @@ public class UserController {
             subject.login(token);
             saved = (User) subject.getPrincipal();
         } catch (LockedAccountException e) {
-            logger.Warn("Account is locked: " + e.getMessage())
+            logger.warn("Account is locked: " + e.getMessage());
             token.clear();
             throw new AuthorizationException(e.getMessage());
             // return new ResponseEntity<String>("Forbidden", HttpStatus.FORBIDDEN);
         } catch (AuthenticationException e) {
-		    logger.Warn("Failed to authenticate: " + e.getMessage())
+		    logger.warn("Failed to authenticate: " + e.getMessage());
             throw new UnauthenticatedException(e.getMessage());
             // return new ResponseEntity<String>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
