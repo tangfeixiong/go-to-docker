@@ -10,3 +10,4 @@ target/
 
 *.war
 
+api-server/mysql-dump.sql

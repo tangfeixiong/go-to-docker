@@ -2,9 +2,8 @@ package io.stackdocker.ugs.apiserver;
 
 import javax.sql.DataSource;
 
-import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
-import io.stackdocker.ugs.apiserver.model.ErrMsg;
-import io.stackdocker.ugs.apiserver.model.NotFoundException;
+import io.stackdocker.ugs.apiserver.domain.ErrMsg;
+import io.stackdocker.ugs.apiserver.domain.NotFoundException;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationException;
