@@ -11,6 +11,6 @@ ARG javaOpt
 COPY ${jarTgt:-api.jar} /api.jar
 
 ENV JAVA_OPTIONS="${javaOpt:-'-Xms128m -Xmx512m -XX:PermSize=128m -XX:MaxPermSize=256m'}" \
-    GO_TO_KUBERNETES="user-group-api"
+    GO_TO_KUBERNETES="user-group-security-api"
 
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/api.jar"]

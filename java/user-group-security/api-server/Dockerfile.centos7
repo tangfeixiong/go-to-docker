@@ -10,7 +10,7 @@ LABEL maintainer="tangfeixiong <tangfx128@gmail.com>" \
 ARG jarTgt
 ARG javaOpt
 
-COPY /maven/${jarTgt:api.jar} /api.jar
+COPY ${jarTgt:-/target/api.jar} /api.jar
 
 ENV JAVA_OPTIONS="${javaOpt:-'-Xms128m -Xmx512m -XX:PermSize=128m -XX:MaxPermSize=256m'}" \
     SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3306/testdb" \
