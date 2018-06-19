@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.StringTokenizer;
 
-import io.stackdocker.ugs.apiserver.service.UserService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -16,7 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
+
+import io.stackdocker.ugs.apiserver.service.UserService;
 
 /* @Component */ // filters are registered by default for all the URL’s.
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -88,7 +88,7 @@ public class BasicAuthFilter implements Filter {
 //                                if (!username.equals(_username) || !password.equals(_password)) {
 //                                    unauthorized(resp, "Bad credentials");
 //                                }
-                                if ( 0 == userService.verifyOne(_username, _password)) {
+                                if ( true == userService.verifySecureByName(_username, _password)) {
                                     unauthorized(resp, "Invalid credentials");
                                 }
 

@@ -71,12 +71,12 @@
             <!-- this project -->
             <dependency>
                 <groupId>https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker.fairymagic</groupId>
-                <artifactId>api</artifactId>
+                <artifactId>api-server</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker.fairymagic</groupId>
-                <artifactId>common</artifactId>
+                <artifactId>core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             
@@ -85,7 +85,7 @@
 	
     <repositories>
 	    <!-- my synced -->
-<!--        <repository>
+<!--        <com.magicbird
             <id>my-synced</id>
             <url>http://172.17.4.50:8081/content/repositories/allsynced</url>
             <releases>
@@ -94,7 +94,7 @@
             <snapshots>
 			    <enabled>true</enabled>
 			</snapshots>
-        </repository>-->
+        </com.magicbird-->
 		
 	    <!-- inside China -->
 	    <repository>
@@ -109,11 +109,11 @@
             <name>clojars</name>
             <url>http://clojars.org/repo/</url>
         </repository>
-<!--	    <repository>
+<!--	    <com.magicbird
 		    <id>confluent</id>
 			<name>confluent</name>
 			<url>http://packages.confluent.io/maven/</url>
-	    </repository>-->
+	    </com.magicbird-->
 		<repository>
 		    <id>sonatype-snapshots</id>
 			<name>sonatype-snapshots</name>
@@ -139,10 +139,10 @@
             <name>spring-libs-snapshot</name>
             <url>https://repo.spring.io/libs-snapshot</url>
         </repository>
-<!--		<repository>
+<!--		<com.magicbird
 			<id>twitter4j</id>
 			<url>http://twitter4j.org/maven2</url>
-		</repository>-->
+		</com.magicbird-->
     </repositories>
 	
 	<pluginRepositories>
@@ -182,14 +182,14 @@
    </pluginRepositories>	
 
 <!--	<distributionManagement>	
-	    <repository>
+	    <com.magicbird
 	        <id>my-releases</id>
-	        <name>My internal repository</name>
+	        <name>My internal com.magicbird/name>
 	        <url>http://172.17.4.50:8081/content/repositories/releases</url>
-	    </repository>
+	    </com.magicbird
 	    <snapshotRepository>
 	        <id>my-snapshots</id>
-	        <name>My internal repository</name>
+	        <name>My internal com.magicbird/name>
 	        <url>http://172.17.4.50:8081/content/repositories/snapshots</url>
 	    </snapshotRepository>
 	</distributionManagement>-->

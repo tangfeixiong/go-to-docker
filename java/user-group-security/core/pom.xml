@@ -6,7 +6,7 @@
 		<groupId>https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker.fairymagic</groupId>
 		<artifactId>user-group-security</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-        <relativePath>../</relativePath>  <!-- lookup parent from repository -->
+        <relativePath>../</relativePath>  <!-- lookup parent from com.magicbird-->
 	</parent>
 <!--    <parent>
         <groupId>org.springframework.boot</groupId>

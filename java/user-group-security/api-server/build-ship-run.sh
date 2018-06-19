@@ -41,7 +41,7 @@ fi
 docker run -d --network=user_organization_security \
     --name mariadb -p3306:3306 \
     -v ${DIR}/db/mariadb-schema.sql:/docker-entrypoint-initdb.d/mariadb-schema.sql:ro \
-    -e MYSQL_ROOT_PASSWORD=password \
+    -e MYSQL_ROOT_PASSWORD=root_password \
     -e MYSQL_DATABASE=example \
     -e MYSQL_USER=dbuser \
     -e MYSQL_PASSWORD=dbpass \

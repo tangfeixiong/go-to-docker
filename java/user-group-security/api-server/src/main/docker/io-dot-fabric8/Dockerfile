@@ -8,7 +8,7 @@ LABEL maintainer="tangfeixiong <tangfx128@gmail.com>" \
 ARG jarTgt
 ARG javaOpt
 
-COPY ${jarTgt:-api.jar} /api.jar
+COPY ${jarTgt:-/maven/api.jar} /api.jar
 
 ENV JAVA_OPTIONS="${javaOpt:-'-Xms128m -Xmx512m -XX:PermSize=128m -XX:MaxPermSize=256m'}" \
     GO_TO_KUBERNETES="user-group-security-api"

@@ -1,13 +1,12 @@
 package io.stackdocker.ugs.apiserver;
 
-import javax.inject.Qualifier;
-
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.crazycake.shiro.RedisCacheManager;
 import org.crazycake.shiro.RedisManager;
 import org.crazycake.shiro.RedisSessionDAO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class ShiroRedisConf {
@@ -28,7 +27,7 @@ public class ShiroRedisConf {
         RedisManager redisManager = new RedisManager();
         redisManager.setHost(host);
         redisManager.setPort(port);
-        redisManager.setExpire(1800);
+//        redisManager.setExpire(1800);
         redisManager.setTimeout(timeout);
        // redisManager.setPassword(password);
         return redisManager;

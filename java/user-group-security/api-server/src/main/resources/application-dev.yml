@@ -8,10 +8,10 @@ spring:
   profiles: dev # spring.profiles.active= # Comma-separated list (or list if using YAML) of active profiles.
 
   datasource:
-    url: jdbc:mysql://172.17.0.8:3306/testdb # JDBC url of the database.
-    username: testuser # Login user of the database.
-    password: testpassword # Login password of the database.
-    name: testdb # Name of the datasource.
+    url: jdbc:mysql://127.0.0.1:3306/example # JDBC url of the database.
+    username: dbuser # Login user of the database.
+    password: dbpass # Login password of the database.
+    name: example # Name of the datasource.
     driverClassName: com.mysql.jdbc.Driver
     max-active: 20
     max-idle: 8
@@ -71,8 +71,9 @@ minus:
   seconds: 10
 
 mybatis:
-  mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: io.fairymagic.domain
+  config-location: classpath:mybatis-config.xml
+  # mapper-locations: classpath:io/stackdocker/ugs/apiserver/mapper/*.xml
+  # type-aliases-package: io.fairymagic.core.ugs.domain
 
 pagehelper:
   helperDialect: mysql

@@ -2,8 +2,8 @@ package io.stackdocker.ugs.apiserver;
 
 import javax.sql.DataSource;
 
-import io.stackdocker.ugs.apiserver.domain.ErrMsg;
-import io.stackdocker.ugs.apiserver.domain.NotFoundException;
+import io.stackdocker.ugs.apiserver.help.ErrMsg;
+import io.stackdocker.ugs.apiserver.help.NotFoundException;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationException;

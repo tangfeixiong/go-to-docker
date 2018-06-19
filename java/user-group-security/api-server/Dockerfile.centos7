@@ -5,7 +5,7 @@ LABEL maintainer="tangfeixiong <tangfx128@gmail.com>" \
       name="api" \
       namespace="stackdocker0x2Eio" \
       annotation='{"stackdocker.io/created-by":"n/a"}' \
-      tag="centos java springboot shiro mybatis mysql"
+      tag="centos java springboot shiro com mysql"
 
 ARG jarTgt
 ARG javaOpt

@@ -33,8 +33,8 @@ Maven
 [INFO] Building jar: /Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-docker/java/user-group-security/core/target/core-0.0.1-SNAPSHOT.jar
 [INFO] 
 [INFO] --- maven-install-plugin:2.4:install (default-install) @ core ---
-[INFO] Installing /Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-docker/java/user-group-security/core/target/core-0.0.1-SNAPSHOT.jar to /home/vagrant/.m2/repository/https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker/fairymagic/core/0.0.1-SNAPSHOT/core-0.0.1-SNAPSHOT.jar
-[INFO] Installing /Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-docker/java/user-group-security/core/pom.xml to /home/vagrant/.m2/repository/https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker/fairymagic/core/0.0.1-SNAPSHOT/core-0.0.1-SNAPSHOT.pom
+[INFO] Installing /Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-docker/java/user-group-security/core/target/core-0.0.1-SNAPSHOT.jar to /home/vagrant/.m2/com.magicbird/https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker/fairymagic/core/0.0.1-SNAPSHOT/core-0.0.1-SNAPSHOT.jar
+[INFO] Installing /Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-docker/java/user-group-security/core/pom.xml to /home/vagrant/.m2/com.magicbird/https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker/fairymagic/core/0.0.1-SNAPSHOT/core-0.0.1-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------

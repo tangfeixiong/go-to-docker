@@ -1,7 +1,6 @@
 package io.stackdocker.ugs.apiserver.security;
 
-import javax.annotation.Resource;
-
+import io.fairymagic.core.ugs.domain.RoleBinding;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.Sha256CredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -13,21 +12,27 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import io.stackdocker.ugs.apiserver.service.PermissionService;
+import io.stackdocker.ugs.apiserver.service.ResourceService;
+import io.stackdocker.ugs.apiserver.service.RoleService;
 import io.stackdocker.ugs.apiserver.service.UserService;
-import io.fairymagic.auth.api.Role;
-import io.fairymagic.exam.api.dao.User;
+import io.fairymagic.core.ugs.domain.Role;
+import io.fairymagic.core.ugs.domain.User;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 @Component
 public class ShiroAuthczRealm extends AuthorizingRealm {
     private static Logger logger = LoggerFactory.getLogger(ShiroAuthczRealm.class);
 
-    protected UserService userDAO = null;
+    protected UserService userService = null;
     
-    @Resource private ResourceService resourceService;
+    @Autowired private ResourceService resourceService;
     
-    @Autowired private RoleDao roleService;
+    @Autowired private RoleService roleService;
     
-    @Autowired private PermissionService permissionSerivce 
+    @Autowired private PermissionService permissionSerivce;
 
     public ShiroAuthczRealm() {
         setName("ShiroAuthczRealm"); //This name must match the name in the User class's getPrincipals() method
@@ -41,7 +46,7 @@ public class ShiroAuthczRealm extends AuthorizingRealm {
 
     @Autowired
     public void setUserDAO(UserService userService) {
-        this.userDAO = userService;
+        this.userService = userService;
     }
 
     // Authenticate
@@ -49,9 +54,9 @@ public class ShiroAuthczRealm extends AuthorizingRealm {
         logger.debug("do Authentication");
         // String username = (String)authcToken.getPrincipal();
         UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
-        User user = userDAO.findByName(token.getUsername());
+        User user = userService.findByName(token.getUsername());
         if( user != null ) {
-            if (0 == user.getEnabled()) {
+            if (true == userService.isActiveState(user)) {
                 throw new LockedAccountException();
             }
             // SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
@@ -89,16 +94,19 @@ public class ShiroAuthczRealm extends AuthorizingRealm {
         //     info.AddStringPermission(item.getResUrl());
         // }
         Long userId = (Long) principals.fromRealm(getName()).iterator().next();
-        User user = userDAO.getUser(userId);
+        User user = userService.getById(userId);
         if( user != null ) {
             SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-            for( Role role : user.getRoles() ) {
+            Collection<Role> roles = roleService.getWithBindings(user.getRoleBindings());
+            for( Role role : roles ) {
                 info.addRole(role.getName());
-                info.addStringPermissions( role.getPermissions() );
+            }
+            for( RoleBinding binding: user.getRoleBindings()) {
+                info.addStringPermissions(Arrays.asList("create", "read", "update", "delete"));
             }
             return info;
         } else {
-            logger.warn("Failed to get user with name " + token.getUsername());
+            logger.warn("Failed to get user with name " + user.getUsername());
             return null;
         }
 

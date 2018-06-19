@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//com.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.stackdocker.ugs.apiserver.mapper.UserMapper">
+
+    <!-- add  -->
+    <insert id="addOne" parameterType="io.fairymagic.core.ugs.domain.User" useGeneratedKeys="true" keyProperty="id">
+        insert into user(username,password)
+        values(#{username},#{password})
+    </insert>
+
+    <!-- verify -->
+    <select id="verifySecureByName" resultType="int">
+        Select count(*) from user
+        where username=#{username} and password=#{password}
+    </select>
+    <select id="verifySecureByEmail" resultType="int">
+        Select count(*) from user
+        where username=#{email} and password=#{password}
+    </select>
+
+</mapper>
+
+

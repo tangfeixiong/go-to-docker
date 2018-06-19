@@ -178,8 +178,8 @@ Downloaded from central: https://repo.maven.apache.org/maven2/org/codehaus/plexu
 [INFO] --- maven-plugin-plugin:3.4:addPluginArtifactMetadata (default-addPluginArtifactMetadata) @ sql-maven-plugin ---
 [INFO] 
 [INFO] --- maven-install-plugin:2.5.2:install (default-install) @ sql-maven-plugin ---
-[INFO] Installing /Users/fanhongling/Downloads/workspace/src/github.com/mojohaus/sql-maven-plugin/target/sql-maven-plugin-3.0.0-SNAPSHOT.jar to /Users/fanhongling/.m2/repository/org/codehaus/mojo/sql-maven-plugin/3.0.0-SNAPSHOT/sql-maven-plugin-3.0.0-SNAPSHOT.jar
-[INFO] Installing /Users/fanhongling/Downloads/workspace/src/github.com/mojohaus/sql-maven-plugin/pom.xml to /Users/fanhongling/.m2/repository/org/codehaus/mojo/sql-maven-plugin/3.0.0-SNAPSHOT/sql-maven-plugin-3.0.0-SNAPSHOT.pom
+[INFO] Installing /Users/fanhongling/Downloads/workspace/src/github.com/mojohaus/sql-maven-plugin/target/sql-maven-plugin-3.0.0-SNAPSHOT.jar to /Users/fanhongling/.m2/com.magicbird/org/codehaus/mojo/sql-maven-plugin/3.0.0-SNAPSHOT/sql-maven-plugin-3.0.0-SNAPSHOT.jar
+[INFO] Installing /Users/fanhongling/Downloads/workspace/src/github.com/mojohaus/sql-maven-plugin/pom.xml to /Users/fanhongling/.m2/com.magicbird/org/codehaus/mojo/sql-maven-plugin/3.0.0-SNAPSHOT/sql-maven-plugin-3.0.0-SNAPSHOT.pom
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------

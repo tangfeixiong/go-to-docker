@@ -47,7 +47,7 @@ services:
 
   api:
     environment:
-    - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/example
+    - SPRING_DATASOURCE_URL=jdbc:mysql://mariadb:3306/example
     - SPRING_DATASOURCE_USERNAME=dbuser
     - SPRING_DATASOURCE_PASSWORD=dbpass
     - SPRING_REDIS_HOST=redis
@@ -57,9 +57,9 @@ services:
     - SERVER_PORT=8080
     - VOLUME_MOUNT=/tmp/mnt-home
     - MINUS_SECONDS=10
-    image: docker.io/tangfeixiong/ugs:0.1
+    image: docker.io/tangfeixiong/ugs
     ports:
-    - "8080:8080"
+    - "18080:8080"
     restart: always
     volumes:
     - /tmp/mnt-home:/tmp/mnt-home

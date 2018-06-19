@@ -1,4 +1,4 @@
-package io.stackdocker.ugs.apiserver.domain;
+package io.stackdocker.ugs.apiserver.help;
 
 public class NotFoundException extends Exception {
 
