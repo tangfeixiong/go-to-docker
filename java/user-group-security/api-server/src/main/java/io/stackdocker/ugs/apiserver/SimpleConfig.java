@@ -23,7 +23,8 @@ public class SimpleConfig {
 //        ups.add("/v1/*");
 //        registrationBean.setUrlPatterns(ups);
         registrationBean.addUrlPatterns("/v1/default/*");
-        registrationBean.addInitParameter("paramName", "paramValue");
+        registrationBean.addInitParameter("username", "internaladmin");
+        registrationBean.addInitParameter("password", "internalpassword");
 
         return registrationBean;
     }

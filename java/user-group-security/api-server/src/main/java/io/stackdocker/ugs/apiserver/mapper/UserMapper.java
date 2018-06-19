@@ -28,4 +28,15 @@ public interface UserMapper {
      * @return count, 0 or 1
      */
     public int verifySecureByEmail(@Param("email") String email, @Param("password") String password);
+
+    public User getOne(@Param("id") long id);
+
+    public User findOneByName(@Param("username") String name);
+
+    public int updateStatusByName(@Param("username") String name, @Param("status") byte status);
+
+    public int withdrawByName(@Param("username") String name);
+
+    public int revokeByName(@Param("username") String name);
+
 }

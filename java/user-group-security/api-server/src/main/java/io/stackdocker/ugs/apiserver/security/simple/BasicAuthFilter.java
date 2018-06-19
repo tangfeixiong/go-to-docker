@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
+import io.stackdocker.ugs.apiserver.help.State;
 import io.stackdocker.ugs.apiserver.service.UserService;
 
 /* @Component */ // filters are registered by default for all the URL’s.
@@ -58,10 +59,10 @@ public class BasicAuthFilter implements Filter {
                 path = req.getRequestURI().substring(req.getContextPath().length());
             }
             String method = req.getMethod();
-            if (false == path.startsWith("/v1/default/users/")) {
+            if (false == path.toLowerCase().startsWith("/v1/default/users/")) {
                 switch (method) {
                     case "POST":
-                        // Goes to default servlet
+                        logger.info("Skip basic auth, go to default servlet");
                         filterChain.doFilter(wrapper, servletResponse);
                         return;
                     default:
@@ -88,11 +89,17 @@ public class BasicAuthFilter implements Filter {
 //                                if (!username.equals(_username) || !password.equals(_password)) {
 //                                    unauthorized(resp, "Bad credentials");
 //                                }
-                                if ( true == userService.verifySecureByName(_username, _password)) {
-                                    unauthorized(resp, "Invalid credentials");
+                                State state = userService.verifyWithBasicAuth(_username, _password);
+                                switch (state) {
+                                    case UNAUTHENTICATED_USER:
+                                        unauthorized(resp, state.message());
+                                        break;
+                                    case BLOCKED_USER:
+                                        denied(resp, state.message());
+                                        break;
+                                        default:
+                                            filterChain.doFilter(servletRequest, servletResponse);
                                 }
-
-                                filterChain.doFilter(servletRequest, servletResponse);
                             } else {
                                 unauthorized(resp, "Invalid authentication token");
                             }
@@ -122,5 +129,13 @@ public class BasicAuthFilter implements Filter {
 
     private void unauthorized(HttpServletResponse response) throws IOException {
         unauthorized(response, "Unauthorized");
+    }
+
+    private void denied(HttpServletResponse response, String message) throws IOException {
+        response.sendError(403, message);
+    }
+
+    private void denied(HttpServletResponse response) throws IOException {
+        response.sendError(403, "Forbidden");
     }
 }

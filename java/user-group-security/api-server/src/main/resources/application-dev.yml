@@ -1,5 +1,6 @@
 logging:
-  level: info
+  level:
+    ROOT: INFO
 
 server:
   port: 8090

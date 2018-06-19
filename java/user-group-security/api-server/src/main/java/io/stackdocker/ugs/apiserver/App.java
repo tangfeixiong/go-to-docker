@@ -8,8 +8,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.magicbird.api", "io.fairymagic.exam.api",
-        "io.stackdocker.ugs.apiserver", "io.fairymagic.core"})
+/*@ComponentScan(basePackages = {"com.magicbird.api", "io.fairymagic.exam.api",
+        "io.stackdocker.ugs.apiserver", "io.fairymagic.core"})*/
 public class App {
     private static Logger logger = LoggerFactory.getLogger(App.class);
 

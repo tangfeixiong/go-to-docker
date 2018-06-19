@@ -16,8 +16,44 @@
     </select>
     <select id="verifySecureByEmail" resultType="int">
         Select count(*) from user
-        where username=#{email} and password=#{password}
+        where email=#{email} and password=#{password}
     </select>
+
+    <select id="getOne" resultType="io.fairymagic.core.ugs.domain.User">
+        SELECT id, username, password, status
+        FROM user
+        WHERE id=${id}
+    </select>
+
+    <select id="findOneByName" resultType="io.fairymagic.core.ugs.domain.User">
+        SELECT id, username, password, status
+        FROM user
+        WHERE username=${username}
+    </select>
+
+    <update id="updateStatusByName">
+        update user
+        set status=#{status}
+        where username=#{username}
+    </update>
+
+    <!-- disable user   -->
+    <update id="withdrawByName" parameterType="String">
+        update user
+        set status=255
+        where username=#{username}
+    </update>
+
+    <delete id="revoke" parameterType="long">
+        delete user
+        where id=#{id}
+    </delete>
+
+    <delete id="revokeByName" parameterType="String">
+        delete user
+        where username=#{username}
+    </delete>
+
 
 </mapper>
 

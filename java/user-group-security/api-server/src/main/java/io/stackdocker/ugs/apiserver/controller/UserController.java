@@ -58,11 +58,35 @@ public class UserController {
         try {
             id = userService.addOne(user);
         } catch (Exception e) {
-            logger.warn("Failed to register: " + e.getMessage());
+            logger.warn("Failed to insert: " + e.getMessage());
             return new ResponseEntity<String>("Bad Request", HttpStatus.BAD_REQUEST);
         }
-
+        logger.info("New user " + user.getUsername() + " has added: " + id.toString());
         return new ResponseEntity<Long>(user.getId(), HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/v1/default/users", method = RequestMethod.DELETE,
+            headers = "Accept=application/json", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<?> revokeByName(@RequestHeader(name = "shiro_security") String ssFlag, @RequestBody User user) {
+        if (false == "disabled".equals(ssFlag.toLowerCase())) {
+            UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
+            Subject currentUser = SecurityUtils.getSubject();
+            PrincipalCollection principals = currentUser.getPrincipals();
+            if (principals != null && !principals.isEmpty()) {
+                throw new AuthorizationException("User existed: " + user.getUsername());
+            }
+        }
+
+        boolean affected;
+        try {
+            affected = userService.revokeByName(user.getUsername());
+        } catch (Exception e) {
+            logger.warn("Failed to delete: " + e.getMessage());
+            return new ResponseEntity<String>("Bad Request", HttpStatus.BAD_REQUEST);
+        }
+        logger.info("User " + user.getUsername() + " has revoked");
+        return new ResponseEntity<Boolean>(Boolean.valueOf(affected), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/v1/default/credentials", method = RequestMethod.POST,
@@ -87,6 +111,31 @@ public class UserController {
         }
 
         return new ResponseEntity<User>(saved, HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/v1/default/user-actions/withdraw", method = RequestMethod.PUT,
+            headers = "Accept=application/json", produces = "application/json")
+    @ResponseBody
+    public ResponseEntity<?> withdrawOne(@RequestHeader(name = "shiro_security") String ssFlag, @RequestBody User user) {
+        if (false == "disabled".equals(ssFlag.toLowerCase())) {
+            UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
+            Subject currentUser = SecurityUtils.getSubject();
+            PrincipalCollection principals = currentUser.getPrincipals();
+            if (principals != null && !principals.isEmpty()) {
+                throw new AuthorizationException("User existed: " + user.getUsername());
+            }
+        }
+
+        boolean affected;
+        try {
+            affected = userService.withdrawByName(user.getUsername());
+        } catch (Exception e) {
+            logger.warn("Failed to update: " + e.getMessage());
+            return new ResponseEntity<String>("Bad Request", HttpStatus.BAD_REQUEST);
+        }
+        logger.info("User " + user.getUsername() + " has withdrawed");
+        return new ResponseEntity<Boolean>(Boolean.valueOf(affected), HttpStatus.OK);
     }
 
 }

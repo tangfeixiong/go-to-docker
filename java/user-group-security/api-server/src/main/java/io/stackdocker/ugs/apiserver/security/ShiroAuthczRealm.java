@@ -56,7 +56,7 @@ public class ShiroAuthczRealm extends AuthorizingRealm {
         UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
         User user = userService.findByName(token.getUsername());
         if( user != null ) {
-            if (true == userService.isActiveState(user)) {
+            if (true == userService.isActive(user)) {
                 throw new LockedAccountException();
             }
             // SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
@@ -94,7 +94,7 @@ public class ShiroAuthczRealm extends AuthorizingRealm {
         //     info.AddStringPermission(item.getResUrl());
         // }
         Long userId = (Long) principals.fromRealm(getName()).iterator().next();
-        User user = userService.getById(userId);
+        User user = userService.getOne(userId);
         if( user != null ) {
             SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
             Collection<Role> roles = roleService.getWithBindings(user.getRoleBindings());

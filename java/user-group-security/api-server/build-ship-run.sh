@@ -49,7 +49,7 @@ docker run -d --network=user_organization_security \
 
 # To create db and init schema, the alternative CLI:
 # docker exec -ti mariadb bash
-# mysql -h 172.18.0.3 -u root --password=password < /docker-entrypoint-initdb.d/mariadb-schema.sql
+# mysql -h 172.18.0.3 -u root --password=root_password < /docker-entrypoint-initdb.d/mariadb-schema.sql
 
 apic=$(docker ps -qaf name=ugs)
 if [[ ! -z $apic ]]; then
