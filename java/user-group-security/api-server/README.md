@@ -54,6 +54,15 @@ Mysql
 ```
 
 
+```bash
+fanhonglingdeMacBook-Pro:user-group-security fanhongling$ mvn package spring-boot:run -Dmaven.test.skip=true -Dspring.profiles.active=dev -Dspring.datasource.url=jdbc:mysql://172.17.4.59:3306/example -Dspring.datasource.username=dbuser -Dspring.datasource.password=dbpass --projects api-server
+```
+
+```
+[vagrant@kubedev-172-17-4-59 user-group-security]$ TEST_HOST=192.168.0.106:8090 ./api-server/runtests_curl.sh withdrawuser
+```
+
+
 For example, skip all tests (http://maven.apache.org/plugins-archives/maven-surefire-plugin-2.12.4/examples/skipping-test.html)
 ```
 [vagrant@kubedev-172-17-4-59 user-group-security]$ mvn package spring-boot:repackage --Dmaven.test.skip=true --projects api-server

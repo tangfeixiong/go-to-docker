@@ -9,7 +9,7 @@ else
 fi
 
 case $1 in
-    "add"|"addOne")
+    "addUser"|"adduser")
 	    curl http://${TEST_HOST}/v1/default/users \
 		    -H "Content-Type: application/json" -X POST -iv -d \
 '{
@@ -18,11 +18,12 @@ case $1 in
 }'
         ;;
 
-    "withdraw"|"withdrawOne")
+    "withdrawUser"|"withdrawuser")
 	    curl --user admin:123456 http://${TEST_HOST}/v1/default/user-actions/withdraw \
 		    -H "Content-Type: application/json" -X PUT -iv -d \
 '{
   "username": "admin",
+  "status": 255
 }'
         ;;
 

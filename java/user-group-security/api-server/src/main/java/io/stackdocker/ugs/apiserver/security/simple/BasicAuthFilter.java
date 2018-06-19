@@ -1,5 +1,8 @@
 package io.stackdocker.ugs.apiserver.security.simple;
 
+import io.stackdocker.ugs.apiserver.help.State;
+import io.stackdocker.ugs.apiserver.service.UserService;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,16 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-
-import io.stackdocker.ugs.apiserver.help.State;
-import io.stackdocker.ugs.apiserver.service.UserService;
+import org.springframework.stereotype.Component;
 
 /* @Component */ // filters are registered by default for all the URL’s.
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class BasicAuthFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BasicAuthFilter.class);
 
-    @Value( "${simple.basicauth.disabled}" )
+    @Value( "${simple.basicauth.disabled:false}" )
     private boolean filterDisabled;
 
     private String username = "";
@@ -92,14 +93,21 @@ public class BasicAuthFilter implements Filter {
                                 State state = userService.verifyWithBasicAuth(_username, _password);
                                 switch (state) {
                                     case UNAUTHENTICATED_USER:
+                                        logger.warn(  "Failed to authenticate user " + _username);
                                         unauthorized(resp, state.message());
                                         break;
                                     case BLOCKED_USER:
+                                        logger.info(_username + " blocked");
                                         denied(resp, state.message());
                                         break;
                                         default:
-                                            filterChain.doFilter(servletRequest, servletResponse);
+                                            logger.info(_username + " authenticated");
+                                            if (true == path.toLowerCase().startsWith("/v1/default/user-actions/")) {
+                                                wrapper.addHeader("username", _username);
+                                            }
+                                            filterChain.doFilter(wrapper, servletResponse);
                                 }
+                                return;
                             } else {
                                 unauthorized(resp, "Invalid authentication token");
                             }

@@ -22,13 +22,13 @@
     <select id="getOne" resultType="io.fairymagic.core.ugs.domain.User">
         SELECT id, username, password, status
         FROM user
-        WHERE id=${id}
+        WHERE id=#{id}
     </select>
 
-    <select id="findOneByName" resultType="io.fairymagic.core.ugs.domain.User">
+    <select id="findOneByName" parameterType="String" resultType="io.fairymagic.core.ugs.domain.User">
         SELECT id, username, password, status
         FROM user
-        WHERE username=${username}
+        WHERE username=#{username}
     </select>
 
     <update id="updateStatusByName">

@@ -1,6 +1,7 @@
 logging:
   level:
-    ROOT: INFO
+    # root: DEBUG
+    org.springframework.boot: INFO
 
 server:
   port: 8090
@@ -13,7 +14,7 @@ spring:
     username: dbuser # Login user of the database.
     password: dbpass # Login password of the database.
     name: example # Name of the datasource.
-    driverClassName: com.mysql.jdbc.Driver
+    driverClassName: com.mysql.cj.jdbc.Driver # com.mysql.jdbc.Driver
     max-active: 20
     max-idle: 8
     min-idle: 8

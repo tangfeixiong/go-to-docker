@@ -54,7 +54,7 @@ public class ShiroAuthczRealm extends AuthorizingRealm {
         logger.debug("do Authentication");
         // String username = (String)authcToken.getPrincipal();
         UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
-        User user = userService.findByName(token.getUsername());
+        User user = userService.findOneByName(token.getUsername());
         if( user != null ) {
             if (true == userService.isActive(user)) {
                 throw new LockedAccountException();

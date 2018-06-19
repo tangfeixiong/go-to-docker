@@ -26,9 +26,8 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @RequestMapping(value = "/v1/default", method = RequestMethod.GET)
-    public ResponseEntity<Object> doSomething(@RequestHeader(name = "remote_addr")
-                                                      String remoteAddress) {
+    @RequestMapping(value = "/v1/apis", method = RequestMethod.GET)
+    public ResponseEntity<Object> doSomething(@RequestHeader(name = "remote_addr") String remoteAddress) {
         logger.debug("The Remote address added by WebFiler is :: {}", remoteAddress);
         ResponseEntity<Object> response = null;
         try {
@@ -117,13 +116,20 @@ public class UserController {
     @RequestMapping(value = "/v1/default/user-actions/withdraw", method = RequestMethod.PUT,
             headers = "Accept=application/json", produces = "application/json")
     @ResponseBody
-    public ResponseEntity<?> withdrawOne(@RequestHeader(name = "shiro_security") String ssFlag, @RequestBody User user) {
+    public ResponseEntity<?> withdrawOne(@RequestHeader(name = "shiro_security") String ssFlag,
+                                         @RequestHeader(name = "username") String authenticator,
+                                         @RequestBody User user) {
         if (false == "disabled".equals(ssFlag.toLowerCase())) {
             UsernamePasswordToken token = new UsernamePasswordToken(user.getUsername(), user.getPassword());
             Subject currentUser = SecurityUtils.getSubject();
             PrincipalCollection principals = currentUser.getPrincipals();
             if (principals != null && !principals.isEmpty()) {
                 throw new AuthorizationException("User existed: " + user.getUsername());
+            }
+        } else {
+            if ( false == authenticator.contentEquals(user.getUsername())) {
+                logger.warn("Forbid to withdraw, must do by user itself");
+                return new ResponseEntity<String>("Forbid to withdraw, must do by user itself", HttpStatus.FORBIDDEN);
             }
         }
 

@@ -14,11 +14,16 @@ import java.util.List;
 public class SimpleConfig {
 
     @Bean
+    public BasicAuthFilter basicAuthFilter() {
+        return new BasicAuthFilter();
+    }
+
+    @Bean
     public FilterRegistrationBean<BasicAuthFilter> theBasicAuthFilter(){
         FilterRegistrationBean<BasicAuthFilter> registrationBean
                 = new FilterRegistrationBean<>();
 
-        registrationBean.setFilter(new BasicAuthFilter());
+        registrationBean.setFilter(basicAuthFilter());
 //        List<String> ups = new ArrayList<>();
 //        ups.add("/v1/*");
 //        registrationBean.setUrlPatterns(ups);
