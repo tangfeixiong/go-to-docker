@@ -1,0 +1,17 @@
+FROM docker.io/tomcat:7-jre8
+# FROM docker.io/tomcat:7-jre8-slim
+# FROM docker.io/tomcat:8
+LABEL maintainer="tangfeixiong <tangfx128@gmail.com>" \
+      project="https://github.com/tangfeixiong/go-to-docker" \
+      name="web-server" \
+      namespace="stackdocker0x2Eio" \
+      annotation='{"stackdocker.io/created-by":"n/a"}' \
+      tag="debian java springboot tomcat jsp restTemplate"
+
+ARG jarTgt
+ARG javaOpt
+
+COPY ${jarTgt:-/target/web-server.war} ${CATALINA_HOME:-/usr/local/tomcat}/webapps/web-server.war
+
+EXPOSE 8080
+CMD ["catalina.sh", "run"]
