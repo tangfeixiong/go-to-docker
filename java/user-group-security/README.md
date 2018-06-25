@@ -1,5 +1,32 @@
+# Help
 
+A Spring Boot web app with Spring Boot restful server
 
+## Development
+
+Build parent only
+```
+fanhonglingdeMacBook-Pro:user-group-security fanhongling$ mvn install --non-recursive
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Organization Management 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ user-group-security ---
+[INFO] Installing /Users/fanhongling/Downloads/workspace/src/github.com/tangfeixiong/go-to-docker/java/user-group-security/pom.xml to /Users/fanhongling/.m2/repository/https0x3A0x2F0x2Fgithub0x2Ecom0x2Fstackdocker/fairymagic/user-group-security/0.0.1-SNAPSHOT/user-group-security-0.0.1-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 0.579 s
+[INFO] Finished at: 2018-06-20T19:16:51-07:00
+[INFO] Final Memory: 9M/309M
+[INFO] ------------------------------------------------------------------------
+```
+
+### About
+
+sql maven plugin
 ```
 fanhonglingdeMacBook-Pro:github.com fanhongling$ git clone https://github.com/mojohaus/sql-maven-plugin mojohaus/sql-maven-plugin
 Cloning into 'mojohaus/sql-maven-plugin'...

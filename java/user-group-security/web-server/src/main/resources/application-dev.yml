@@ -1,0 +1,7 @@
+spring:
+  profiles: dev # spring.profiles.active= # Comma-separated list (or list if using YAML) of active profiles.
+
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
