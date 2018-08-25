@@ -1,0 +1,35 @@
+// tangfeixiong <tangfx128@gmail.com>
+//
+// https://github.com/docker/go-connections/blob/master/nat/nat.go
+
+syntax = "proto3";
+package nat;
+
+// PortBinding represents a binding between a Host IP address and a Host Port
+// type PortBinding struct
+message PortBinding {
+	// HostIP is the host IP Address
+	// HostIP string 0x60json:"HostIp"0x60
+	string host_ip = 1;
+	// HostPort is the host port number
+	// HostPort string
+	string host_port = 2;
+}
+
+// PortMap is a collection of PortBinding indexed by Port
+// Port is a string containing port number and protocol in the format "80/tcp" // type Port string
+// type PortMap map[Port][]PortBinding
+message PortMap {
+    message PortBindingSlice {
+        repeated PortBinding items = 1;
+    }
+    map<string, PortBindingSlice> value = 1;
+}
+
+// PortSet is a collection of structs indexed by Port
+// type PortSet map[Port]struct{}
+message PortSet {
+	map<string, VoidStruct> value = 1;
+	
+	message VoidStruct {}
+}

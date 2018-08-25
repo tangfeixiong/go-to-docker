@@ -1,0 +1,339 @@
+// tangfeixiong <tangfx128@gmail.com>
+
+syntax = "proto3";
+package container;
+
+import "pb/moby/blkiodev/blkiodev.proto";
+import "pb/moby/units/units.proto";
+import "pb/moby/nat/nat.proto";
+import "pb/moby/mount/mount.proto";
+
+//
+// https://github.com/moby/moby/blob/master/api/types/container/config.go
+//
+
+// HealthConfig holds configuration settings for the HEALTHCHECK feature.
+// type HealthConfig struct
+message HealthConfig {
+	// Test []string 0x60json:",omitempty"0x60
+	// Test is the test to perform to check that the container is healthy.
+	// An empty slice means to inherit the default.
+	// The options are:
+	// {} : inherit healthcheck
+	// {"NONE"} : disable healthcheck
+	// {"CMD", args...} : exec arguments directly
+	// {"CMD-SHELL", command} : run command with system's default shell
+	repeated string test = 1;
+
+	// Zero means to inherit. Durations are expressed as integer nanoseconds.
+	// Interval time.Duration 0x60json:",omitempty"0x60 // Interval is the time to wait between checks.
+    int64 interval_seconds = 2;
+	// Timeout time.Duration 0x60json:",omitempty"0x60 // Timeout is the time to wait before considering the check to have hung.
+    int64 timeout_seconds = 3;
+	// StartPeriod time.Duration 0x60json:",omitempty"0x60 // The start period for the container to initialize before the retries starts to count down.
+    int64 start_period = 4;
+    
+	// Retries int 0x60json:",omitempty"0x60// Retries is the number of consecutive failures needed to consider a container as unhealthy. Zero means inherit.
+	int32 retries = 5;
+}
+
+// Config contains the configuration data about a container.
+// It should hold only portable information about the container.
+// Here, "portable" means "independent from the host we are running on".
+// Non-portable information *should* appear in HostConfig.
+// All fields added to this struct must be marked 'omitempty' to keep getting
+// predictable hashes from the old 'v1Compatibility' configuration.
+// type Config struct
+message Config {
+	// Hostname string // Hostname
+	string hostname = 1;
+	// Domainname string // Domainname
+	string domainname = 2;
+	// User string // User that will run the command(s) inside the container, also support user:group
+	string user = 3;
+	// AttachStdin bool // Attach the standard input, makes possible user interaction
+	bool attach_stdin = 4;
+	// AttachStdout bool // Attach the standard output
+	bool attach_stdout = 5;
+	// AttachStderr bool // Attach the standard error
+	bool attach_stderr = 6;
+	// ExposedPorts nat.PortSet 0x60json",omitempty"0x60 // List of exposed ports
+	nat.PortSet exposed_ports = 7;
+	// Tty bool // Attach standard streams to a tty, including stdin if it is not closed.
+	bool tty = 8;
+	// OpenStdin // Open stdin
+	bool open_stdin = 9;
+	// StdinOnce bool // If true, close stdin after the 1 attached client disconnects.
+	bool stdin_once = 10;
+	// Env []string  // List of environment variable to set in the container
+	repeated string env = 11;
+	// Cmd strslice.StrSlice // Command to run when starting the container
+	// StrSlice represents a string or an array of strings. We need to override the json decoder to accept both options. // type StrSlice []string
+	repeated string cmd = 12;
+	// Healthcheck *HealthConfig 0x60json:",omitempty"0x60 // Healthcheck describes how to check the container is healthy
+	HealthConfig healthcheck = 13;
+	// ArgsEscaped bool 0x60json",omitempty"0x60 // True if command is already escaped (Windows specific)
+	bool args_escaped = 14;
+	// Image string // Name of the image as it was passed by the operator (e.g. could be symbolic)
+	string image = 15;
+	// Volumes map[string]struct{} // List of volumes (mounts) used for the container
+	map<string, VoidStruct> volumes = 16;
+	// WorkingDir string // Current directory (PWD) in the command will be launched
+	string working_dir = 17;      
+	// Entrypoint strslice.StrSlice // Entrypoint to run when starting the container
+	repeated string entrypoint = 18;
+	// NetworkDisabled bool 0x60json:",omitempty"0x60 // Is network disabled
+	bool network_disabled = 19;
+	// MacAddress string 0x60json:",omitempty"0x60 // Mac Address of the container
+	string mac_address = 20;
+	// OnBuild []string // ONBUILD metadata that were defined on the image Dockerfile
+	repeated string on_build = 21;
+	// Labels map[string]string // List of labels set to this container
+	map<string, string> labels = 22;
+	// StopSignal string 0x60json:",omitempty"0x60 // Signal to stop a container
+	string stop_signal = 23;
+	// StopTimeout 0x60json:",omitempty"0x60 // Timeout (in seconds) to stop a container
+	int32 stop_timeout = 24;
+	// Shell strslice.StrSlice 0x60json:",omitempty"0x60 // Shell for shell-form of RUN, CMD, ENTRYPOINT
+	repeated string shell = 25;
+	
+	message VoidStruct {}
+}
+
+//
+// https://github.com/moby/moby/blob/master/api/types/container/container_create.go
+//
+
+// ContainerCreateCreatedBody OK response to ContainerCreate operation
+// type ContainerCreateCreatedBody struct
+message ContainerCreateCreatedBody {
+	// The ID of the created container. Required: true
+	// ID string 0x60json:"Id"0x60
+	string id = 1;
+	
+	// Warnings encountered when creating the container. Required: true
+	// Warnings []string 0x60json:"Warnings"0x60
+	repeated string warnings = 2;
+}
+
+//
+// https://github.com/moby/moby/blob/master/api/types/container/host_config.go
+//
+
+// DeviceMapping represents the device mapping between the host and the container.
+// type DeviceMapping struct
+message DeviceMapping {
+	// PathOnHost string
+	string path_on_host = 1;
+	// PathInContainer string
+	string path_in_container = 2;
+	// CgroupPermissions string
+	string cgroup_permissions = 3;
+}
+
+// RestartPolicy represents the restart policies of the container.
+// type RestartPolicy struct
+message RestartPolicy {
+	// Name string
+	string name = 1;
+	// MaximumRetryCount int
+	int32 maximum_retry_count = 2;
+}
+
+// LogConfig represents the logging configuration of the container.
+// type LogConfig struct
+message LogConfig {
+	// Type string // "", "blocking", "non-blocking"
+	string type = 1;
+	// Config map[string]string
+	map<string, string> config = 2;
+}
+
+// Resources contains container's resources (cgroups config, ulimits...)
+// to see https://github.com/moby/moby/blob/master/api/types/container/host_config.go
+message Resources {
+	// Applicable to all platforms
+	//
+	// CPUShares int64 0x60json:"CpuShares"0x60 // CPU shares (relative weight vs. other containers)
+	int64 cpu_shares = 1;
+	// Memory int64 // Memory limit (in bytes)
+	int64 memory = 2;
+	// NanoCPUs int64 0x60json:"NonoCpus"0x60 // CPU quota in units of 10<sup>-9</sup> CPUs.
+	int64 nano_cpus = 3;  
+
+	// Applicable to UNIX platforms
+	//
+	// CgroupParent string // Parent cgroup.
+	string cgroup_parent = 4;
+	// BlkioWeight uint16 // Block IO weight (relative weight vs. other containers)
+	int32 blkio_weight = 5;
+	// BlkioWeightDevice []*blkiodev.WeightDevice
+	repeated blkiodev.WeightDevice blkio_weight_device = 6;
+	// BlkioDeviceReadBps []*blkiodev.ThrottleDevice
+	repeated blkiodev.ThrottleDevice blkio_device_read_bps = 7;  
+	// BlkioDeviceWriteBps []*blkiodev.ThrottleDevice
+	repeated blkiodev.ThrottleDevice blkio_device_write_bps = 8;
+	// BlkioDeviceReadIOps []*blkiodev.ThrottleDevice
+	repeated blkiodev.ThrottleDevice blkio_device_read_iops = 9;
+	// BlkioDeviceWriteIOps []*blkiodev.ThrottleDevice
+	repeated blkiodev.ThrottleDevice blkio_device_write_iops = 10;
+	// CPUPeriod int64 0x60json:"CpuPeriod"0x60 // CPU CFS (Completely Fair Scheduler) period
+	int64 cpu_period = 11;
+	// CPUQuota int64 0x60json:"CpuQuota"0x60 // CPU CFS (Completely Fair Scheduler) quota
+	int64 cpu_quota = 12;
+	// CPURealtimePeriod int64 0x60json:"CpuRealtimePeriod"0x60 // CPU real-time period
+	int64 cpu_realtime_period = 13;
+	// CPURealtimeRuntime int64 0x60json:"CpuRealtimeRuntime"0x60 // CPU real-time runtime
+	int64 cpu_realtime_runtime = 14;
+	// CpusetCpus string // CpusetCpus 0-2, 0,1
+	string cpuset_cpus = 15;
+	// CpusetMems string // CpusetMems 0-2, 0,1
+	string cpuset_mems = 16;
+	// Devices []DeviceMapping // List of devices to map inside the container
+	repeated DeviceMapping devices = 17;
+	// DeviceCgroupRules []string // List of rule to be added to the device cgroup
+	repeated string device_cgroup_rules = 18;
+	// DiskQuota int64 // Disk limit (in bytes)
+	int64 disk_quota = 19;
+	// KernelMemory int64 // Kernel memory limit (in bytes)
+	int64 kernel_memory = 20;
+	// MemoryReservation int64 // Memory soft limit (in bytes)
+	int64 memory_reservation = 21;
+	// MemorySwap int64 // Total memory usage (memory + swap); set `-1` to enable unlimited swap
+	int64 memory_swap = 22;
+	// MemorySwappiness *int64 // Tuning container memory swappiness behaviour
+	int64 memory_swappiness = 23;
+	// OomKillDisable *bool // Whether to disable OOM Killer or not
+	bool oom_kill_disable = 24;
+	// PidsLimit int64 // Setting pids limit for a container
+	int64 pids_limit = 25;
+	// Ulimits []*units.Ulimit // List of ulimits to be set in the container
+	repeated units.Ulimit ulimits = 26;               
+
+	// Applicable to Windows
+	//
+	// CPUCount int64 // CPU count
+	int64 cpu_count = 27;
+	// CPUPercent int64 // CPU percent
+	int64 cpu_percent = 28;
+	// IOMaximumIOps uint64 // Maximum IOps for the container system drive
+	uint64 io_maximum_iops = 29;
+	// IOMaximumBandwidth // Maximum IO in bytes per second for the container system drive
+	uint64 io_maximum_bandwidth = 30;
+}
+
+// HostConfig the non-portable Config structure of a container.
+// Here, "non-portable" means "dependent of the host we are running on".
+// Portable information *should* appear in Config.
+// type HostConfig struct
+message HostConfig {
+	// Applicable to all platforms
+	//
+	// Binds []string // List of volume bindings for this container
+	repeated string binds = 1;
+	// ContainerIDFile // File (path) where the containerId is written
+	string container_id_file = 2;
+	// LogConfig LogConfig // Configuration of the logs for this container
+	LogConfig  log_config = 3;
+	// NetworkMode NetworkMode // Network mode to use for the container, "none", "default", "container:<id>"
+	// NetworkMode represents the container network stack. // type NetworkMode string
+	string network_mode = 4;
+	// PortBindings nat.PortMap // Port mapping between the exposed port (container) and the host
+	nat.PortMap port_bindings = 5;
+	// RestartPolicy RestartPolicy // Restart policy to be used for the container
+	RestartPolicy restart_policy = 6;
+	// AutoRemove bool // Automatically remove container when it exits
+	bool auto_remove = 7;
+	// VolumeDriver string // Name of the volume driver used to mount volumes
+	string volume_driver = 8;
+	// VolumesFrom []string // List of volumes to take from other container
+	repeated string volumes_from = 9;
+
+	// Applicable to UNIX platforms
+	//
+	// CapAdd strslice.StrSlice // List of kernel capabilities to add to the container
+	repeated string cap_add = 10;
+	// CapDrop strslice.StrSlice // List of kernel capabilities to remove from the container
+	repeated string cap_drop = 11;
+	// DNS []string 0x60json:"Dns"0x60 // List of DNS server to lookup
+	repeated string dns = 12;
+	// DNSOptions []string 0x60json:"DnsOptions"0x60 // List of DNSOption to look for
+	repeated string dns_options = 13;
+	// DNSSearch []string 0x60json:"DnsSearch"0x60 // List of DNSSearch to look for
+	repeated string dns_search = 14;
+	// ExtraHosts []string // List of extra hosts
+	repeated string extra_hosts = 15;
+	// GroupAdd []string // List of additional groups that the container process will run as
+	repeated string group_add = 16;
+	// IpcMode IpcMode // IPC namespace to use for the container, "", "host", "container"
+	// IpcMode represents the container ipc stack. // type IpcMode string
+	string ipc_mode = 17;
+	// Cgroup CgroupSpec // Cgroup to use for the container, "container:<id>"
+	// CgroupSpec represents the cgroup to use for the container. // type CgroupSpec string
+	string cgroup = 18;
+	// Links []string // List of links (in the name:alias form)
+	repeated string links = 19;
+	// OomScoreAdj int // Container preference for OOM-killing
+	int32 oom_score_adj = 20;
+	// PidMode PidMode // PID namespace to use for the container
+	// PidMode represents the pid namespace of the container. // type PidMode string
+	string pid_mode = 21;
+	// Privieged bool // Is the container in privileged mode
+	bool privileged = 22;
+	// PublishAllPorts bool // Should docker publish all exposed port for the container
+	bool publish_all_ports = 23;
+	// ReadonlyRootfs bool // Is the container root filesystem in read-only
+	bool readonly_rootfs = 24;
+	// SecurityOpt []string // List of string values to customize labels for MLS systems, such as SELinux.
+	repeated string security_opt = 25;
+	// Storage driver options per container.
+	// StorageOpt map[string]string 0x60json:",omitempty"0x60
+	map<string, string> storage_opt = 26;
+	// List of tmpfs (mounts) used for the container
+	// Tmpfs map[string]string 0x60json:",omitempty"0x60
+	map<string, string> tmpfs = 27;
+	// UTSMode UTSMode // UTSMode represents the UTS namespace of the container. // type UTSMode string
+	// UTS namespace to use for the container
+	string uts_mode = 28;
+	// UsernsMode UsernsMode // UsernsMode represents userns mode in the container. // type UsernsMode string
+	// The user namespace to use for the container
+	string userns_mode = 29;
+	// ShmSize int64
+	// Total shm memory usage
+	int64 shm_size = 30;
+	// Sysctls map[string]string 0x60json:",omitempty"0x60
+	// List of Namespaced sysctls used for the container
+	map<string, string> sysctls = 31;
+	// Runtime string 0x60json:",omitempty"0x60
+	// Runtime to use with this container
+	string runtime = 32;
+
+	// Applicable to Windows
+	//
+	// ConsoleSize [2]uint // Initial console size (height,width)
+	uint32 console_size_height = 33;
+	uint32 console_size_width = 34;
+	// Isolation Isolation // Isolation technology of the container (e.g. default, hyperv)
+	// Isolation represents the isolation technology of a container. The supported values are platform specific // type Isolation string
+	string isolation = 35;                      
+
+	// Contains container's resources (cgroups, ulimits)
+	// Resources
+	Resources resources = 36;
+
+	// Mounts specs used by the container
+	// Mounts []mount.Mount 0x60json:",omitempty"0x60
+	repeated mount.Mount mounts = 37;
+
+    // MaskedPaths is the list of paths to be masked inside the container (this overrides the default set of paths)
+	// MaskedPaths []string
+	repeated string masked_paths = 38;
+	
+	// ReadonlyPaths is the list of paths to be set as read-only inside the container (this overrides the default set of paths)
+	// ReadonlyPaths []string
+	repeated string readonly_paths = 39;
+	
+	// Run a custom init inside the container, if null, use the daemon's configured settings
+	// Init *bool 0x60json:",omitempty"0x60
+	bool init = 40;
+}

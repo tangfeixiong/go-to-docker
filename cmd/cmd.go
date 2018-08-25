@@ -18,6 +18,7 @@ import (
 	"github.com/tangfeixiong/go-to-docker/pb"
 	"github.com/tangfeixiong/go-to-docker/pb/moby"
 	"github.com/tangfeixiong/go-to-docker/pkg/server"
+	"github.com/tangfeixiong/go-to-docker/pkg/server2"
 	"github.com/tangfeixiong/go-to-docker/pkg/util"
 )
 
@@ -47,10 +48,29 @@ func NewRootCommand(name string) *cobra.Command {
 		Short: "Deploy dockerized applications",
 		Long:  fmt.Sprintf(tmplLong, name, name, name),
 	}
-	root.AddCommand(newServeCommand())
-	root.AddCommand(newRunTestCommand())
+	root.AddCommand(newServe2Command())
+	// root.AddCommand(newServeCommand())
+	// root.AddCommand(newRunTestCommand())
 
 	return root
+}
+
+func newServe2Command() *cobra.Command {
+	var opt server2.Option
+
+	command := &cobra.Command{
+		Use:   "serve2",
+		Short: "Start gRPC with HTTP gateway service",
+		Run: func(cmd *cobra.Command, args []string) {
+			flag.Set("v", opt.LogLevel)
+			flag.Parse()
+
+			server2.Start(&opt)
+		},
+	}
+
+	command.Flags().StringVar(&opt.LogLevel, "loglevel", "2", "for glog")
+	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 }
 
 func newServeCommand() *cobra.Command {

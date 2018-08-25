@@ -1,7 +1,7 @@
 // tangfeixiong <tangfx128@gmail.com>
 
 syntax = "proto3";
-package moby;
+package engine;
 
 // HealthConfig holds configuration settings for the HEALTHCHECK feature.
 // to see https://github.com/moby/moby/blob/master/api/types/container/config.go

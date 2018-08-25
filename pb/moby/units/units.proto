@@ -1,0 +1,28 @@
+// tangfeixiong <tangfx128@gmail.com>
+//
+// https://github.com/docker/go-units/blob/master/ulimit.go
+
+syntax = "proto3";
+package units;
+
+// Ulimit is a human friendly version of Rlimit.
+// type Ulimit struct
+message Ulimit {
+	// Name sstring
+	string name = 1;
+	// Hard int64
+	int64 hard = 2;
+	// Soft int64
+	int64 soft = 3;
+}
+
+// Rlimit specifies the resources limits, such as max open files.
+// type Rlimit struct
+message UnitsUlimit {
+	// Type int 0x60json:"type,omitempty"0x60
+	int32 type = 1;
+	// Hard uint64 0x60json:"hard,omitempty"0x60
+	uint64 hard = 2;
+	// Soft uint64 0x60json:"soft,omitempty"0x60
+	uint64 soft = 3;
+}

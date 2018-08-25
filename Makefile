@@ -15,12 +15,12 @@ protoc-grpc: protoc-moby
 	protoc -I/usr/local/include -I. \
 		-I${GOPATHP}/src \
 		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-		--gofast_out=Mpb/moby/api.proto=github.com/tangfeixiong/go-to-docker/pb/moby,Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:. \
+		--gofast_out=Mpb/moby/moby.proto=github.com/tangfeixiong/go-to-docker/pb/moby,Mpb/moby/container/container.proto=github.com/tangfeixiong/go-to-docker/pb/moby/container,Mpb/moby/network/network.proto=github.com/tangfeixiong/go-to-docker/pb/moby/network,Mgoogle/api/annotations.proto=github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api,plugins=grpc:. \
 		pb/service.proto
 	protoc -I/usr/local/include -I. \
 		-I${GOPATHP}/src \
 		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-		--grpc-gateway_out=Mpb/moby/api.proto=github.com/tangfeixiong/go-to-docker/pb/moby,logtostderr=true:. \
+		--grpc-gateway_out=Mpb/moby/moby.proto=github.com/tangfeixiong/go-to-docker/pb/moby,Mpb/moby/container/container.proto=github.com/tangfeixiong/go-to-docker/pb/moby/container,Mpb/moby/network/network.proto=github.com/tangfeixiong/go-to-docker/pb/moby/network,logtostderr=true:. \
 		pb/service.proto
 	protoc -I/usr/local/include -I. \
 		-I${GOPATHP}/src \
@@ -33,8 +33,43 @@ protoc-moby:
 	protoc -I/usr/local/include -I. \
 		-I${GOPATHP}/src \
 		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/api.proto=github.com/tangfeixiong/go-to-docker/pb/moby:. \
-        pb/moby/api.proto
+		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/blkiodev/blkiodev.proto=github.com/tangfeixiong/go-to-docker/pb/moby/blkiodev:. \
+        pb/moby/blkiodev/blkiodev.proto
+	protoc -I/usr/local/include -I. \
+		-I${GOPATHP}/src \
+		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/filters/filters.proto=github.com/tangfeixiong/go-to-docker/pb/moby/filters:. \
+        pb/moby/filters/filters.proto
+	protoc -I/usr/local/include -I. \
+		-I${GOPATHP}/src \
+		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/mount/mount.proto=github.com/tangfeixiong/go-to-docker/pb/moby/mount:. \
+        pb/moby/mount/mount.proto
+	protoc -I/usr/local/include -I. \
+		-I${GOPATHP}/src \
+		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/nat/nat.proto=github.com/tangfeixiong/go-to-docker/pb/moby/nat:. \
+        pb/moby/nat/nat.proto
+	protoc -I/usr/local/include -I. \
+		-I${GOPATHP}/src \
+		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/network/network.proto=github.com/tangfeixiong/go-to-docker/pb/moby/network:. \
+        pb/moby/network/network.proto
+	protoc -I/usr/local/include -I. \
+		-I${GOPATHP}/src \
+		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/units/units.proto=github.com/tangfeixiong/go-to-docker/pb/moby/units:. \
+        pb/moby/units/units.proto
+	protoc -I/usr/local/include -I. \
+		-I${GOPATHP}/src \
+		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/blkiodev/blkiodev.proto=github.com/tangfeixiong/go-to-docker/pb/moby/blkiodev,Mpb/moby/container/container.proto=github.com/tangfeixiong/go-to-docker/pb/moby/container,Mpb/moby/filters/filters.proto=github.com/tangfeixiong/go-to-docker/pb/moby/filters,Mpb/moby/mount/mount.proto=github.com/tangfeixiong/go-to-docker/pb/moby/mount,Mpb/moby/nat/nat.proto=github.com/tangfeixiong/go-to-docker/pb/moby/nat,Mpb/moby/network/network.proto=github.com/tangfeixiong/go-to-docker/pb/moby/network,Mpb/moby/units/units.proto=github.com/tangfeixiong/go-to-docker/pb/moby/units:. \
+        pb/moby/container/container.proto
+	protoc -I/usr/local/include -I. \
+		-I${GOPATHP}/src \
+		-I${GOPATHD}/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+		--gofast_out=Mgoogle/protobuf/timestamp.proto=github.com/golang/protobuf/ptypes/timestamp,Mpb/moby/moby.proto=github.com/tangfeixiong/go-to-docker/pb/moby,Mpb/moby/blkiodev/blkiodev.proto=github.com/tangfeixiong/go-to-docker/pb/moby/blkiodev,Mpb/moby/container/container.proto=github.com/tangfeixiong/go-to-docker/pb/moby/container,Mpb/moby/filters/filters.proto=github.com/tangfeixiong/go-to-docker/pb/moby/filters,Mpb/moby/mount/mount.proto=github.com/tangfeixiong/go-to-docker/pb/moby/mount,Mpb/moby/nat/nat.proto=github.com/tangfeixiong/go-to-docker/pb/moby/nat,Mpb/moby/network/network.proto=github.com/tangfeixiong/go-to-docker/pb/moby/network,Mpb/moby/units/units.proto=github.com/tangfeixiong/go-to-docker/pb/moby/units:. \
+        pb/moby/moby.proto
 
 go-install:
 	go install -v ./

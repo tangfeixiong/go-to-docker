@@ -1,0 +1,130 @@
+// tangfeixiong <tangfx128@gmail.com>
+//
+// https://github.com/moby/moby/blob/master/api/types/network/network.go
+
+syntax = "proto3";
+package network;
+
+// Address represents an IP address
+// type Address struct
+message Address {
+	// Addr string
+	string addr = 1;
+	// PrefixLen int
+	int32 prefix_len = 2;
+}
+
+// IPAM represents IP Address Management
+// type IPAM struct
+message IPAM {
+	// Driver string
+	string driver = 1;
+	// Options map[string]string //Per network IPAM driver options
+	map<string, string> options = 2;
+	// Config []IPAMConfig
+	repeated IPAMConfig config = 3;
+}
+
+// IPAMConfig represents IPAM configurations
+// type IPAMConfig struct
+message IPAMConfig {
+	// Subnet string 0x60json:",omitempty"0x60
+	string subnet = 1;
+	// IPRange string 0x60json:",omitempty"0x60
+	string ip_range = 2;
+	// Gateway string 0x60json:",omitempty"0x60
+	string gateway = 3;
+	// AuxAddress map[string]string 0x60json:"AuxiliaryAddresses,omitempty"
+	map<string, string> aux_address = 4;
+}
+
+// EndpointIPAMConfig represents IPAM configurations for the endpoint
+// type EndpointIPAMConfig struct
+message EndpointIPAMConfig {
+	// IPv4Address string 0x60json:",omitempty"0x60
+	string ipv4_address = 1;
+	// IPv6Address string 0x60json:",omitempty"0x60
+	string ipv6_address = 2;
+	// LinkLocalIPs []string 0x60json:",omitempty"0x60
+	repeated string link_local_ips = 3;
+}
+
+// PeerInfo represents one peer of an overlay network
+// type PeerInfo struct
+message PeerInfo {
+	// Name string
+	string name = 1;
+	// IP string
+	string ip = 2;
+}
+
+// EndpointSettings stores the network endpoint details
+// type EndpointSettings struct
+message EndpointSettings {
+    // IPAMConfig *EndpointIPAMConfig	// Configurations
+	EndpointIPAMConfig ipam_config = 1;
+	// Links []string
+	repeated string links = 2;
+	// Aliases []string
+	repeated string aliases = 3;
+	// NetworkID string // Operational data
+	string network_id = 4;
+	// EndpointID string
+	string endpoint_id = 5;
+	// Gateway string
+	string gateway = 6;
+	// IPAddress string
+	string ip_address = 7;
+	// IPPrefixLen int
+	int32 ip_prefix_len = 8;
+	// IPv6Gateway string
+	string ipv6_gateway = 9;
+	// GlobalIPv6Address string
+	string global_ipv6_address = 10;
+	// GlobalIPv6PrefixLen int
+	int32 global_ipv6_prefix_len = 11;
+	// MacAddress string
+	string mac_address = 12;
+	// DriverOpts map[string]string
+	map<string, string> driver_opts = 13;
+}
+
+// Task carries the information about one backend task
+// type Task struct
+message Task {
+	// Name string
+	string name = 1;
+	// EndpointID string
+	string endpoint_id = 2;
+	// EndpointIP string
+	string endpoint_ip = 3;
+	// Info map[string]string
+	map<string, string> info = 4;
+}
+
+// ServiceInfo represents service parameters with the list of service's tasks
+// type ServiceInfo struct
+message ServiceInfo {
+	// VIP string
+	string vip = 1;
+	// Ports []string
+	repeated string ports = 2;
+	// LocalLBIndex int
+	int32 local_lb_index = 3;
+	// Tasks []Task
+	repeated Task tasks = 4;
+}
+
+// NetworkingConfig represents the container's networking configuration for each of its interfaces Carries the networking configs specified in the 'docker run' and 'docker network connect' commands
+// type NetworkingConfig struct
+message NetworkingConfig {
+	// EndpointsConfig map[string]*EndpointSettings // Endpoint configs for each connecting network
+	map<string, EndpointSettings> endpoints_config = 1;
+}
+
+// ConfigReference specifies the source which provides a network's cconfiguration
+// type ConfigReference struct
+message ConfigReference {
+	// Network string
+	string network = 1;
+}

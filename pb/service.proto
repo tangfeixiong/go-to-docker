@@ -5,426 +5,70 @@ package pb;
 
 import "google/api/annotations.proto";
 
-import "pb/moby/api.proto";
+import "pb/moby/moby.proto";
+import "pb/moby/container/container.proto";
+import "pb/moby/network/network.proto";
 
-message EchoMessage {
- string value = 1;
+service SimpleService {
+	
+	// Pull Docker image
+	//
+	// Like command of 'docker pull', Input/Output is a same Protobuf/JSON object. For input example:
+	// { "image_ref": "docker.io/nginx" }
+    // For output example:		
+	// { "image_ref": "docker.io/nginx", "state_code": 0, "state_message": "SUCCEEDED" }
+	rpc PullImage(DockerImagePullReqResp) returns (DockerImagePullReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-pull"
+			body: "*"
+		};
+	}
+	
+	// Run Docker container
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	rpc RunContainer(DockerContainerRunReqResp) returns (DockerContainerRunReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-run"
+			body: "*"
+		};
+	}
+	
+	// Create Docker network
+	//
+	//
+	rpc CreateNetwork(DockerNetworkCreateReqResp) returns (DockerNetworkCreateReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-network-create"
+			body: "*"
+		};
+	}
 }
 
-service EchoService {
-  rpc Echo(EchoMessage) returns (EchoMessage) {
-    option (google.api.http) = {
-      get: "/v1/echo/{value}"
-    };
-  }
-
-  // Like 'docker pull' command
-  //
-  // Input/Output is a same protobuf/json object. For input:
-  // {
-  //   "image": "tomcat:8"
-  // }
-  rpc PullImage(DockerPullData) returns (DockerPullData) {
-    option (google.api.http) = {
-        post: "/v1/pull"
-        body: "*"
-    };
-  }
-
-  // Like 'docker run' command
-  //
-  // Input/Output is a same protobuf/json object. For input:
-  // {
-  //   "config":
-  //     {
-  //       "image": "nginx",
-  //       "cmd": [
-  //         "-c", "printenv && ls /usr/share/nginx/html && nginx -g \"daemon off;\""
-  //       ],
-  //       "entrypoint": [
-  //         "/bin/bash"
-  //       ],
-  //       "env": [
-  //         "GOAPTH=/home/vagrant/go",
-  //         "JAVA_HOME=/opt/jdk1.8.0_112"
-  //       ],
-  //       "exposed_ports":
-  //         {
-  //           "value": 
-  //             {
-  //               "80": "webui"
-  //             }
-  //         },
-  //       "volumes":
-  //         {
-  //           "/etc/nginx/nginx.conf": "sysconf",
-  //           "/etc/nginx/conf.d/default.conf": "usrconf",
-  //           "/usr/share/nginx/html/": "usrdata"
-  //         }
-  //     },
-  //   "host_config":
-  //     {
-  //       "binds": [
-  //         "/home/vagrant/project-php/etc/nginx.conf:/etc/nginx/nginx.conf,Z",
-  //         "/home/vagrant/project-php/etc/default.conf:/etc/nginx/conf.d/default.conf:Z",
-  //         "/home/vagrant/project-php/src/:/usr/share/nginx/html/:ro"
-  //       ],
-  //       "port_bindings":
-  //         {
-  //           "value":
-  //             {
-  //               "80":
-  //                 {
-  //                   "host_port": "80"
-  //                 }
-  //             }
-  //         },
-  //       "resources":
-  //         {
-  //           "memory": 300000000
-  //         }
-  //     },
-  //   "network_config":
-  //     {
-  //     },
-  //   "container_name": "nginx"
-  // }
-  // For output, plus returning elements:
-  // {
-  //   "state_code": 0, // succeeded, otherwise none zero
-  //   "state_message": "if failed, provide error information"
-  //   "container_id": "returning value of docker engine"  
-  // }
-  rpc RunContainer(DockerRunData) returns (DockerRunData) {
-    option (google.api.http) = {
-        post: "/v1/containers"
-        body: "*"
-    };
-  }
-
-  // Like 'docker ps' command
-  //
-  rpc ProcessStatuses(DockerProcessStatusReqResp) returns (DockerProcessStatusReqResp) {
-    option (google.api.http) = {
-        post: "/v1/process-statuses"
-        body: "*"
-    };
-  }
-
-  // Run containers with a user namespace information
-  //
-  // Input/Output is a same protobuf/json object. For input:
-  // {
-  //   "name": "fighter and target"
-  //   "namespace": "default"
-  //   "metadata":
-  //     {
-  //       "categroy_name": "basic-web-security",
-  //       "class_name": "http-protocol"
-  //       "field_name": "http-method"
-  //     },
-  //   "provisionings": [
-  //     <list of DockerRunData type, see previous>
-  //   ]
-  // }
-  rpc ProvisionContainers(ProvisioningsData) returns (ProvisioningsData) {
-    option (google.api.http) = {
-        post: "/v1/provisions"
-        body: "*"
-    };
-  }
-
-  // Delete containers with a user namespace information
-  //
-  // Input/Output is a same protobuf/json object. For input:
-  // {
-  //   "name": "fighter and target"
-  //   "namespace": "default"
-  //   "metadata":
-  //     {
-  //       "categroy_name": "basic-web-security",
-  //       "class_name": "http-protocol"
-  //       "field_name": "http-method"
-  //     }
-  // }
-  // And returning information append this object for output:
-  // {
-  //   "provisionings": [
-  //     list of DockerRunData type, see previous
-  //   ]
-  // }
-  rpc TerminationContainers(ProvisioningsData) returns (ProvisioningsData) {
-    option (google.api.http) = {
-        post: "/v1/terminations"
-        body: "*"
-    };
-  }
-
-  // Find containers with instantiating of a user namespace
-  //
-  // Input/Output is a same protobuf/json object. For input:
-  // {
-  //   "name": "fighter and target",
-  //   "namespace": "default",
-  //   "metadata":
-  //     {
-  //       "categroy_name": "default",
-  //       "class_name": "default",
-  //       "field_name": "default"
-  //     }
-  // }
-  // For output, plus a returning object:
-  // {
-  //   "instantiation": [
-  //     {
-  //       // List of Moby Container type
-  //     }
-  //   ]
-  // }
-  rpc ReapInstantiation(InstantiationData) returns (InstantiationData) {
-    option (google.api.http) = {
-        post: "/v1/reap-instantiation"
-        body: "*"
-    };
-  }
-
-  // List registry, include Docker Hub, or private registry (using .docker/config.json)
-  //
-  // Input/Output is a same protobuf/json object. For input:
-  // {
-  //   "repositories": [
-  //     {
-  //       name: "127.0.0.1:5000"
-  //     }
-  //   ]
-  // }
-  // For output, plus a returning object:
-  // {
-  //   "repositories": [
-  //     {
-  //       name: "127.0.0.1:5000",
-  //       catalogs: [
-  //         {
-  //           "name": "nginx",
-  //           "tags": [
-  //             {
-  //               "name": "latest"
-  //             }
-  //           ]
-  //         }
-  //       ]
-  //     }
-  //   ],
-  //   "state_code": 0,  // Value greater than zero indicates error 
-  //   "state_message": "..." // Usually error message 
-  // }
-  rpc ReapRegistryForRepositories(RegistryRepositoryData) returns (RegistryRepositoryData) {
-    option (google.api.http) = {
-        post: "/v1/reap-registry"
-        body: "*"
-    };
-  }
-
-  rpc ReapDockerNetwork(DockerNetworkData) returns (DockerNetworkData) {
-    option (google.api.http) = {
-        get: "/v1/networks"
-    };
-  }
-
-  rpc CreateDockerNetwork(DockerNetworkCreationReqResp) returns (DockerNetworkCreationReqResp) {
-    option (google.api.http) = {
-        post: "/v1/network-creation"
-        body: "*"
-    };
-  }
-
-  rpc SnoopBridgedNetworkLandscape(BridgedNetworkingData) returns (BridgedNetworkingData) {
-    option (google.api.http) = {
-        post: "/v1/snooping-brns"
-        body: "*"
-    };
-  }
-
-  rpc SniffEtherNetworking(EthernetSniffingData) returns (EthernetSniffingData) {
-    option (google.api.http) = {
-        post: "/v1/sniffing-brns"
-        body: "*"
-    };
-  }
-
-}
-
-message InstrumentMetadata {
-    string category_name = 1;
-    string class_name = 2;
-    string field_name = 3;
-}
-
-message DockerRunData {
-    moby.Config config = 1;
-    moby.HostConfig host_config = 2;
-    moby.NetworkingConfig network_config = 3;
-    string container_name = 4;
-    int32 state_code = 5;
-    string state_message = 6;
-    string container_id = 7;
-}
-
-message DockerPullData {
-    string image = 1;
-    int32 state_code = 2;
-    string state_message = 3;
-    string image_id = 4;
-    string progress_report = 5;
-}
-
-message DockerProcessStatusReqResp {
-    moby.ContainerListOptions options = 1;
-    repeated moby.Container containers = 2;
-    int32 state_code = 3;
-    string state_message = 4;
-}
-
-message DockerContainerInspection {
-    moby.ContainerJSON container_info = 1;
-    int32 state_code = 2;
-    string state_message = 3;
-}
-
-message ProvisioningsData {
-    message Metadata {
-        string category_name = 1;
-        string class_name = 2;
-        string field_name = 3;
-    }
-    string name = 1;
-    string namespace = 2;
-    Metadata metadata = 3;
-    repeated DockerRunData provisionings = 4;
-}
-
-message InstantiationData {
-    string name = 1;
-    string namespace = 2;
-    InstrumentMetadata metadata = 3;
-    repeated moby.Container instantiation = 4;
-    int32 state_code = 5;
-    string state_message = 6;
-}
-
-message RegistryRepositoryData {
-    message Tag {
-        string name = 1;
-    }
-    message Catalog {
-        string name = 1;
-        repeated Tag tags = 2;
-    }
-    message Registry {
-        string name = 1;
-        repeated Catalog catalogs = 2;
-        bool tls_disabled = 3;
-    }
-    repeated Registry registries = 1;
-    int32 state_code = 2;
-    string state_message = 3;
-}
-
-message ImageRegistryData {
-    string id = 1;
-    moby.ImageSummary registration = 2;
-}
-
-message ImageArchiveData {
-    string id = 1;
-    moby.ImageInspect inspection = 2;
-}
-
-
-// SearchResult describes a search result returned from a registry
-// to see https://github.com/moby/moby/blob/master/api/types/registry/registry.go
-message SearchResult {
-	// StarCount indicates the number of stars this repository has
-	int32 star_count = 1;
-	// IsOfficial is true if the result is from an official repository.
-	bool is_official = 2;
-	// Name is the name of the repository
-	string name = 3;
-	// IsAutomated indicates whether the result is automated
-	bool is_automated = 4;
-	// Description is a textual description of the repository
-	string description = 5;
-}
-
-message DockerNetworkData {
-    repeated moby.NetworkResource network_resources = 1;
-    int32 state_code = 2;
-    string state_message = 3;
-}
-
-message DockerNetworkCreationReqResp {
-    moby.NetworkCreateRequest network_create_request = 1;
-    moby.NetworkCreateResponse network_create_response = 2;
-    int32 state_code = 3;
-    string state_message = 4;
-}
-
-message BridgedNetworkingData {
-    message LinkLayerInfo {
-        string index = 1; 
-        string name = 2;
-        repeated string data_link_status = 3;
-        repeated string data_link_conf = 4;
-    	    string data_link_frame = 5;
-        string data_link_ether_mac = 6;
-        string data_link_ether_brd = 7;
-        string data_link_netns_id = 8;
-    }
-
-    message IPAddressInfo {
-        	LinkLayerInfo link_info = 1;
-    	    string ipv4 = 2;
-        string v4_mask = 3;
-        repeated string v4_info = 4;
-        repeated string v4_lifetime = 5;
-        string ipv6 = 6;
-    	    string v6_mask = 7;
-        repeated string v6_info = 8;
-    	    repeated string v6_lifetime = 9;
-    }
-
-    message LinuxBridgeLearnedMac {
-	    string port_no = 1;
-	    string mac_addr = 2;
-	    string is_local = 3;
-	    string ageing_timer = 4;
-    }
-
-    message LinuxBridgeInfo {
-	    string id = 1;
-	    string name = 2;
-	    string stp_enabled = 3;
-	    repeated string interfaces = 4;
-	    repeated LinuxBridgeLearnedMac mac_info = 5;
-        repeated IPAddressInfo ip_addresses_info = 6;
-    }
-
-    message ContainersNetworkingInfo {
-        repeated moby.NetworkResource network_resources = 1;
-        repeated moby.ContainerJSON containers_info = 2;
-        repeated IPAddressInfo addresses_info = 3;
-    }
-
-    repeated LinuxBridgeInfo linux_bridges = 1;
-    ContainersNetworkingInfo containers_networking = 2;
-    map<string, string> veth_pairs = 3;
+message DockerImagePullReqResp {
+	string ref_str = 1;
+	moby.ImagePullOptions image_pull_options = 2;
+    bytes resp_body = 3;
     int32 state_code = 4;
     string state_message = 5;
 }
 
-message EthernetSniffingData {
-    string iface = 1;
-    repeated string stats_and_packets = 2;
-    int32 state_code = 3;
-    string state_message = 4;
+message DockerNetworkCreateReqResp {
+	string name = 1;
+	moby.NetworkCreate network_create = 2;
+	moby.NetworkCreateResponse network_create_response = 3;
+	int32 state_code = 4;
+	string state_message = 5;
 }
+
+message DockerContainerRunReqResp {
+    container.Config config = 1;
+    container.HostConfig host_config = 2;
+    network.NetworkingConfig networking_config = 3;
+    string name = 4;
+	container.ContainerCreateCreatedBody container_create_response = 5;
+    int32 state_code = 6;
+    string state_message = 7;
+}
+

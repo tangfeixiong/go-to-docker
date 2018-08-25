@@ -1,0 +1,830 @@
+// tangfeixiong <tangfx128@gmail.com>
+
+syntax = "proto3";
+package moby;
+
+import "pb/moby/container/container.proto";
+import "pb/moby/network/network.proto";
+import "pb/moby/units/units.proto";
+import "pb/moby/filters/filters.proto";
+import "pb/moby/nat/nat.proto";
+
+//
+// https://github.com/moby/moby/blob/master/api/types/auth.go
+//
+// AuthConfig contains authorization information for connecting to a Registry
+// type AuthConfig struct
+message AuthConfig {
+	// Username string 0x60json:"username,omitempty"0x60
+	string username = 1;
+	// Password string 0x60json:"password,omitempty"0x60
+	string password = 2;
+	// Auth string  0x60json:"auth,omitempty"0x60
+	string auth = 3;
+	
+	// Email string 0x60json:"email,omitempty"0x60 // Email is an Operational value associated with the username. This field is deprecated and will be removed in a later version of docker.
+	string email = 4;
+
+	// ServerAddress string 0x60json:"serveraddress,omitempty"0x60
+	string serveraddress = 5;
+
+	// IdentityToken string 0x60json:"identitytoken,omitempty"0x60 // IdentityToken is used to authenticate the user and get an access token for the registry.
+	string identitytoken = 6;
+
+    // RegistryToken string 0x60json:"registrytoken,omitempty"0x60 // RegistryToken is a bearer token to be sent to a registry
+	string registrytoken = 7;	
+}
+
+
+
+//
+// https://github.com/moby/moby/blob/master/api/types/client.go
+//
+// ContainerListOptions holds parameters to list containers with.
+// type ContainerListOptions struct
+message ContainerListOptions {
+	// Quiet bool
+	bool quiet = 1;
+	// Size bool
+	bool size = 2;
+	// All bool
+	bool all = 3;
+	// Latest bool
+	bool latest = 4;
+	// Since string
+	string since = 5;
+	// Before string
+	string before = 6;
+	// Limit int
+	int32 limit = 7;
+	// Filters filters.Args
+	filters.Args filters = 8;
+}
+
+
+// NetworkListOptions holds parameters to filter the list of networks with.
+// type NetworkListOptions struct
+message NetworkListOptions {
+	// Filters filters.Args
+	filters.Args filters = 1;
+}
+
+
+// ImageBuildOptions holds the information necessary to build images.
+// type ImageBuildOptions struct
+message ImageBuildOptions {
+	// Tags []string
+	repeated string tags = 1;
+	// SuppressOutput bool
+	bool suppress_output = 2;
+	// RemoteContext string
+	string remote_context = 3;
+	// NoCache bool
+	bool no_cache = 4;
+	// Remove bool
+	bool remove = 5;
+	// ForceRemove bool
+	bool force_remove = 6;
+	// PullParent bool
+	bool pull_parent = 7;
+	// Isolation container.Isolation // Isolation represents the isolation technology of a container. The supported value are platform specific. // type Isolation string
+	string isolation = 8;
+	// CPUSetCPUs string
+	string cpu_set_cpus = 9;
+	// CPUSetMems string
+	string cpu_set_mems = 10;
+	// CPUShares int64
+	int64 cpu_shares = 11;
+	// CPUQuota int64
+	int64 cpu_quota = 12;
+	// CPUPeriod int64
+	int64 cpu_period = 13;
+	// Memory int64
+	int64 memory = 14;
+	// MemorySwap int64
+	int64 memory_swap = 15;
+	// CgroupParent string
+	string cgroup_parent = 16;
+	// NetworkMode string
+	string network_mode = 17;
+	// ShmSize int64
+	int64 shm_size = 18;
+	// Dockerfile string
+	string dockerfile = 19;
+	// Ulimits []*units.Ulimit
+	repeated units.Ulimit ulimits = 20;
+	// BuildArgs map[string]*string // BuildArgs needs to be a *string instead of just a string so that we can tell the difference between "" (empty string) and no value at all (nil). See the parsing of buildArgs in api/server/router/build/build_routers.go for even more info.
+	map<string, bytes> build_args = 21;
+	// AuthConfigs map[string]AuthConfig
+	map<string, AuthConfig> auth_configs = 22;
+	// Context io.Reader
+	bytes context = 23;
+	// Labels map[string]string
+	map<string, string> labels = 24;
+	// Squash bool // squash the resulting image's layers to the parent preserve the original image and creates a new one from the parent with all the changes applied to a single layer
+	bool squash = 25;
+	// CacheFrom []string // CacheFrom specifies images that are used for matching cache. Images specified here do not need to have a valid parent chain to match cache.
+	repeated string cache_from = 26;
+	// SecurityOpt []string
+	repeated string security_opt = 27;
+	// ExtraHosts []string // List of extra hosts
+	repeated string eextra_hosts = 28;
+	// Target string
+	string target = 29;
+	// SessionID string
+	string session_id = 30;
+	// Platform string
+	string platform = 31;
+	// Version BuildVersion // Version specifies the version of the underlying builder to use // type BuilderVersion string // BuilderV1 is the first generation builder in docker daemon. BuilderV1 BuilderVersion = "1" // BuilderBuildKit is builder based on moby/buildkit project. BuilderBuildKit = "2"
+	string build_version = 32;
+	// BuildID string // BuildID is an Operational identifier that can be passed together with the build request. Tha same identifier can be used to gracefully cancel the build with the cancel request.
+	string build_id = 33;
+}
+
+// ImageBuildResponse holds information returned by a server after building an image
+// type ImageBuildResponse struct
+message ImageBuildResponse {
+	// Body io.ReadCloser
+	bytes body = 1;
+	// OSType string
+	string os_type = 2;
+}
+
+// ImageCreateOptions holds information to create images.
+// type ImageCreateOptions struct
+message ImageCreateOptions {
+	// RegistryAuth string // RegistryAuth is the base64 encoded credentials for the registry.
+	string registry_auth = 1;
+	// Platform string // Platform is the target platform of the image if it needs to be pulled from the registry.
+	string platform = 2;
+}
+
+// ImageImportSource holds source information for ImageImport
+// type ImageImportSource struct
+message ImageImportSource {
+	// Source io.Reader // Source is the data to send to the server to create this image from. You must set SourceName to "-" to leverage this.
+	bytes source = 1;
+	// SourceName string // SourceName is the name of the image to pull. Set to "-" to leverage the Source attribute
+	string source_name = 2;
+}
+
+// ImageImportOptions holds information to import images from the client host.
+// type ImageImportOptions struct
+message ImageImportOptions {
+	// Tag string // Tag is the name to tag this image with. This attribute is deprecated.
+	string tag = 1;
+	// Message string // Message is the message to tag the image with
+	string message = 2;
+	// Changes []string // Changes are the raw changes to apply to this image
+	repeated string changes = 3;
+	// Platform string // Platform is the target platform of the image
+	string platform = 4;
+}
+
+// ImageListOptions holds parameters to filter the list of images with.
+// type ImageListOptions struct
+message ImageListOptions {
+	// All bool
+	bool all = 1;
+	// Filters filters.Args
+	filters.Args filters = 2;   
+}
+
+// ImageLoadResponse returns information to the client about a load process
+// type ImageLoadResponse struct
+message ImageLoadResponse {
+	// Body must be closed to avoid a response leak
+	// Body io.ReadCloser
+	bytes body = 1;
+	// JSON bool
+	bool json = 2;
+}
+
+// ImagePullOptions holds information to pull images.
+// type ImagePullOptions struct
+message ImagePullOptions {
+	// All bool
+	bool all = 1;
+	// RegistryAuth string // RegistryAuth is the base64 encoded credentials for the registry
+	string registry_auth = 2;
+	// PrivilegeFunc RequestPrivilegeFunc
+	string privilege_func = 3;
+	// Platform string
+	string platform = 4;
+}
+
+// ImagePushOptions holds information to push images.
+// type ImagePushOptions ImagePullOptions
+message ImagePushOptions {
+	// All bool
+	bool all = 1;
+	// RegistryAuth string // RegistryAuth is the base64 encoded credentials for the registry
+	string registry_auth = 2;
+	// PrivilegeFunc RequestPrivilegeFunc
+	string privilege_func = 3;
+	// Platform string
+	string platform = 4;
+}
+
+// ImageRemoveOptions holds parameters to remove images.
+// type ImageRemoveOptions struct
+message ImageRemoveOptions {
+	// Force bool
+	bool force = 1;
+	// PruneChildren bool
+	bool prune_children = 2;
+}
+
+// ImageSearchOptions holds parameters to search images with.
+// type ImageSearchOptions struct
+message ImageSearchOptions {
+	// RegistryAuth string
+	string registry_auth = 1;
+	// PrivilegeFunc RequestPrivilegeFunc
+	string privilege_func = 2;
+	// Filters filters.Args
+	filters.Args filters = 3;
+	// Limit int
+	int32 limit = 4;
+}
+
+
+
+//
+// https://github.com/moby/moby/blob/master/api/types/graph_driver_data.go
+//
+// GraphDriverData Information about a container's graph driver.
+// swagger:model GraphDriverData
+// type GraphDriverData struct
+message GraphDriverData {
+
+	// data
+	// Required: true
+	// Data map[string]string 0x60json:"Data"0x60
+	map<string, string> data = 1;
+
+	// name
+	// Required: true
+	// Name string 0x60json:"Name"0x60
+	string name = 2;
+}
+
+
+
+//
+// https://github.com/moby/moby/blob/master/api/types/image_summary.go
+//
+// ImageSummary image summary
+// swagger:model ImageSummary
+// type ImageSummary struct
+message ImageSummary {
+
+	// containers int64 0x60json:"Containers"0x60
+	// Required: true
+	int64 containers = 1;
+
+	// created int64 0x60json:"Created"0x60
+	// Required: true
+	int64 created = 2;
+
+	// Id string 0x60json:"Id"0x60
+	// Required: true
+	string id = 3;
+
+	// labels map[string]string 0x60json:"Labels"0x60
+	// Required: true
+	map<string, string> labels = 4;
+
+	// parent Id
+	// Required: true
+	// ParentID string 0x60json:"ParentId"0x60
+	string parent_id = 5;
+
+	// repo digests
+	// Required: true
+	// RepoDigests []string 0x60json:"RepoDigests"0x60
+	repeated string repo_digests = 6;
+
+	// repo tags
+	// Required: true
+	// RepoTags []string 0x60json:"RepoTags"0x60
+	repeated string repo_tags = 7;
+
+	// shared size
+	// Required: true
+	// SharedSize int64 0x60json:"SharedSize"0x60
+	int64 shared_size = 8;
+
+	// size int64 0x60json:"Size"0x60
+	// Required: true
+	int64 size = 9;
+
+	// virtual size
+	// Required: true
+	// VirtualSize int64 0x60json:"VirtualSize"0x60
+	int64 virtual_size = 10;
+}
+
+
+
+//
+// https://github.com/moby/moby/blob/master/api/types/port.go
+//
+// Port stores open ports info of container
+// e.g. {"PrivatePort": 8080, "PublicPort": 80, "Type": "tcp"}
+// type Port struct
+message Port {
+	// Host IP address that the container's port is mapped to
+	// IP string 0x60json:"IP,omitempty"0x60
+	string ip = 1;
+	
+	// Port on the container
+	// Required: true
+	// PrivatePort uint16 0x60json:"PrivatePort"0x60
+	int32 private_port = 2;
+	
+	// Port exposed on the host
+	// PublicPort uint16 0x60json:"PublicPort,omitempty"0x60
+	int32 public_port = 3;
+	
+	// type
+	// Required: true
+	// Type string 0x60json:"Type"0x60
+	string type = 4;
+}
+
+
+
+//
+// https://github.com/moby/moby/blob/master/api/types/types.go
+//
+// RootFS returns Image's RootFS description including the layer IDs.
+// type RootFS struct
+message RootFS{
+	// Type string
+	string type = 1;
+	// Layers []string 0x60json:",omitempty"0x60
+	repeated string layers = 2;
+	// BaseLayer string 0x60json:",omitempty"0x60
+	string base_layer = 3;
+}
+
+// ImageInspect contains response of Engine API:
+// GET "/images/{name:.*}/json"
+// type ImageInspect struct
+message ImageInspect {
+	// ID string 0x60json:"Id"0x60
+	string id = 1;
+	// RepoTags []string
+	repeated string repo_tags = 2;
+	// RepoDigests []string
+	repeated string repo_digests = 3;
+	// Parent string
+	string parent = 4;
+	// Comment string
+	string comment = 5;
+	// Created string
+	string created = 6;
+	// Container string
+	string container = 7;
+	// ContainerConfig *container.Config
+	container.Config container_config = 8; 
+	// DockerVersion string
+	string docker_version = 9;
+	// Author string
+	string author = 10;
+	// Config *container.Config
+	container.Config config = 11;     
+	// Architecture string     
+	string architecture = 12;
+	// Os string
+	string os = 13;
+	// OsVersion string 0x60json:",omitempty"0x60
+	string os_version = 14;
+	// Size int64
+	int64 size = 15;
+	// VirtualSize int64
+	int64 virtual_size = 16;
+	// GraphDriver GraphDriverData
+	GraphDriverData graph_driver = 17;
+	// RootFS RootFS
+	RootFS root_fs = 18;
+	// Metadata ImageMetadata
+	ImageMetadata metadata = 19;        
+}
+
+// ImageMetadata contains engine-local data about the image
+// type ImageMetadata struct
+message ImageMetadata {
+	// LastTagTime time.Time 0x60json:",omitempty"0x60
+	string last_tag_time = 1;  
+}
+
+// Container contains response of Remote API:
+// GET  "/containers/json"
+// type Container struct
+message Container {
+    message HostConfig {
+		// NetworkMode String 0x60json:",omitempty"
+        string network_mode = 1;
+    }
+	// ID string 0x60json:"Id"0x60
+	string id = 1;
+	// Names []string
+	repeated string names = 2;
+	// Image string
+	string image = 3;
+	// ImageID string
+	string image_id = 4;
+	// Command string
+	string command = 5;
+	// Created int64
+	int64 created = 6;
+	// Ports []Port
+	repeated Port Ports = 7;
+	// SizeRw int64 0x60json:",omitempty"0x60
+	int64 size_rw = 8;
+	// SizeRootFs int64 0x60json:",omitempty"0x60
+	int64 size_root_fs = 9;
+	// Labels map[string]string
+	map<string, string> labels = 10;
+	// State string
+	string state = 11;
+	// Status string
+	string status = 12;
+	// HostConfig struct
+	HostConfig host_config = 13;
+	// NetworkSettings *SummaryNetworkSettings
+	SummaryNetworkSettings network_settings = 14;
+	// Mounts []MountPoint
+	repeated MountPoint mounts = 15;
+}
+
+
+// HealthcheckResult stores information about a single run of a healthcheck probe
+// type HealthcheckResult struct
+message HealthcheckResult {
+	// Start time.Time // Start is the time this check started
+	string start = 1;
+	// End time.Time // End is the time this check ended
+	string end = 2;
+	// ExitCode int // ExitCode meanings: 0=healthy, 1=unhealthy, 2=reserved (considered unhealthy), else=error running probe
+	int32 exit_code = 3;
+	// Output string // Output from last check
+	string output = 4;
+}
+
+// Health stores information about the Container's healthcheck results
+// type Health struct
+message Health {
+	// Status string // Status is one of Starting, Healthy or Unhealthy
+	string status = 1;
+	// FailingStreak int // FailingStreak is the number of consecutive failures
+	int32 failing_streak = 2;
+	// Log []*HealthcheckResult // Log contains the last few results (oldest first)
+	repeated HealthcheckResult log = 3;
+}
+
+// ContainerState stores container's running state
+// it's part of ContainerJSONBase and will return by "inspect" command
+// type ContainerState struct
+message ContainerState {
+	// Status string // String representation of the container state. Can be one of "created", "running", "paused", "restarting", "removing", "exited", of "dead"
+	string status = 1;
+	// Running bool
+	bool running = 2;
+	// Paused bool
+	bool paused = 3;
+	// Restarting bool
+	bool restarting = 4;
+	// OOMKilled bool
+	bool oom_killed = 5;
+	// Dead bool
+	bool dead = 6;
+	// Pid int
+	int32 pid = 7;
+	// ExitCode int
+	int32 exit_code = 8;
+	// Error string
+	string error = 9;
+	// StartedAt string
+	string started_at = 10;
+	// FinishedAt string
+	string finished_at = 11;
+	// Health *Health 0x60json:",omitempty"0x60
+	Health health = 12;
+}
+
+// ContainerNode stores information about the node that a container is running on. It's only available in Docker Swarm
+// type ContainerNode struct
+message ContainerNode {
+	// ID string 
+	string id = 1;
+	// IPAddress string
+	string ip_address = 2;
+	// Addr string
+	string addr = 3;
+	// Name string
+	string name = 4;
+	// Cpus int
+	int32 cpus = 5;
+	// Memory int64
+	int64 memory = 6;
+	// Labels map[string]string
+	map<string, string> labels = 7;
+}
+
+// ContainerJSONBase contains response of Remote API:
+// GET "/containers/{name:.*}/json"
+// type ContainerJSONBase struct
+message ContainerJSONBase {
+	// ID string 0x60json:"Id"0x60
+	string id = 1;
+	// Created string
+	string created = 2;
+	// Path string
+	string path = 3;
+	// Args []string
+	repeated string args = 4;
+	// State *ContainerState
+	ContainerState state = 5;
+	// Image string
+	string image = 6;
+	// ResolvConfPath string
+	string resolv_conf_path = 7;
+	// HostnamePath string
+	string hostname_path = 8;
+	// HostsPath string
+	string hosts_path = 9;
+	// LogPath string
+	string log_path = 10;
+	// Node *ContainerNode 0x60json:",omitempty"0x60
+	ContainerNode node = 11;
+	// Name string
+	string name = 12;
+	// RestartCount int
+	int32 restart_count = 13;
+	// Driver string
+	string driver = 14;
+	// MountLabel string
+	string mount_label = 15;
+	// ProcessLabel string
+	string process_label = 16;
+	// AppArmorProfile string
+	string app_armor_profile = 17;
+	// ExecIDs []string
+	repeated string exec_ids = 18;
+	// HostConfig *container.HostConfig
+	container.HostConfig host_config= 19;
+	// GraphDriver GraphDriverData
+	GraphDriverData graph_driver = 20;
+	// SizeRw *int64 0x60json:",omitempty"0x60
+	int64 size_rw =21;         
+	// SizeRootFs *int64 0x60json:",omitempty"0x60
+	int64 size_root_fs = 22;
+}
+
+// ContainerJSON is newly used struct along with MountPoint
+// type ContainerJSON struct
+message ContainerJSON {
+	// ContainerJSONBase
+	ContainerJSONBase container_json_base = 1;
+	// Mounts []MountPoint
+	repeated MountPoint mounts = 2;
+	// Config *container.Config
+	container.Config config = 3;
+    // NetworkSettings *NetworkSettings	
+	NetworkSettings network_settings = 4;
+}
+
+// NetworkSettings exposes the network settings in the api
+// type NetworkSettings struct
+message NetworkSettings {
+	// NetworkSettingsBase
+	NetworkSettingsBase network_settings_base = 1;
+	// DefaultNetworkSettings
+	DefaultNetworkSettings default_network_settings = 2;
+	// Networks map[string]*network.EndpointSettings
+	map<string, network.EndpointSettings> networks = 3;
+}
+
+// SummaryNetworkSettings provides a summary of container's networks
+// in /containers/json
+// type SummaryNetworkSettings struct
+message SummaryNetworkSettings {
+	// Networks map[string]*network.EndpointSettings
+	map<string, network.EndpointSettings> networks = 1;
+}
+
+// NetworkSettingsBase holds basic information about networks
+// type NetworkSettingsBase
+message NetworkSettingsBase {
+	// Bridge string // Bridge is the Bridge name the network uses(e.g. 'docker0')
+	string bridge = 1;
+	// SandboxID string // SandboxID uniquely represents a container's network stack
+	string sandbox_id = 2;
+	// HairpinMode bool // HairpinMode specifies if hairpin NAT should be enabled on the virtual interface
+	bool hairpin_mode = 3;
+	// LinkLocalIPv6Address string // LinkLocalIPv6Address is an IPv6 unicast address using the link-local prefix
+	string link_local_ipv6_address = 4;
+	// LinkLocalIPv6PrefixLen int // LinkLocalIPv6PrefixLen is the prefix length of an IPv6 unicast address
+	int32 link_local_ipv6_prefix_len = 5;
+	// Ports nat.PortMap // Ports is a collection of PortBinding indexed by Port
+	nat.PortMap ports = 6;
+	// SandboxKey string //SandboxKey identifies the sandbox
+	string sandbox_key = 7;
+	// SecondaryIPAddresses []network.Address
+	repeated network.Address secondary_ip_addresses = 8;
+	// SecondaryIPv6Addresses []network.Address
+	repeated network.Address secondary_ipv6_addresses = 9;
+}
+
+// DefaultNetworkSettings holds network information during the 2 release deprecation period.
+// It will be removed in Docker 1.11.
+// type DefaultNetworkSettings struct
+message DefaultNetworkSettings {
+	// EndpointID string // EndpointID uniquely represents a service endpoint in a sandbox
+	string endpoint_id = 1;
+	// Gateway string // Gateway holds the gateway address for the network
+	string gateway = 2;
+	// GlobalIPv6Address string // GlobalIPv6Address holds network's global IPv6 address
+	string global_ipv6_address = 3;
+	// GlobalIPv6PrefixLen int // GlobalIPv6PrefixLen represents mask length of network's global IPv6 address
+	int32 global_ipv6_prefix_len = 4;
+	// IPAddress string // IPAddress holds the IPv4 address for the network
+	string ip_address = 5;
+	// IPPrefixLen int // IPPrefixLen represents mask length of network's IPv4 address
+	int32 ip_prefix_len = 6;
+	// IPv6Gateway string // IPv6Gateway holds gateway address specific for IPv6
+	string ipv6_gateway = 7;
+	// MacAddress string // MacAddress holds the MAC address for the network
+	string mac_address = 8;
+}
+
+// MountPoint represents a mount point configuration inside the container.
+// This is used for reporting the mountpoints in used by a container.
+// type MountPoint struct
+message MountPoint {
+	// Type mount.Type 0x60json:",omitempty"0x60
+	// Type represents the type of mount. // type Type string
+	string type = 1;
+	// Name string 0x60json:",omitempty"0x60
+	string name = 2;
+	// Source string
+	string source = 3;
+	// Destination string
+	string destination = 4;
+	// Driver string 0x60json:",omitempty"0x60
+	string driver = 5;
+	// Mode string
+	string mode = 6;
+	// RW bool
+	bool rw = 7;
+	// Propagation mount.Propagation
+	// Propagation represents the propagation of a mount. // type Propagation string
+	string propagation = 8;
+}
+
+// NetworkResource is the body of the "get network" http response message
+// type NetworkResource struct
+message NetworkResource {
+	// Name string // Name is the requested name of the network
+	string name = 1;
+	// ID string 0x60json:"Id"0x60 // ID uniquely identifies a network on a single machine
+	string id = 2;
+	// Created time.Time // Created is the time the network created
+	string created = 3;
+	// Scope string // Scope describes the level at which the network exists (e.g. 'swarm' for cluster-wide or 'local' for machine level)
+	string scope = 4;
+	// Driver string // Driver is the Driver name used to create the network (e.g. 'bridge', 'overlay')
+	string driver = 5;
+	// EnableIPv6 bool //EnableIPv6 represents whether to enable IPv6
+	bool enable_ipv6 = 6;
+	// IPAM network.IPAM // IPAM is the network's IP Address Management
+	network.IPAM ipam = 7;
+	// Internal bool // Internal represents if the network is used internal only
+	bool internal = 8;
+	// Attachable bool // Attachable represents if the global scope is manually attachable by regular containers from workers in swarm mode.
+	bool attachable = 9;
+	// Ingress bool // Ingress indicates the network is providing the routing-mesh for the swarm custer.
+	bool ingress = 10;
+	// ConfigFrom network.ConfigReference // ConfigFrom speifies the source which will provide the cconfiguration for this network.
+	network.ConfigReference config_from = 11;
+	// ConfigOnly bool // ConfigOnly networks are place-holder networks for network configurations to be used by other network. ConfigOnly networks cannot be used directly to run containers or services.
+	bool config_only = 12;
+	// Containers map[string]EndpointResource // Containers contains endpoints belonging to the network
+	map<string, EndpointResource> containers = 13; 
+	// Options map[string]string // Options holds the network specific options to use for when creating the network
+	map<string, string> options = 14;   
+	// Labels map[string]string // Labels holds metadata specific to the network being created
+	map<string, string> labels = 15;
+	// Peers []network.PeefInfo 0x60json:",omitempty"0x60 // List of peer nodes for an overlay network
+	repeated network.PeerInfo peers = 16;    
+}
+
+// EndpointResource contains network resources allocated and used for a container in a network
+// type EndpointResource struct
+message EndpointResource {
+	// Name string
+	string name = 1;
+	// EndpointID string
+	string endpoint_id = 2;
+	// MacAddress string
+	string mac_address = 3;
+	// IPv4Address string
+	string ipv4_address = 4;
+	// IPv6Address string
+	string ipv6_address = 5;
+}
+
+// NetworkCreate is the expected body of the "create network" http request message
+// type NetworkCreate struct
+message NetworkCreate {
+	// CheckDuplicate bool // Check for networks with duplicate names. Network is primarily keyed based on a random ID and not on the name. Network name is strictly a user-friendly alias to the network which is uniquely identified using IO. And there is no gauranteed way to check for duplicates. Option CheckDuplicate is there to provide a best effort checking of any networks which had the same name but it is not guaranteed to catch all name collisions.
+	bool check_duplicate = 1;
+	// Driver string
+	string driver = 2;
+	// Scope string
+	string scope = 3;
+	// EnableIPv6 bool
+	bool enable_ipv6 = 4;
+	// IPAM *network.IPAM
+	network.IPAM ipam = 5;
+	// Internal bool
+	bool internal = 6;
+	// Attachable bool
+	bool attachable = 7;
+	// Ingress bool
+	bool ingress = 8;
+	// ConfigOnly bool
+	bool config_only = 9;
+	// ConfigFrom *network.ConfigReference
+	network.ConfigReference config_from = 10;
+	// Options map[string]string
+	map<string, string> options = 11;
+	// Labels map[string]string
+ 	map<string, string> labels = 12;
+}
+
+// NetworkCreateRequest is the request message sent to the server for network create call.
+// type NetworkCreateRequest struct
+message NetworkCreateRequest {
+	// NetworkCreate
+	NetworkCreate network_create = 1;
+	// Name string
+	string Name = 2;
+}
+
+// NetworkCreateResponse is the response message sent by the server for network create call
+// type NetworkCreateResponse struct
+message NetworkCreateResponse {
+	// ID string 0x60json:"Id"0x60
+	string id = 1;
+	// Warning string
+	string warning = 2;
+}
+
+// NetworkConnect represents the data to be used to connect a container to the network
+// type NetworkConnect struct
+message NetworkConnect {
+	// Container string
+	string container = 1;
+	// EndpointConfig *network.EndpointSettings 0x60json:",omitempty"0x60
+	network.EndpointSettings endpoint_config = 2;
+}
+
+// NetworkDisconnect represents the data to be used to disconnect a container from the network
+// type NetworkDisconnect struct
+message NetworkDisconnect {
+	// Container string
+	string container = 1;
+	// Force bool
+	bool force = 2;
+}
+
+// NetworkInspectOptions holds parameters to inspect network
+// type NetworkInspectOptions struct
+message NetworkInspectOptions {
+	// Scope string
+	string scope = 1;
+	// Verbose bool
+	bool verbose = 2;
+}
+
+
+
+
+
+// Image contains response of Remote API:
+// GET "/images/json"
+message Image {
+	string id = 1;
+	string parent_id = 2;
+	repeated string repo_tags = 3;
+	repeated string repo_digests = 4;
+	int64 created = 5;
+	int64 size = 6;
+	int64 virtual_size = 7;
+	map<string, string> labels = 8;
+}
+

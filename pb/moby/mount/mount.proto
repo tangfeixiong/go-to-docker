@@ -1,0 +1,96 @@
+// tangfeixiong <tangfx128@gmail.com>
+//
+// https://github.com/moby/moby/bolb/master/api/types/mount/mount.go
+
+syntax = "proto3";
+package mount;
+
+// Mount represents a mount (volume).
+// type Mount struct
+message Mount {
+	// Type Type 0x60json:",omitempty"0x60
+	string type = 1; // "bind", "volume", "tmpfs"
+	// Source specifies the name of the mount. Depending on mount type, this may be a volume name or a host path, or even ignored.
+	// Source is not supported for tmpfs (must be an empty value)
+	// Source string 0x60json:",omitempty"0x60
+	string source = 2; 
+	// Target string 0x60json:",omitempty"0x60
+	string target = 3;
+	// ReadOnly bool 0x60json:",omitempty"0x60
+	string read_only= 4;
+	// Consistency consistency 0x60json:",omitempty"0x60
+	// Consistency represents the consistency requirements of a mount. // type Consistency string
+	string consistency = 5; // "consistent", "cached", "delegated", "default"
+
+    // BindOptions *BindOptions 0x60json:",omitempty"0x60
+	BindOptions   bind_options = 6;
+	// VolumeOptions *VolumeOptions 0x60json:",omitempty"0x60
+	VolumeOptions volume_options = 7;
+	// TmpfsOptions *TmpfsOptions 0x60json:",omitempty"0x60
+	TmpfsOptions  tmpfs_options = 8;
+}
+
+// BindOptions defines options specific to mounts of type "bind".
+// type BindOptions struct
+message BindOptions {
+	// Propagation Propagation 0x60json",omitempty"0x60
+	// Propagation represents the propagation of a mount. // type Propagation string
+	string propagation = 1; // "rprivate", "private", "rshared", "shared", "rslave", "slave"
+}
+
+// VolumeOptions represents the options for a mount of type volume.
+// type VolumeOptions struct
+message VolumeOptions {
+	// NoCopy bool 0x60json:",omitempty"0x60
+	bool no_copy = 1;
+	// Labels map[string]string 0x60json:",omitempty"0x60
+	map<string, string> labels = 2;
+	// DriverConfig *Driver 0x60json:",omitempty"0x60
+	Driver driver_config = 3;
+}
+
+// Driver represents a volume driver.
+// type Driver struct
+message Driver {
+	// Name string 0x60json:",omitempty"0x60
+	string name = 1;
+	// Options map[string]string 0x60json:",omitempty"0x60
+	map<string, string> options = 2;
+}
+
+// TmpfsOptions defines options specific to mounts of type "tmpfs".
+// type TmpfsOptions struct
+message TmpfsOptions {
+	// Size sets the size of the tmpfs, in bytes.
+	//
+	// This will be converted to an operating system specific value
+	// depending on the host. For example, on linux, it will be converted to
+	// use a 'k', 'm' or 'g' syntax. BSD, though not widely supported with
+	// docker, uses a straight byte value.
+	//
+	// Percentages are not supported.
+	// SizeBytes int84 0x60json:",omitempty"0x60
+	int64 size_bytes = 1;
+	// Mode of the tmpfs upon creation
+	// Mode os.FileMode 0x60json:",omitempty"0x60
+	uint32 mode = 2;
+
+	// TODO(stevvooe): There are several more tmpfs flags, specified in the
+	// daemon, that are accepted. Only the most basic are added for now.
+	//
+	// From docker/docker/pkg/mount/flags.go:
+	//
+	// var validFlags = map[string]bool{
+	// 	"":          true,
+	// 	"size":      true, X
+	// 	"mode":      true, X
+	// 	"uid":       true,
+	// 	"gid":       true,
+	// 	"nr_inodes": true,
+	// 	"nr_blocks": true,
+	// 	"mpol":      true,
+	// }
+	//
+	// Some of these may be straightforward to add, but others, such as
+	// uid/gid have implications in a clustered system.
+}

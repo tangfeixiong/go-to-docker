@@ -1,0 +1,24 @@
+// tangfeixiong <tangfx128@gmail.com>
+//
+// https://github.com/moby/moby/blob/master/api/types/blkiodev/blkio.go
+
+syntax = "proto3";
+package blkiodev;
+
+// WeightDevice is a structure that holds device:weight pair
+// type WeightDevice struct
+message WeightDevice {
+	// Path string
+	string path = 1;
+	// Weight uint16
+	int32 weight = 2;
+}
+
+// ThrottleDevice is a structure that holds device:rate_per_second pair
+// type ThrottleDevice struct
+message ThrottleDevice {
+	// Path string
+	string path = 1;
+	// Rate uint64
+    uint64 rate = 2;
+}
