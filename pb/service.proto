@@ -49,7 +49,7 @@ service SimpleService {
 message DockerImagePullReqResp {
 	string ref_str = 1;
 	moby.ImagePullOptions image_pull_options = 2;
-    bytes resp_body = 3;
+    bytes resp_body = 3; // output io.ReadCloser
     int32 state_code = 4;
     string state_message = 5;
 }
