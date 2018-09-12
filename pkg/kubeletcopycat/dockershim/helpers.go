@@ -17,21 +17,19 @@ import (
 	dockernat "github.com/docker/go-connections/nat"
 	"github.com/golang/glog"
 
-	// utilerrors "k8s.io/apimachinery/pkg/util/errors"
+	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	// "k8s.io/kubernetes/pkg/credentialprovider"
 	// runtimeapi "k8s.io/kubernetes/pkg/kubelet/apis/cri/runtime/v1alpha2"
 	// "k8s.io/kubernetes/pkg/kubelet/dockershim/libdocker"
 	// "k8s.io/kubernetes/pkg/kubelet/types"
 	// "k8s.io/kubernetes/pkg/security/apparmor"
-	// "k8s.io/kubernetes/pkg/util/parsers"
+	"k8s.io/kubernetes/pkg/util/parsers"
 
 	"github.com/tangfeixiong/go-to-docker/pkg/credentialprovider"
 	runtimeapi "github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/apis/cri/runtime/v1alpha2"
 	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/dockershim/libdocker"
 	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/types"
 	"github.com/tangfeixiong/go-to-docker/pkg/security/apparmor"
-	utilerrors "github.com/tangfeixiong/go-to-docker/pkg/util/errors"
-	"github.com/tangfeixiong/go-to-docker/pkg/util/parsers"
 )
 
 const (

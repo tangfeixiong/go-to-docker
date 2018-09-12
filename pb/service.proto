@@ -8,8 +8,93 @@ import "google/api/annotations.proto";
 import "pb/moby/moby.proto";
 import "pb/moby/container/container.proto";
 import "pb/moby/network/network.proto";
+import "pb/moby/filters/filters.proto";
 
 service SimpleService {
+	
+	// Run Docker container
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	rpc RunDockerContainer(DockerContainerRunReqResp) returns (DockerContainerRunReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-container-run"
+			body: "*"
+		};
+	}
+	
+	// Inspect Docker container
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	rpc InspectDockerContainer(DockerContainerInspectReqResp) returns (DockerContainerInspectReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-container-inspect"
+			body: "*"
+		};
+	}
+	
+	// List Docker containers
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	rpc ListDockerContainers(DockerContainerListReqResp) returns (DockerContainerListReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-container-ls"
+			body: "*"
+		};
+	}
+	
+	// Remove Docker containers
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	rpc RemoveDockerContainer(DockerContainerRemoveReqResp) returns (DockerContainerRemoveReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-container-rm"
+			body: "*"
+		};
+	}
+	
+	// Prune Docker containers
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	rpc PruneDockerContainers(DockerContainerPruneReqResp) returns (DockerContainerPruneReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-container-prune"
+			body: "*"
+		};
+	}
+
+	
+	rpc InspectDockerImage(DockerImageInspectReqResp) returns (DockerImageInspectReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-image-inspect"
+			body: "*"
+		};
+	}
+	
+	rpc ListDockerImages(DockerImageListReqResp) returns (DockerImageListReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-image-list"
+			body: "*"
+		};
+	}
+	
+	rpc RemoveDockerImage(DockerImageRemoveReqResp) returns (DockerImageRemoveReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-image-remove"
+			body: "*"
+		};
+	}
+	
+	rpc PruneDockerImages(DockerImagePruneReqResp) returns (DockerImagePruneReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-image-prune"
+			body: "*"
+		};
+	}
 	
 	// Pull Docker image
 	//
@@ -17,42 +102,208 @@ service SimpleService {
 	// { "image_ref": "docker.io/nginx" }
     // For output example:		
 	// { "image_ref": "docker.io/nginx", "state_code": 0, "state_message": "SUCCEEDED" }
-	rpc PullImage(DockerImagePullReqResp) returns (DockerImagePullReqResp) {
+	rpc PullDockerImage(DockerImagePullReqResp) returns (DockerImagePullReqResp) {
 		option (google.api.http) = {
-			post: "/v1/docker-pull"
+			post: "/v1/docker-image-pull"
 			body: "*"
 		};
 	}
 	
-	// Run Docker container
-	//
-	// For output, plus result fileds:
-	// { ..., "state_code": 0, "state_message": "RUNNING" }
-	rpc RunContainer(DockerContainerRunReqResp) returns (DockerContainerRunReqResp) {
+	rpc BuildDockerImage(DockerImageBuildReqResp) returns (DockerImageBuildReqResp) {
 		option (google.api.http) = {
-			post: "/v1/docker-run"
+			post: "/v1/docker-image-build"
 			body: "*"
 		};
 	}
 	
-	// Create Docker network
-	//
-	//
-	rpc CreateNetwork(DockerNetworkCreateReqResp) returns (DockerNetworkCreateReqResp) {
+	rpc PushDockerImage(DockerImagePushReqResp) returns (DockerImagePushReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-image-push"
+			body: "*"
+		};
+	}
+	
+	rpc PullDockerImageStreaming(DockerImagePullReqResp) returns (stream DockerImagePullReqResp) {
+	}
+	
+	rpc BuildDockerImageStreaming(stream DockerImageBuildReqResp) returns (stream DockerImageBuildReqResp) {
+	}
+	
+	rpc PushDockerImageStreaming(stream DockerImagePushReqResp) returns (DockerImagePushReqResp) {
+	}
+	
+		
+	// Create Docker network - like CLI: docker network create
+	// 
+	// create with IPAM config, for example request:
+	// {} will create bridged network with random name
+	// {"name": "foo"} will create bridged network named foo
+	// {"name": "foo", "networ_create": {"ipam": { "config": {"subnet": "172.30.1.128/25", "172.30.1."}}}}
+	rpc CreateDockerNetwork(DockerNetworkCreateReqResp) returns (DockerNetworkCreateReqResp) {
 		option (google.api.http) = {
 			post: "/v1/docker-network-create"
 			body: "*"
 		};
 	}
+	
+	// Inspect Docker network
+	// return detailed content
+	//
+	rpc InspectDockerNetwork(DockerNetworkInspectReqResp) returns (DockerNetworkInspectReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-network-inspect"
+			body: "*"
+		};
+	}
+	
+	// List Docker networks
+	// return all networks
+	//
+	rpc ListDockerNetworks(DockerNetworkListReqResp) returns (DockerNetworkListReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-network-ls"
+			body: "*"
+		};
+	}
+	
+	// Remove Docker network
+	// remove network with ID or name
+	//
+	rpc RemoveDockerNetwork(DockerNetworkRemoveReqResp) returns (DockerNetworkRemoveReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-network-rm"
+			body: "*"
+		};
+	}
+	
+	// Prune Docker networks
+	// clear unused networks
+	//
+	rpc PruneDockerNetworks(DockerNetworkPruneReqResp) returns (DockerNetworkPruneReqResp) {
+		option (google.api.http) = {
+			post: "/v1/docker-network-prune"
+			body: "*"
+		};
+	}
+}
+
+message DockerContainerRunReqResp {
+    container.Config config = 1;
+    container.HostConfig host_config = 2;
+    network.NetworkingConfig networking_config = 3;
+    string name = 4;
+	moby.ImagePullOptions image_pull_options = 5;
+	container.ContainerCreateCreatedBody container_create_created_body = 6;
+    int32 state_code = 7;
+    string state_message = 8;
+}
+
+message DockerContainerInspectReqResp {
+	enum KeyType {
+		ID = 0;
+		NAME = 1;
+	}
+	string id = 1;
+	string name = 2;
+	KeyType key_type = 3;
+	moby.ContainerJSON container_json = 4;
+	int32 state_code = 5;
+	string state_message = 6;
+}
+
+message DockerContainerListReqResp {
+	moby.ContainerListOptions container_list_options = 1;
+	repeated moby.Container containers = 2;
+	int32 state_code = 3;
+	string state_message = 4;
+}
+
+message DockerContainerRemoveReqResp {
+	enum KeyType {
+		ID = 0;
+		NAME = 1;
+	}
+	string id = 1;
+	string name = 2;
+	KeyType key_type = 3;
+	moby.ContainerRemoveOptions container_remove_options = 4;
+	int32 state_code = 5;
+	string state_message = 6;
+}
+
+message DockerContainerPruneReqResp {
+	filters.Args filters = 1;
+	moby.ContainersPruneReport containers_prune_report = 2;
+	int32 state_code = 4;
+	string state_message = 5;
+}
+
+
+message DockerImageListReqResp {
+	moby.ImageListOptions image_list_options = 1;
+	repeated moby.ImageSummary image_summaries = 2;
+	int32 state_code = 3;
+	string state_message = 4;
+}
+
+message DockerImageInspectReqResp {
+	enum KeyType {
+		ID = 0;
+		REF = 1;
+	}
+	string id = 1;
+	string ref = 2;
+	KeyType key_type = 3;
+	moby.ImageInspect image_inspect = 4;
+	int32 state_code = 5;
+	string state_message = 6;
+}
+
+message DockerImageRemoveReqResp {
+	enum KeyType {
+		ID = 0;
+		REF = 1;
+	}
+	string id = 1;
+	string ref = 2;
+	KeyType key_type = 3;
+	moby.ImageRemoveOptions image_remove_options = 4;
+	repeated moby.ImageDeleteResponseItem image_delete_response_items = 5;
+	int32 state_code = 6;
+	string state_message = 7;
+}
+
+message DockerImagePruneReqResp {
+	filters.Args filters = 1;
+	moby.ImagesPruneReport images_prune_report = 2;
+	int32 state_code = 3;
+	string state_message = 4;
 }
 
 message DockerImagePullReqResp {
 	string ref_str = 1;
 	moby.ImagePullOptions image_pull_options = 2;
-    bytes resp_body = 3; // output io.ReadCloser
+    bytes resp_body = 3; // io.ReadCloser
     int32 state_code = 4;
     string state_message = 5;
 }
+
+message DockerImagePushReqResp {
+	string ref_str = 1;
+	moby.ImagePushOptions image_push_options = 2;
+	bytes resp_body = 3; // io.ReadCloser
+	int32 state_code = 4;
+	string state_message = 5;
+}
+
+message DockerImageBuildReqResp {
+	bytes build_context = 1; // io.Reader
+	moby.ImageBuildOptions image_build_options = 2;
+	moby.ImageBuildResponse image_build_response = 3;
+	int32 state_code = 4;
+	string state_message = 5;
+}
+
 
 message DockerNetworkCreateReqResp {
 	string name = 1;
@@ -62,13 +313,42 @@ message DockerNetworkCreateReqResp {
 	string state_message = 5;
 }
 
-message DockerContainerRunReqResp {
-    container.Config config = 1;
-    container.HostConfig host_config = 2;
-    network.NetworkingConfig networking_config = 3;
-    string name = 4;
-	container.ContainerCreateCreatedBody container_create_response = 5;
-    int32 state_code = 6;
-    string state_message = 7;
+message DockerNetworkInspectReqResp {
+	enum KeyType {
+		ID = 0;
+		NAME = 1;
+	}
+	string id = 1;
+	string name = 2;
+	KeyType key_type = 3;
+	moby.NetworkInspectOptions network_inspect_options = 4;
+	moby.NetworkResource network_resource = 5;
+	int32 state_code = 6;
+	string state_message = 7;
 }
 
+message DockerNetworkListReqResp {
+	moby.NetworkListOptions network_list_options = 1;
+	repeated moby.NetworkResource network_resources = 2;
+	int32 state_code = 4;
+	string state_message = 5;
+}
+
+message DockerNetworkRemoveReqResp{
+	enum KeyType {
+		ID = 0;
+		NAME = 1;
+	}
+	string id = 1;
+	string name = 2;
+	KeyType key_type = 3;
+	int32 state_code = 4;
+	string state_message = 5;
+}
+
+message DockerNetworkPruneReqResp {
+	filters.Args filters = 1;
+	moby.NetworksPruneReport networks_prune_report = 2;
+	int32 state_code = 3;
+    string state_message = 4;
+}

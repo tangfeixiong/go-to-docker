@@ -22,8 +22,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/tangfeixiong/go-to-docker/pb"
-	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/docckershim/libdocker"
-	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/dockershim"
+	"github.com/tangfeixiong/go-to-docker/pkg/dockerclient"
 	"github.com/tangfeixiong/go-to-docker/pkg/ui/data/swagger"
 )
 
@@ -32,14 +31,13 @@ type MicroServer struct {
 	lstn       net.Listener
 	httpServer *http.Server
 	grpcServer *grpc.Server
-	// criHandler dockershim.DockerService
-	DockerClient libdocker.DockerClient
+
+	config       *Config
+	DockerClient *dockerclient.DockerClient
 }
 
 func Start(opt *Option) {
-	cfg := &Config{
-		Port: 10050,
-	}
+	cfg := NewConfig()
 
 	conn, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.Port))
 	if err != nil {
@@ -48,27 +46,9 @@ func Start(opt *Option) {
 	defer conn.Close()
 
 	s := New(fmt.Sprint(":%d", cfg.Port), conn)
+	s.config = cfg
 
-	// refer to
-	//   https://github.com/kubernetes/kubernetes/blob/master/pkg/kubelet/kubelet.go#L614-L620
-	//
-	//     ds, err := dockershim.NewDockerService(kubeDeps.DockerClientConfig, crOptions.PodSandboxImage, streamingConfig,
-	//		   &pluginSettings, runtimeCgroups, kubeCfg.CgroupDriver, crOptions.DockershimRootDirectory, !crOptions.RedirectContainerStreaming)
-	//	   if err != nil {
-	//		   return nil, err
-	//	   }
-	//	   if crOptions.RedirectContainerStreaming {
-	//		   klet.criHandler = ds
-	//	   }
-
-	dcc := &dockershim.ClientConfig{
-		RuntimeRequestTimeout:     2*time.Minute - 1*timm.Second,
-		ImagePullProgressDeadline: 1 * time.Minute,
-	}
-	s.DockerClient = dockershim.NewDockerClientFromConfig(dcc)
-	if s.DockerClient == nil {
-		panic("couldn't initialize Docker client from config")
-	}
+	s.DockerClient = dockerclient.NewOrDie()
 
 	if err = s.Start(); err != nil {
 		panic(err)

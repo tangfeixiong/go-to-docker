@@ -3,6 +3,8 @@
 syntax = "proto3";
 package moby;
 
+import "google/protobuf/timestamp.proto";
+
 import "pb/moby/container/container.proto";
 import "pb/moby/network/network.proto";
 import "pb/moby/units/units.proto";
@@ -26,13 +28,13 @@ message AuthConfig {
 	string email = 4;
 
 	// ServerAddress string 0x60json:"serveraddress,omitempty"0x60
-	string serveraddress = 5;
+	string server_address = 5;
 
 	// IdentityToken string 0x60json:"identitytoken,omitempty"0x60 // IdentityToken is used to authenticate the user and get an access token for the registry.
-	string identitytoken = 6;
+	string identity_token = 6;
 
     // RegistryToken string 0x60json:"registrytoken,omitempty"0x60 // RegistryToken is a bearer token to be sent to a registry
-	string registrytoken = 7;	
+	string registry_token = 7;	
 }
 
 
@@ -59,6 +61,47 @@ message ContainerListOptions {
 	int32 limit = 7;
 	// Filters filters.Args
 	filters.Args filters = 8;
+}
+
+// ContainerLogsOptions holds parameters to filter logs with
+// type ContainerLogsOptions struct
+message ContainerLogsOptions {
+	// ShowStdout bool
+	bool show_stdout = 1;
+	// ShowStderr bool
+	bool show_stderr = 2;
+	// Since string
+	string since = 3;
+	// Until string
+	string until = 4;
+	// Timestamps bool
+	bool timestamps = 5;
+	// Follow bool
+	bool follow = 6;
+	// Tail string
+	string tail = 7;
+	// Details bool
+	bool details =8;
+}
+
+// ContainerRemoveOptions holds parameters to remove containers
+// type ContainerRemoveOptions struct
+message ContainerRemoveOptions {
+	// RemoveVolumes bool
+	bool remove_volumes = 1;
+	// RemoveLinks bool
+	bool remove_links = 2;
+	// Force bool
+	bool force = 3;
+}
+
+// ContainerStartOptions holds parameters to start containers
+// type ContainerStartOptions struct
+message ContainerStartOptions {
+	// CheckpointID string
+	string checkpoint_id = 1;
+	// CheckpointDir string
+	string checkpoint_dir = 2;
 }
 
 
@@ -114,7 +157,7 @@ message ImageBuildOptions {
 	// Ulimits []*units.Ulimit
 	repeated units.Ulimit ulimits = 20;
 	// BuildArgs map[string]*string // BuildArgs needs to be a *string instead of just a string so that we can tell the difference between "" (empty string) and no value at all (nil). See the parsing of buildArgs in api/server/router/build/build_routers.go for even more info.
-	map<string, bytes> build_args = 21;
+	map<string, StringStruct> build_args = 21;
 	// AuthConfigs map[string]AuthConfig
 	map<string, AuthConfig> auth_configs = 22;
 	// Context io.Reader
@@ -128,7 +171,7 @@ message ImageBuildOptions {
 	// SecurityOpt []string
 	repeated string security_opt = 27;
 	// ExtraHosts []string // List of extra hosts
-	repeated string eextra_hosts = 28;
+	repeated string extra_hosts = 28;
 	// Target string
 	string target = 29;
 	// SessionID string
@@ -136,9 +179,13 @@ message ImageBuildOptions {
 	// Platform string
 	string platform = 31;
 	// Version BuildVersion // Version specifies the version of the underlying builder to use // type BuilderVersion string // BuilderV1 is the first generation builder in docker daemon. BuilderV1 BuilderVersion = "1" // BuilderBuildKit is builder based on moby/buildkit project. BuilderBuildKit = "2"
-	string build_version = 32;
+	string version = 32;
 	// BuildID string // BuildID is an Operational identifier that can be passed together with the build request. Tha same identifier can be used to gracefully cancel the build with the cancel request.
 	string build_id = 33;
+	
+	message StringStruct {
+		string value = 1;
+	}
 }
 
 // ImageBuildResponse holds information returned by a server after building an image
@@ -260,15 +307,32 @@ message GraphDriverData {
 
 	// data
 	// Required: true
-	// Data map[string]string 0x60json:"Data"0x60
+	// Data map[string]string `json:"Data"`
 	map<string, string> data = 1;
 
 	// name
 	// Required: true
-	// Name string 0x60json:"Name"0x60
+	// Name string `json:"Name"`
 	string name = 2;
 }
 
+
+
+// 
+// https://github.com/moby/moby/blob/master/api/types/image_delete_response_item.go
+//
+// ImageDeleteResponseItem image delete response item
+// swagger:model ImageDeleteResponseItem
+// type ImageDeleteResponseItem struct
+message ImageDeleteResponseItem {
+	// The image ID of an image that was deleted
+	// Deleted string `json:"Deleted,omitempty"`
+	string deleted = 1;
+	
+	// The image ID of an image that was untagged
+	// Untagged string `json:"Untagged,omitempty"`
+	string untagged = 2;
+}
 
 
 //
@@ -279,49 +343,49 @@ message GraphDriverData {
 // type ImageSummary struct
 message ImageSummary {
 
-	// containers int64 0x60json:"Containers"0x60
+	// containers int64 `json:"Containers"`
 	// Required: true
 	int64 containers = 1;
 
-	// created int64 0x60json:"Created"0x60
+	// created int64 `json:"Created"`
 	// Required: true
 	int64 created = 2;
 
-	// Id string 0x60json:"Id"0x60
+	// Id string `json:"Id"`
 	// Required: true
 	string id = 3;
 
-	// labels map[string]string 0x60json:"Labels"0x60
+	// labels map[string]string `json:"Labels"`
 	// Required: true
 	map<string, string> labels = 4;
 
 	// parent Id
 	// Required: true
-	// ParentID string 0x60json:"ParentId"0x60
+	// ParentID string `json:"ParentId"`
 	string parent_id = 5;
 
 	// repo digests
 	// Required: true
-	// RepoDigests []string 0x60json:"RepoDigests"0x60
+	// RepoDigests []string `json:"RepoDigests"`
 	repeated string repo_digests = 6;
 
 	// repo tags
 	// Required: true
-	// RepoTags []string 0x60json:"RepoTags"0x60
+	// RepoTags []string `json:"RepoTags"`
 	repeated string repo_tags = 7;
 
 	// shared size
 	// Required: true
-	// SharedSize int64 0x60json:"SharedSize"0x60
+	// SharedSize int64 `json:"SharedSize"`
 	int64 shared_size = 8;
 
-	// size int64 0x60json:"Size"0x60
+	// size int64 `json:"Size"`
 	// Required: true
 	int64 size = 9;
 
 	// virtual size
 	// Required: true
-	// VirtualSize int64 0x60json:"VirtualSize"0x60
+	// VirtualSize int64 `json:"VirtualSize"`
 	int64 virtual_size = 10;
 }
 
@@ -335,21 +399,21 @@ message ImageSummary {
 // type Port struct
 message Port {
 	// Host IP address that the container's port is mapped to
-	// IP string 0x60json:"IP,omitempty"0x60
+	// IP string `json:"IP,omitempty"`
 	string ip = 1;
 	
 	// Port on the container
 	// Required: true
-	// PrivatePort uint16 0x60json:"PrivatePort"0x60
+	// PrivatePort uint16 `json:"PrivatePort"`
 	int32 private_port = 2;
 	
 	// Port exposed on the host
-	// PublicPort uint16 0x60json:"PublicPort,omitempty"0x60
+	// PublicPort uint16 `json:"PublicPort,omitempty"`
 	int32 public_port = 3;
 	
 	// type
 	// Required: true
-	// Type string 0x60json:"Type"0x60
+	// Type string `json:"Type"`
 	string type = 4;
 }
 
@@ -363,9 +427,9 @@ message Port {
 message RootFS{
 	// Type string
 	string type = 1;
-	// Layers []string 0x60json:",omitempty"0x60
+	// Layers []string `json:",omitempty"`
 	repeated string layers = 2;
-	// BaseLayer string 0x60json:",omitempty"0x60
+	// BaseLayer string `json:",omitempty"`
 	string base_layer = 3;
 }
 
@@ -373,7 +437,7 @@ message RootFS{
 // GET "/images/{name:.*}/json"
 // type ImageInspect struct
 message ImageInspect {
-	// ID string 0x60json:"Id"0x60
+	// ID string `json:"Id"`
 	string id = 1;
 	// RepoTags []string
 	repeated string repo_tags = 2;
@@ -399,7 +463,7 @@ message ImageInspect {
 	string architecture = 12;
 	// Os string
 	string os = 13;
-	// OsVersion string 0x60json:",omitempty"0x60
+	// OsVersion string `json:",omitempty"`
 	string os_version = 14;
 	// Size int64
 	int64 size = 15;
@@ -416,8 +480,8 @@ message ImageInspect {
 // ImageMetadata contains engine-local data about the image
 // type ImageMetadata struct
 message ImageMetadata {
-	// LastTagTime time.Time 0x60json:",omitempty"0x60
-	string last_tag_time = 1;  
+	// LastTagTime time.Time `json:",omitempty"`
+	google.protobuf.Timestamp last_tag_time = 1;  
 }
 
 // Container contains response of Remote API:
@@ -425,10 +489,10 @@ message ImageMetadata {
 // type Container struct
 message Container {
     message HostConfig {
-		// NetworkMode String 0x60json:",omitempty"
+		// NetworkMode string `json:",omitempty"
         string network_mode = 1;
     }
-	// ID string 0x60json:"Id"0x60
+	// ID string `json:"Id"`
 	string id = 1;
 	// Names []string
 	repeated string names = 2;
@@ -442,9 +506,9 @@ message Container {
 	int64 created = 6;
 	// Ports []Port
 	repeated Port Ports = 7;
-	// SizeRw int64 0x60json:",omitempty"0x60
+	// SizeRw int64 `json:",omitempty"`
 	int64 size_rw = 8;
-	// SizeRootFs int64 0x60json:",omitempty"0x60
+	// SizeRootFs int64 `json:",omitempty"`
 	int64 size_root_fs = 9;
 	// Labels map[string]string
 	map<string, string> labels = 10;
@@ -465,9 +529,9 @@ message Container {
 // type HealthcheckResult struct
 message HealthcheckResult {
 	// Start time.Time // Start is the time this check started
-	string start = 1;
+	google.protobuf.Timestamp start = 1;
 	// End time.Time // End is the time this check ended
-	string end = 2;
+	google.protobuf.Timestamp end = 2;
 	// ExitCode int // ExitCode meanings: 0=healthy, 1=unhealthy, 2=reserved (considered unhealthy), else=error running probe
 	int32 exit_code = 3;
 	// Output string // Output from last check
@@ -489,7 +553,7 @@ message Health {
 // it's part of ContainerJSONBase and will return by "inspect" command
 // type ContainerState struct
 message ContainerState {
-	// Status string // String representation of the container state. Can be one of "created", "running", "paused", "restarting", "removing", "exited", of "dead"
+	// Status string // string representation of the container state. Can be one of "created", "running", "paused", "restarting", "removing", "exited", of "dead"
 	string status = 1;
 	// Running bool
 	bool running = 2;
@@ -511,7 +575,7 @@ message ContainerState {
 	string started_at = 10;
 	// FinishedAt string
 	string finished_at = 11;
-	// Health *Health 0x60json:",omitempty"0x60
+	// Health *Health `json:",omitempty"`
 	Health health = 12;
 }
 
@@ -538,7 +602,7 @@ message ContainerNode {
 // GET "/containers/{name:.*}/json"
 // type ContainerJSONBase struct
 message ContainerJSONBase {
-	// ID string 0x60json:"Id"0x60
+	// ID string `json:"Id"`
 	string id = 1;
 	// Created string
 	string created = 2;
@@ -558,7 +622,7 @@ message ContainerJSONBase {
 	string hosts_path = 9;
 	// LogPath string
 	string log_path = 10;
-	// Node *ContainerNode 0x60json:",omitempty"0x60
+	// Node *ContainerNode `json:",omitempty"`
 	ContainerNode node = 11;
 	// Name string
 	string name = 12;
@@ -566,22 +630,28 @@ message ContainerJSONBase {
 	int32 restart_count = 13;
 	// Driver string
 	string driver = 14;
+	// Platform string
+	string platform = 15;
 	// MountLabel string
-	string mount_label = 15;
+	string mount_label = 16;
 	// ProcessLabel string
-	string process_label = 16;
+	string process_label = 17;
 	// AppArmorProfile string
-	string app_armor_profile = 17;
+	string app_armor_profile = 18;
 	// ExecIDs []string
-	repeated string exec_ids = 18;
+	repeated string exec_ids = 19;
 	// HostConfig *container.HostConfig
-	container.HostConfig host_config= 19;
+	container.HostConfig host_config= 20;
 	// GraphDriver GraphDriverData
-	GraphDriverData graph_driver = 20;
-	// SizeRw *int64 0x60json:",omitempty"0x60
-	int64 size_rw =21;         
-	// SizeRootFs *int64 0x60json:",omitempty"0x60
-	int64 size_root_fs = 22;
+	GraphDriverData graph_driver = 21;
+	// SizeRw *int64 `json:",omitempty"`
+	Int64Struct size_rw =22;         
+	// SizeRootFs *int64 `json:",omitempty"`
+	Int64Struct size_root_fs = 23;
+	
+	message Int64Struct {
+		int64 value = 1;
+	}
 }
 
 // ContainerJSON is newly used struct along with MountPoint
@@ -665,16 +735,16 @@ message DefaultNetworkSettings {
 // This is used for reporting the mountpoints in used by a container.
 // type MountPoint struct
 message MountPoint {
-	// Type mount.Type 0x60json:",omitempty"0x60
+	// Type mount.Type `json:",omitempty"`
 	// Type represents the type of mount. // type Type string
 	string type = 1;
-	// Name string 0x60json:",omitempty"0x60
+	// Name string `json:",omitempty"`
 	string name = 2;
 	// Source string
 	string source = 3;
 	// Destination string
 	string destination = 4;
-	// Driver string 0x60json:",omitempty"0x60
+	// Driver string `json:",omitempty"`
 	string driver = 5;
 	// Mode string
 	string mode = 6;
@@ -690,10 +760,10 @@ message MountPoint {
 message NetworkResource {
 	// Name string // Name is the requested name of the network
 	string name = 1;
-	// ID string 0x60json:"Id"0x60 // ID uniquely identifies a network on a single machine
+	// ID string `json:"Id"` // ID uniquely identifies a network on a single machine
 	string id = 2;
 	// Created time.Time // Created is the time the network created
-	string created = 3;
+	google.protobuf.Timestamp created = 3;
 	// Scope string // Scope describes the level at which the network exists (e.g. 'swarm' for cluster-wide or 'local' for machine level)
 	string scope = 4;
 	// Driver string // Driver is the Driver name used to create the network (e.g. 'bridge', 'overlay')
@@ -718,8 +788,10 @@ message NetworkResource {
 	map<string, string> options = 14;   
 	// Labels map[string]string // Labels holds metadata specific to the network being created
 	map<string, string> labels = 15;
-	// Peers []network.PeefInfo 0x60json:",omitempty"0x60 // List of peer nodes for an overlay network
-	repeated network.PeerInfo peers = 16;    
+	// Peers []network.PeefInfo `json:",omitempty"` // List of peer nodes for an overlay network
+	repeated network.PeerInfo peers = 16;   
+	// Services map[string]network.ServiceInfo `json:",omitempty"`
+	map<string, network.ServiceInfo> services = 17; 
 }
 
 // EndpointResource contains network resources allocated and used for a container in a network
@@ -778,7 +850,7 @@ message NetworkCreateRequest {
 // NetworkCreateResponse is the response message sent by the server for network create call
 // type NetworkCreateResponse struct
 message NetworkCreateResponse {
-	// ID string 0x60json:"Id"0x60
+	// ID string `json:"Id"`
 	string id = 1;
 	// Warning string
 	string warning = 2;
@@ -789,7 +861,7 @@ message NetworkCreateResponse {
 message NetworkConnect {
 	// Container string
 	string container = 1;
-	// EndpointConfig *network.EndpointSettings 0x60json:",omitempty"0x60
+	// EndpointConfig *network.EndpointSettings `json:",omitempty"`
 	network.EndpointSettings endpoint_config = 2;
 }
 
@@ -811,6 +883,34 @@ message NetworkInspectOptions {
 	bool verbose = 2;
 }
 
+
+// ContainersPruneReport contains the response for Engine API:
+// POST "/conainers/prune"
+// type ContainersPruneReport struct
+message ContainersPruneReport {
+	// ContainersDeleted []string
+	repeated string containers_deleted = 1;
+	// SpaceReclaimed uint64
+	uint64 space_reclaimed = 2;
+}
+
+// ImagesPruneReport contains the response for Engine API:
+// POST "/images/prune"
+// type ImagesPruneReport struct
+message ImagesPruneReport {
+	// ImagesDeleted []ImageDeleteResponseItem
+	repeated ImageDeleteResponseItem images_deleted = 1;
+	// SpaceReclaimed uint64
+	uint64 space_reclaimed = 2;
+}
+
+// NetworksPruneReport contains the response for Engine API:
+// POST "/networks/prune"
+// type NetworksPruneReport struct
+message NetworksPruneReport {
+	// NetworksDeleted []string
+	repeated string networks_deleted = 1;
+}
 
 
 

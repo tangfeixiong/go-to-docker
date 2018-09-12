@@ -9,7 +9,7 @@ package nat;
 // type PortBinding struct
 message PortBinding {
 	// HostIP is the host IP Address
-	// HostIP string 0x60json:"HostIp"0x60
+	// HostIP string `json:"HostIp"`
 	string host_ip = 1;
 	// HostPort is the host port number
 	// HostPort string
@@ -21,15 +21,15 @@ message PortBinding {
 // type PortMap map[Port][]PortBinding
 message PortMap {
     message PortBindingSlice {
-        repeated PortBinding items = 1;
+        repeated PortBinding internal_list = 1;
     }
-    map<string, PortBindingSlice> value = 1;
+    map<string, PortBindingSlice> internal_map = 1;
 }
 
 // PortSet is a collection of structs indexed by Port
 // type PortSet map[Port]struct{}
 message PortSet {
-	map<string, VoidStruct> value = 1;
+	map<string, VoidStruct> internal_map = 1;
 	
 	message VoidStruct {}
 }

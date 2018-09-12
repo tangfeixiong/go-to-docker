@@ -18,11 +18,11 @@ message Ulimit {
 
 // Rlimit specifies the resources limits, such as max open files.
 // type Rlimit struct
-message UnitsUlimit {
-	// Type int 0x60json:"type,omitempty"0x60
+message Rlimit {
+	// Type int `json:"type,omitempty"`
 	int32 type = 1;
-	// Hard uint64 0x60json:"hard,omitempty"0x60
+	// Hard uint64 `json:"hard,omitempty"`
 	uint64 hard = 2;
-	// Soft uint64 0x60json:"soft,omitempty"0x60
+	// Soft uint64 `json:"soft,omitempty"`
 	uint64 soft = 3;
 }

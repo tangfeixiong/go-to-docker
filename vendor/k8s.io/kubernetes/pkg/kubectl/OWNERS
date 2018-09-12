@@ -1,7 +1,7 @@
-assignees:
-  - brendandburns
-  - deads2k
-  - janetkuo
-  - jlowdermilk
-  - pwittrock
-  - smarterclayton
+approvers:
+- sig-cli-maintainers
+reviewers:
+- sig-cli
+labels:
+- area/kubectl
+- sig/cli

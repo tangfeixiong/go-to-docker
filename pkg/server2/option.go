@@ -1,17 +1,18 @@
 package server2
 
 import (
+	"encoding/base64"
+	"encoding/json"
+	"os"
 	"runtime"
+	"strings"
+
+	"github.com/docker/docker/api/types"
 )
 
 type Option struct {
 	LogLevel       string
 	DockerEndpoint string
-}
-
-type Config struct {
-	Port     int
-	Insecure bool
 }
 
 func NewOption() *Option {

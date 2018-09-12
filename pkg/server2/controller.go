@@ -3,173 +3,162 @@ package server2
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/golang/glog"
 
 	"github.com/tangfeixiong/go-to-docker/pb"
-	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/dockershim/libdocker"
-)
-
-const (
-	ILLEGAL_PARAMETER = 1000
-	DOCKER_NOT_READY  = 1001
-
-	IMAGE_PULL_ACCEPTED = 1
+	// containerpb "github.com/tangfeixiong/go-to-docker/pb/moby/container"
+	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat"
+	// "github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/dockershim/libdocker"
 )
 
 var (
-	ErrNotImplemented = errors.New("Not Implemented")
+	errNotImplemented = errors.New("Not Implemented")
 )
 
-func (ms *MicroServer) PullImage(ctx context.Context, req *pb.DockerImagePullReqResp) (*pb.DockerImagePullReqResp, error) {
-	var resp *pb.DockerImagePullReqResp
-	var err error
+// docker container op
 
-	resp, err = req.CopyWithRequestValidation()
-	if nil != err {
-		return resp, fmt.Errorf("Unable to pull image: %v", err)
-	}
-
-	ch := make(chan map[int]error)
-	go func() {
-		fmt.Printf("rpc request of PullImage: %v\n", req.ImageRef)
-		// dockershim/libdocker/image.go
-		ms.DockerClient.PullImageIntoCachingProgress(ctx, req.RefStr, req.ImagePullOptions, ch)
-	}()
-
-	status := <-ch
-	for k, v := range status {
-		if k != 0 {
-			glog.Errorf("Pulling image failure: %v", v)
-			resp.StateCode = 100
-			resp.StateMessage = v.Error()
-			return resp, fmt.Errorf("Pulling image failure: %v", v)
-		}
-	}
-
-	resp.StateCode = IMAGE_PULL_ACCEPTED
-	resp.StateMessage = "Request pulling image accepted"
-	return resp, nil
-}
-
-func (ms *MicroServer) InspectImageByRef(ctx context.Context) error {
-
-	return ErrNotImplemented
-}
-
-func (ms *MicroServer) InspectImageById(ctx context.Context) error {
-
-	return ErrNotImplemented
-}
-
-func (ms *MicroServer) ListImages(ctx context.Context) error {
-
-	return ErrNotImplemented
-}
-
-func (ms *MicroServer) RemoveImage(ctx context.Context) error {
-
-	return ErrNotImplemented
-}
-
-func (ms *MicroServer) BuildImage(ctx context.Context) error {
-
-	return ErrNotImplemented
-}
-
-func (ms *MicroServer) ImageHistory(ctx context.Context) error {
-
-	return ErrNotImplemented
-}
-
-func (ms *MicroServer) CreateNetwork(ctx context.Context, req *pb.DockerNetworkCreateReqResp) (*pb.DockerNetworkCreateReqResp, error) {
-	var resp *pb.DockerNetworkCreateReqResp
-	var err error
-
-	resp, err = req.CopyWithRequestValidation()
-	if nil != err {
-		return resp, fmt.Errorf("Unable to create network: %v", err)
-	}
-
-	resp.NetWorkCreateResponse, err = ms.DockerClient.CreateNetwork(ctx, req.Name, req.NetworkCreate)
-	if err != nil {
-		resp.StateCode = 100
-		resp.StateMessage = err.Error()
-		return resp, fmt.Errorf("Creating network failure: %v", err)
-	}
-
-	resp.StateCode = 0
-	resp.StateMessage = "SUCCEEDED"
-	return resp
-}
-
-func (ms *MicroServer) RemoveNetwork(ctx context.Context) error {
-
-	return nil
-}
-
-func (ms *MicroServer) InspectNetwork(ctx context.Context) error {
-
-	return nil
-}
-
-func (ms *MicroServer) ListNetworks(ctx context.Context) error {
-
-	return nil
-}
-
-func (ms *MicroServer) RunContainer(ctx context.Context, req *pb.DockerContainerRunReqResp) (*pb.DockerContainerRunReqResp, error) {
-	resp := new(pb.DockerContainerRunReqResp)
-	if req == null {
-		glog.Warningln("Container request required")
-		return nil, fmt.Errorf("Container request required")
-	}
-
-	return resp, nil
-}
-
-func (ms *MicroServer) RemoveContainer(ctx context.Context) error {
-
-	return ErrNotImplemented
+func (ms *MicroServer) RunDockerContainer(ctx context.Context, req *pb.DockerContainerRunReqResp) (*pb.DockerContainerRunReqResp, error) {
+	glog.V(4).Infof("go to run docker container %v", req)
+	return ms.DockerClient.RunContainer(ctx, req)
 }
 
 func (ms *MicroServer) CreateContainer(ctx context.Context) error {
-
-	return ErrNotImplemented
+	return errNotImplemented
 }
 
 func (ms *MicroServer) StartContainer(ctx context.Context) error {
-
-	return ErrNotImplemented
+	return errNotImplemented
 }
 
-func (ms *MicroServer) ContainerLogs(ctx context.Context) error {
-
-	return ErrNotImplemented
+func (ms *MicroServer) ListDockerContainers(ctx context.Context, req *pb.DockerContainerListReqResp) (*pb.DockerContainerListReqResp, error) {
+	glog.V(4).Infof("go to list docker containers %v", req)
+	return ms.DockerClient.ListContainers(ctx, req)
 }
 
-func (ms *MicroServer) StopContainer(ctx context.Context) error {
-
-	return ErrNotImplemented
-}
-
-func (ms *MicroServer) ListContainers(ctx context.Context) error {
-
-	return ErrNotImplemented
-}
-
-func (ms *MicroServer) InspectContainer(ctx context.Context) error {
-
-	return ErrNotImplemented
+func (ms *MicroServer) InspectDockerContainer(ctx context.Context, req *pb.DockerContainerInspectReqResp) (*pb.DockerConainerInspectReqResp, error) {
+	glog.V(4).Infof("go to inspect docker container %v", req)
+	return ms.DockerClient.InspectContainer(ctx, req)
 }
 
 func (ms *MicroServer) InspectContainerWithSize(ctx context.Context) error {
+	return errNotImplemented
+}
 
-	return ErrNotImplemented
+func (ms *MicroServer) ContainerLogs(ctx context.Context) error {
+	return errNotImplemented
 }
 
 func (ms *MicroServer) UpdateContainerResources(ctx context.Context) error {
+	return errNotImplemented
+}
 
-	return ErrNotImplemented
+func (ms *MicroServer) StopContainer(ctx context.Context) error {
+	return errNotImplemented
+}
+
+func (ms *MicroServer) RemoveDockerContainer(ctx context.Context, req *pb.DockerContainerRemoveReqResp) (*pb.DockerContainerRemoveReqResp, error) {
+	glog.V(4).Infof("go to remove docker container %v", req)
+	return ms.DockerClient.RemoveContainer(ctx, req)
+}
+
+func (ms *MicroServer) PruneDockerContainers(ctx context.Context, req *pb.DockerContainerPruneReqResp) (*pb.DockerContainerPrunReqResp, error) {
+	glog.V(4).Infof("go to prune docker containers")
+	return ms.DockerClient.PruneContainers(ctx, req)
+}
+
+// docker image op
+
+func (ms *MicroServer) PullDockerImage(ctx context.Context, req *pb.DockerImagePullReqResp) (*pb.DockerImagePullReqResp, error) {
+	glog.V(4).Infof("go to pull docker image: %v", req)
+	return kubeletconpycat.PullDockerImage(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) InspectDockerImage(ctx context.Context, req *pb.DockerImageInspectReqResp) (*pb.DockerImageInspectReqResp, error) {
+	glog.V(4).Infof("go to inspect docker image: %v", req)
+	return kubeletconpycat.InspectDockerImage(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) InspectImageByRef(ctx context.Context) error {
+	return errNotImplemented
+}
+
+func (ms *MicroServer) InspectImageById(ctx context.Context) error {
+	return errNotImplemented
+}
+
+func (ms *MicroServer) ListDockerImages(ctx context.Context, req *pb.DockerImageListReqResp) (*pb.DockerImageListReqResp, error) {
+	glog.V(4).Infof("go to list docker images: %v", req)
+	return kubeletconpycat.ListDockerImages(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) RemoveDockerImage(ctx context.Context, req *pb.DockerImageRemoveReqResp) (*pb.DockerImageRemoveReqResp, error) {
+	glog.V(4).Infof("go to remove docker image: %v", req)
+	return kubeletconpycat.RemoveDockerImage(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) PruneDockerImages(ctx context.Context, req *pb.DockerImagePruneReqResp) (*pb.DockerImagePruneReqResp, error) {
+	glog.V(4).Infof("go to prune docker image: %v", req)
+	return kubeletconpycat.PruneDockerImages(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) BuildDockerImage(ctx context.Context, req *pb.DockerImageBuildReqResp) (*pb.DockerImageBuildReqResp, error) {
+	glog.V(4).Infof("go to build docker image: %v", req)
+	return kubeletconpycat.BuildDockerImage(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) PushDockerImage(ctx context.Context, req *pb.DockerImagePushReqResp) (*pb.DockerImagePushReqResp, error) {
+	glog.V(4).Infof("go to push docker image: %v", req)
+	return kubeletconpycat.PushDockerImage(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) ImageHistory(ctx context.Context) error {
+	return errNotImplemented
+}
+
+func (ms *MicroServer) PullDockerImageStreaming(req *pb.DockerImagePullReqResp, streaming pb.SimpleService_PullDockerImageStreamingServer) error {
+	return errNotImplemented
+}
+
+func (ms *MicroServer) BuildDockerImageStreaming(streaming pb.SimpleService_BuildDockerImageStreamingServer) error {
+	return errNotImplemented
+}
+
+func (ms *MicroServer) PushDockerImageStreaming(streaming pb.SimpleService_PushDockerImageStreamingServer) error {
+	return errNotImplemented
+}
+
+// docker network op
+
+func (ms *MicroServer) CreateDockerNetwork(ctx context.Context, req *pb.DockerNetworkCreateReqResp) (*pb.DockerNetworkCreateReqResp, error) {
+	glog.V(4).Infof("go to create docker network. NetworkCreate=%v", req.NetworkCreate)
+	return kubeletcopycat.CreateDockerNetwork(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) RemoveDockerNetwork(ctx context.Context, req *pb.DockerNetworkRemoveReqResp) (*pb.DockerNetworkRemoveReqResp, error) {
+	glog.V(4).Infof("go to remove docker network %s", req.IdOrName)
+	return kubeletcopycat.DeleteDockerNetwork(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) InspectDockerNetwork(ctx context.Context, req *pb.DockerNetworkInspectReqResp) (*pb.DockerNetworkInspectReqResp, error) {
+	glog.V(4).Infof("go to inspect docker network %s", req.IdOrName)
+	return kubeletcopycat.InspectDockerNetwork(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) ListDockerNetworks(ctx context.Context, req *pb.DockerNetworkListReqResp) (*pb.DockerNetworkListReqResp, error) {
+	glog.V(4).Infof("go to list docker networks")
+	return kubeletcopycat.ListDockerNetworks(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) PruneDockerNetworks(ctx context.Context, req *pb.DockerNetworksPruneReqResp) (*pb.DockerNetworkPruneReqResp, eerror) {
+	glog.V(4).Infof("go to prune docker networks")
+	return kubeletcopycat.PruneDockerNetworks(ms.DockerClient, ctx, req)
+}
+
+func (ms *MicroServer) ConnectDockerNetwork(ctx context.Context) error {
+	return errNotImplemented
+}
+
+func (ms *MicroServer) DisconnectDockerNetwork(ctx context.Context) error {
+	return errNotImplemented
 }

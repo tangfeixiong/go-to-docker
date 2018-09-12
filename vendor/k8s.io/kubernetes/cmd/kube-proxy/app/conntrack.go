@@ -20,6 +20,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"strconv"
+	"strings"
 
 	"github.com/golang/glog"
 
@@ -42,12 +43,28 @@ type Conntracker interface {
 
 type realConntracker struct{}
 
-var readOnlySysFSError = errors.New("ReadOnlySysFS")
+var readOnlySysFSError = errors.New("readOnlySysFS")
 
 func (rct realConntracker) SetMax(max int) error {
 	if err := rct.setIntSysCtl("nf_conntrack_max", max); err != nil {
 		return err
 	}
+	glog.Infof("Setting nf_conntrack_max to %d", max)
+
+	// Linux does not support writing to /sys/module/nf_conntrack/parameters/hashsize
+	// when the writer process is not in the initial network namespace
+	// (https://github.com/torvalds/linux/blob/v4.10/net/netfilter/nf_conntrack_core.c#L1795-L1796).
+	// Usually that's fine. But in some configurations such as with github.com/kinvolk/kubeadm-nspawn,
+	// kube-proxy is in another netns.
+	// Therefore, check if writing in hashsize is necessary and skip the writing if not.
+	hashsize, err := readIntStringFile("/sys/module/nf_conntrack/parameters/hashsize")
+	if err != nil {
+		return err
+	}
+	if hashsize >= (max / 4) {
+		return nil
+	}
+
 	// sysfs is expected to be mounted as 'rw'. However, it may be
 	// unexpectedly mounted as 'ro' by docker because of a known docker
 	// issue (https://github.com/docker/docker/issues/24000). Setting
@@ -64,7 +81,7 @@ func (rct realConntracker) SetMax(max int) error {
 	}
 	// TODO: generify this and sysctl to a new sysfs.WriteInt()
 	glog.Infof("Setting conntrack hashsize to %d", max/4)
-	return ioutil.WriteFile("/sys/module/nf_conntrack/parameters/hashsize", []byte(strconv.Itoa(max/4)), 0640)
+	return writeIntStringFile("/sys/module/nf_conntrack/parameters/hashsize", max/4)
 }
 
 func (rct realConntracker) SetTCPEstablishedTimeout(seconds int) error {
@@ -97,12 +114,10 @@ func isSysFSWritable() (bool, error) {
 	}
 
 	for _, mountPoint := range mountPoints {
-		const sysfsDevice = "sysfs"
-		if mountPoint.Device != sysfsDevice {
+		if mountPoint.Type != sysfsDevice {
 			continue
 		}
 		// Check whether sysfs is 'rw'
-		const permWritable = "rw"
 		if len(mountPoint.Opts) > 0 && mountPoint.Opts[0] == permWritable {
 			return true, nil
 		}
@@ -112,4 +127,16 @@ func isSysFSWritable() (bool, error) {
 	}
 
 	return false, errors.New("No sysfs mounted")
+}
+
+func readIntStringFile(filename string) (int, error) {
+	b, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return -1, err
+	}
+	return strconv.Atoi(strings.TrimSpace(string(b)))
+}
+
+func writeIntStringFile(filename string, value int) error {
+	return ioutil.WriteFile(filename, []byte(strconv.Itoa(value)), 0640)
 }

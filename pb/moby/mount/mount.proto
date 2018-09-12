@@ -8,32 +8,32 @@ package mount;
 // Mount represents a mount (volume).
 // type Mount struct
 message Mount {
-	// Type Type 0x60json:",omitempty"0x60
+	// Type Type `json:",omitempty"`
 	string type = 1; // "bind", "volume", "tmpfs"
 	// Source specifies the name of the mount. Depending on mount type, this may be a volume name or a host path, or even ignored.
 	// Source is not supported for tmpfs (must be an empty value)
-	// Source string 0x60json:",omitempty"0x60
+	// Source string `json:",omitempty"`
 	string source = 2; 
-	// Target string 0x60json:",omitempty"0x60
+	// Target string `json:",omitempty"`
 	string target = 3;
-	// ReadOnly bool 0x60json:",omitempty"0x60
-	string read_only= 4;
-	// Consistency consistency 0x60json:",omitempty"0x60
+	// ReadOnly bool `json:",omitempty"`
+	bool read_only= 4;
+	// Consistency consistency `json:",omitempty"`
 	// Consistency represents the consistency requirements of a mount. // type Consistency string
 	string consistency = 5; // "consistent", "cached", "delegated", "default"
 
-    // BindOptions *BindOptions 0x60json:",omitempty"0x60
+    // BindOptions *BindOptions `json:",omitempty"`
 	BindOptions   bind_options = 6;
-	// VolumeOptions *VolumeOptions 0x60json:",omitempty"0x60
+	// VolumeOptions *VolumeOptions `json:",omitempty"`
 	VolumeOptions volume_options = 7;
-	// TmpfsOptions *TmpfsOptions 0x60json:",omitempty"0x60
+	// TmpfsOptions *TmpfsOptions `json:",omitempty"`
 	TmpfsOptions  tmpfs_options = 8;
 }
 
 // BindOptions defines options specific to mounts of type "bind".
 // type BindOptions struct
 message BindOptions {
-	// Propagation Propagation 0x60json",omitempty"0x60
+	// Propagation Propagation `json",omitempty"`
 	// Propagation represents the propagation of a mount. // type Propagation string
 	string propagation = 1; // "rprivate", "private", "rshared", "shared", "rslave", "slave"
 }
@@ -41,20 +41,20 @@ message BindOptions {
 // VolumeOptions represents the options for a mount of type volume.
 // type VolumeOptions struct
 message VolumeOptions {
-	// NoCopy bool 0x60json:",omitempty"0x60
+	// NoCopy bool `json:",omitempty"`
 	bool no_copy = 1;
-	// Labels map[string]string 0x60json:",omitempty"0x60
+	// Labels map[string]string `json:",omitempty"`
 	map<string, string> labels = 2;
-	// DriverConfig *Driver 0x60json:",omitempty"0x60
+	// DriverConfig *Driver `json:",omitempty"`
 	Driver driver_config = 3;
 }
 
 // Driver represents a volume driver.
 // type Driver struct
 message Driver {
-	// Name string 0x60json:",omitempty"0x60
+	// Name string `json:",omitempty"`
 	string name = 1;
-	// Options map[string]string 0x60json:",omitempty"0x60
+	// Options map[string]string `json:",omitempty"`
 	map<string, string> options = 2;
 }
 
@@ -69,10 +69,10 @@ message TmpfsOptions {
 	// docker, uses a straight byte value.
 	//
 	// Percentages are not supported.
-	// SizeBytes int84 0x60json:",omitempty"0x60
+	// SizeBytes int84 `json:",omitempty"`
 	int64 size_bytes = 1;
 	// Mode of the tmpfs upon creation
-	// Mode os.FileMode 0x60json:",omitempty"0x60
+	// Mode os.FileMode `json:",omitempty"`
 	uint32 mode = 2;
 
 	// TODO(stevvooe): There are several more tmpfs flags, specified in the

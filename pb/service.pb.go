@@ -2,32 +2,45 @@
 // source: pb/service.proto
 
 /*
-	Package pb is a generated protocol buffer package.
+Package pb is a generated protocol buffer package.
 
-	It is generated from these files:
-		pb/service.proto
+It is generated from these files:
+	pb/service.proto
 
-	It has these top-level messages:
-		DockerImagePullReqResp
-		DockerNetworkCreateReqResp
-		DockerContainerRunReqResp
+It has these top-level messages:
+	DockerContainerRunReqResp
+	DockerContainerInspectReqResp
+	DockerContainerListReqResp
+	DockerContainerRemoveReqResp
+	DockerContainerPruneReqResp
+	DockerImageListReqResp
+	DockerImageInspectReqResp
+	DockerImageRemoveReqResp
+	DockerImagePruneReqResp
+	DockerImagePullReqResp
+	DockerImagePushReqResp
+	DockerImageBuildReqResp
+	DockerNetworkCreateReqResp
+	DockerNetworkInspectReqResp
+	DockerNetworkListReqResp
+	DockerNetworkRemoveReqResp
+	DockerNetworkPruneReqResp
 */
 package pb
 
-import proto "github.com/golang/protobuf/proto"
+import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import _ "github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/api"
+import _ "github.com/gogo/googleapis/google/api"
 import moby "github.com/tangfeixiong/go-to-docker/pb/moby"
 import container "github.com/tangfeixiong/go-to-docker/pb/moby/container"
 import network "github.com/tangfeixiong/go-to-docker/pb/moby/network"
+import filters "github.com/tangfeixiong/go-to-docker/pb/moby/filters"
 
 import (
 	context "golang.org/x/net/context"
 	grpc "google.golang.org/grpc"
 )
-
-import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -38,7 +51,617 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
+
+type DockerContainerInspectReqResp_KeyType int32
+
+const (
+	DockerContainerInspectReqResp_ID   DockerContainerInspectReqResp_KeyType = 0
+	DockerContainerInspectReqResp_NAME DockerContainerInspectReqResp_KeyType = 1
+)
+
+var DockerContainerInspectReqResp_KeyType_name = map[int32]string{
+	0: "ID",
+	1: "NAME",
+}
+var DockerContainerInspectReqResp_KeyType_value = map[string]int32{
+	"ID":   0,
+	"NAME": 1,
+}
+
+func (x DockerContainerInspectReqResp_KeyType) String() string {
+	return proto.EnumName(DockerContainerInspectReqResp_KeyType_name, int32(x))
+}
+func (DockerContainerInspectReqResp_KeyType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{1, 0}
+}
+
+type DockerContainerRemoveReqResp_KeyType int32
+
+const (
+	DockerContainerRemoveReqResp_ID   DockerContainerRemoveReqResp_KeyType = 0
+	DockerContainerRemoveReqResp_NAME DockerContainerRemoveReqResp_KeyType = 1
+)
+
+var DockerContainerRemoveReqResp_KeyType_name = map[int32]string{
+	0: "ID",
+	1: "NAME",
+}
+var DockerContainerRemoveReqResp_KeyType_value = map[string]int32{
+	"ID":   0,
+	"NAME": 1,
+}
+
+func (x DockerContainerRemoveReqResp_KeyType) String() string {
+	return proto.EnumName(DockerContainerRemoveReqResp_KeyType_name, int32(x))
+}
+func (DockerContainerRemoveReqResp_KeyType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{3, 0}
+}
+
+type DockerImageInspectReqResp_KeyType int32
+
+const (
+	DockerImageInspectReqResp_ID  DockerImageInspectReqResp_KeyType = 0
+	DockerImageInspectReqResp_REF DockerImageInspectReqResp_KeyType = 1
+)
+
+var DockerImageInspectReqResp_KeyType_name = map[int32]string{
+	0: "ID",
+	1: "REF",
+}
+var DockerImageInspectReqResp_KeyType_value = map[string]int32{
+	"ID":  0,
+	"REF": 1,
+}
+
+func (x DockerImageInspectReqResp_KeyType) String() string {
+	return proto.EnumName(DockerImageInspectReqResp_KeyType_name, int32(x))
+}
+func (DockerImageInspectReqResp_KeyType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{6, 0}
+}
+
+type DockerImageRemoveReqResp_KeyType int32
+
+const (
+	DockerImageRemoveReqResp_ID  DockerImageRemoveReqResp_KeyType = 0
+	DockerImageRemoveReqResp_REF DockerImageRemoveReqResp_KeyType = 1
+)
+
+var DockerImageRemoveReqResp_KeyType_name = map[int32]string{
+	0: "ID",
+	1: "REF",
+}
+var DockerImageRemoveReqResp_KeyType_value = map[string]int32{
+	"ID":  0,
+	"REF": 1,
+}
+
+func (x DockerImageRemoveReqResp_KeyType) String() string {
+	return proto.EnumName(DockerImageRemoveReqResp_KeyType_name, int32(x))
+}
+func (DockerImageRemoveReqResp_KeyType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{7, 0}
+}
+
+type DockerNetworkInspectReqResp_KeyType int32
+
+const (
+	DockerNetworkInspectReqResp_ID   DockerNetworkInspectReqResp_KeyType = 0
+	DockerNetworkInspectReqResp_NAME DockerNetworkInspectReqResp_KeyType = 1
+)
+
+var DockerNetworkInspectReqResp_KeyType_name = map[int32]string{
+	0: "ID",
+	1: "NAME",
+}
+var DockerNetworkInspectReqResp_KeyType_value = map[string]int32{
+	"ID":   0,
+	"NAME": 1,
+}
+
+func (x DockerNetworkInspectReqResp_KeyType) String() string {
+	return proto.EnumName(DockerNetworkInspectReqResp_KeyType_name, int32(x))
+}
+func (DockerNetworkInspectReqResp_KeyType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{13, 0}
+}
+
+type DockerNetworkRemoveReqResp_KeyType int32
+
+const (
+	DockerNetworkRemoveReqResp_ID   DockerNetworkRemoveReqResp_KeyType = 0
+	DockerNetworkRemoveReqResp_NAME DockerNetworkRemoveReqResp_KeyType = 1
+)
+
+var DockerNetworkRemoveReqResp_KeyType_name = map[int32]string{
+	0: "ID",
+	1: "NAME",
+}
+var DockerNetworkRemoveReqResp_KeyType_value = map[string]int32{
+	"ID":   0,
+	"NAME": 1,
+}
+
+func (x DockerNetworkRemoveReqResp_KeyType) String() string {
+	return proto.EnumName(DockerNetworkRemoveReqResp_KeyType_name, int32(x))
+}
+func (DockerNetworkRemoveReqResp_KeyType) EnumDescriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{15, 0}
+}
+
+type DockerContainerRunReqResp struct {
+	Config                     *container.Config                     `protobuf:"bytes,1,opt,name=config" json:"config,omitempty"`
+	HostConfig                 *container.HostConfig                 `protobuf:"bytes,2,opt,name=host_config,json=hostConfig" json:"host_config,omitempty"`
+	NetworkingConfig           *network.NetworkingConfig             `protobuf:"bytes,3,opt,name=networking_config,json=networkingConfig" json:"networking_config,omitempty"`
+	Name                       string                                `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
+	ImagePullOptions           *moby.ImagePullOptions                `protobuf:"bytes,5,opt,name=image_pull_options,json=imagePullOptions" json:"image_pull_options,omitempty"`
+	ContainerCreateCreatedBody *container.ContainerCreateCreatedBody `protobuf:"bytes,6,opt,name=container_create_created_body,json=containerCreateCreatedBody" json:"container_create_created_body,omitempty"`
+	StateCode                  int32                                 `protobuf:"varint,7,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage               string                                `protobuf:"bytes,8,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerContainerRunReqResp) Reset()                    { *m = DockerContainerRunReqResp{} }
+func (m *DockerContainerRunReqResp) String() string            { return proto.CompactTextString(m) }
+func (*DockerContainerRunReqResp) ProtoMessage()               {}
+func (*DockerContainerRunReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{0} }
+
+func (m *DockerContainerRunReqResp) GetConfig() *container.Config {
+	if m != nil {
+		return m.Config
+	}
+	return nil
+}
+
+func (m *DockerContainerRunReqResp) GetHostConfig() *container.HostConfig {
+	if m != nil {
+		return m.HostConfig
+	}
+	return nil
+}
+
+func (m *DockerContainerRunReqResp) GetNetworkingConfig() *network.NetworkingConfig {
+	if m != nil {
+		return m.NetworkingConfig
+	}
+	return nil
+}
+
+func (m *DockerContainerRunReqResp) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *DockerContainerRunReqResp) GetImagePullOptions() *moby.ImagePullOptions {
+	if m != nil {
+		return m.ImagePullOptions
+	}
+	return nil
+}
+
+func (m *DockerContainerRunReqResp) GetContainerCreateCreatedBody() *container.ContainerCreateCreatedBody {
+	if m != nil {
+		return m.ContainerCreateCreatedBody
+	}
+	return nil
+}
+
+func (m *DockerContainerRunReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerContainerRunReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerContainerInspectReqResp struct {
+	Id            string                                `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                                `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	KeyType       DockerContainerInspectReqResp_KeyType `protobuf:"varint,3,opt,name=key_type,json=keyType,proto3,enum=pb.DockerContainerInspectReqResp_KeyType" json:"key_type,omitempty"`
+	ContainerJson *moby.ContainerJSON                   `protobuf:"bytes,4,opt,name=container_json,json=containerJson" json:"container_json,omitempty"`
+	StateCode     int32                                 `protobuf:"varint,5,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage  string                                `protobuf:"bytes,6,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerContainerInspectReqResp) Reset()         { *m = DockerContainerInspectReqResp{} }
+func (m *DockerContainerInspectReqResp) String() string { return proto.CompactTextString(m) }
+func (*DockerContainerInspectReqResp) ProtoMessage()    {}
+func (*DockerContainerInspectReqResp) Descriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{1}
+}
+
+func (m *DockerContainerInspectReqResp) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *DockerContainerInspectReqResp) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *DockerContainerInspectReqResp) GetKeyType() DockerContainerInspectReqResp_KeyType {
+	if m != nil {
+		return m.KeyType
+	}
+	return DockerContainerInspectReqResp_ID
+}
+
+func (m *DockerContainerInspectReqResp) GetContainerJson() *moby.ContainerJSON {
+	if m != nil {
+		return m.ContainerJson
+	}
+	return nil
+}
+
+func (m *DockerContainerInspectReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerContainerInspectReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerContainerListReqResp struct {
+	ContainerListOptions *moby.ContainerListOptions `protobuf:"bytes,1,opt,name=container_list_options,json=containerListOptions" json:"container_list_options,omitempty"`
+	Containers           []*moby.Container          `protobuf:"bytes,2,rep,name=containers" json:"containers,omitempty"`
+	StateCode            int32                      `protobuf:"varint,3,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage         string                     `protobuf:"bytes,4,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerContainerListReqResp) Reset()         { *m = DockerContainerListReqResp{} }
+func (m *DockerContainerListReqResp) String() string { return proto.CompactTextString(m) }
+func (*DockerContainerListReqResp) ProtoMessage()    {}
+func (*DockerContainerListReqResp) Descriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{2}
+}
+
+func (m *DockerContainerListReqResp) GetContainerListOptions() *moby.ContainerListOptions {
+	if m != nil {
+		return m.ContainerListOptions
+	}
+	return nil
+}
+
+func (m *DockerContainerListReqResp) GetContainers() []*moby.Container {
+	if m != nil {
+		return m.Containers
+	}
+	return nil
+}
+
+func (m *DockerContainerListReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerContainerListReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerContainerRemoveReqResp struct {
+	Id                     string                               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                   string                               `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	KeyType                DockerContainerRemoveReqResp_KeyType `protobuf:"varint,3,opt,name=key_type,json=keyType,proto3,enum=pb.DockerContainerRemoveReqResp_KeyType" json:"key_type,omitempty"`
+	ContainerRemoveOptions *moby.ContainerRemoveOptions         `protobuf:"bytes,4,opt,name=container_remove_options,json=containerRemoveOptions" json:"container_remove_options,omitempty"`
+	StateCode              int32                                `protobuf:"varint,5,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage           string                               `protobuf:"bytes,6,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerContainerRemoveReqResp) Reset()         { *m = DockerContainerRemoveReqResp{} }
+func (m *DockerContainerRemoveReqResp) String() string { return proto.CompactTextString(m) }
+func (*DockerContainerRemoveReqResp) ProtoMessage()    {}
+func (*DockerContainerRemoveReqResp) Descriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{3}
+}
+
+func (m *DockerContainerRemoveReqResp) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *DockerContainerRemoveReqResp) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *DockerContainerRemoveReqResp) GetKeyType() DockerContainerRemoveReqResp_KeyType {
+	if m != nil {
+		return m.KeyType
+	}
+	return DockerContainerRemoveReqResp_ID
+}
+
+func (m *DockerContainerRemoveReqResp) GetContainerRemoveOptions() *moby.ContainerRemoveOptions {
+	if m != nil {
+		return m.ContainerRemoveOptions
+	}
+	return nil
+}
+
+func (m *DockerContainerRemoveReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerContainerRemoveReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerContainerPruneReqResp struct {
+	Filters               *filters.Args               `protobuf:"bytes,1,opt,name=filters" json:"filters,omitempty"`
+	ContainersPruneReport *moby.ContainersPruneReport `protobuf:"bytes,2,opt,name=containers_prune_report,json=containersPruneReport" json:"containers_prune_report,omitempty"`
+	StateCode             int32                       `protobuf:"varint,4,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage          string                      `protobuf:"bytes,5,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerContainerPruneReqResp) Reset()         { *m = DockerContainerPruneReqResp{} }
+func (m *DockerContainerPruneReqResp) String() string { return proto.CompactTextString(m) }
+func (*DockerContainerPruneReqResp) ProtoMessage()    {}
+func (*DockerContainerPruneReqResp) Descriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{4}
+}
+
+func (m *DockerContainerPruneReqResp) GetFilters() *filters.Args {
+	if m != nil {
+		return m.Filters
+	}
+	return nil
+}
+
+func (m *DockerContainerPruneReqResp) GetContainersPruneReport() *moby.ContainersPruneReport {
+	if m != nil {
+		return m.ContainersPruneReport
+	}
+	return nil
+}
+
+func (m *DockerContainerPruneReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerContainerPruneReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerImageListReqResp struct {
+	ImageListOptions *moby.ImageListOptions `protobuf:"bytes,1,opt,name=image_list_options,json=imageListOptions" json:"image_list_options,omitempty"`
+	ImageSummaries   []*moby.ImageSummary   `protobuf:"bytes,2,rep,name=image_summaries,json=imageSummaries" json:"image_summaries,omitempty"`
+	StateCode        int32                  `protobuf:"varint,3,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage     string                 `protobuf:"bytes,4,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerImageListReqResp) Reset()                    { *m = DockerImageListReqResp{} }
+func (m *DockerImageListReqResp) String() string            { return proto.CompactTextString(m) }
+func (*DockerImageListReqResp) ProtoMessage()               {}
+func (*DockerImageListReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{5} }
+
+func (m *DockerImageListReqResp) GetImageListOptions() *moby.ImageListOptions {
+	if m != nil {
+		return m.ImageListOptions
+	}
+	return nil
+}
+
+func (m *DockerImageListReqResp) GetImageSummaries() []*moby.ImageSummary {
+	if m != nil {
+		return m.ImageSummaries
+	}
+	return nil
+}
+
+func (m *DockerImageListReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerImageListReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerImageInspectReqResp struct {
+	Id           string                            `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Ref          string                            `protobuf:"bytes,2,opt,name=ref,proto3" json:"ref,omitempty"`
+	KeyType      DockerImageInspectReqResp_KeyType `protobuf:"varint,3,opt,name=key_type,json=keyType,proto3,enum=pb.DockerImageInspectReqResp_KeyType" json:"key_type,omitempty"`
+	ImageInspect *moby.ImageInspect                `protobuf:"bytes,4,opt,name=image_inspect,json=imageInspect" json:"image_inspect,omitempty"`
+	StateCode    int32                             `protobuf:"varint,5,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage string                            `protobuf:"bytes,6,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerImageInspectReqResp) Reset()                    { *m = DockerImageInspectReqResp{} }
+func (m *DockerImageInspectReqResp) String() string            { return proto.CompactTextString(m) }
+func (*DockerImageInspectReqResp) ProtoMessage()               {}
+func (*DockerImageInspectReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{6} }
+
+func (m *DockerImageInspectReqResp) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *DockerImageInspectReqResp) GetRef() string {
+	if m != nil {
+		return m.Ref
+	}
+	return ""
+}
+
+func (m *DockerImageInspectReqResp) GetKeyType() DockerImageInspectReqResp_KeyType {
+	if m != nil {
+		return m.KeyType
+	}
+	return DockerImageInspectReqResp_ID
+}
+
+func (m *DockerImageInspectReqResp) GetImageInspect() *moby.ImageInspect {
+	if m != nil {
+		return m.ImageInspect
+	}
+	return nil
+}
+
+func (m *DockerImageInspectReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerImageInspectReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerImageRemoveReqResp struct {
+	Id                       string                           `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Ref                      string                           `protobuf:"bytes,2,opt,name=ref,proto3" json:"ref,omitempty"`
+	KeyType                  DockerImageRemoveReqResp_KeyType `protobuf:"varint,3,opt,name=key_type,json=keyType,proto3,enum=pb.DockerImageRemoveReqResp_KeyType" json:"key_type,omitempty"`
+	ImageRemoveOptions       *moby.ImageRemoveOptions         `protobuf:"bytes,4,opt,name=image_remove_options,json=imageRemoveOptions" json:"image_remove_options,omitempty"`
+	ImageDeleteResponseItems []*moby.ImageDeleteResponseItem  `protobuf:"bytes,5,rep,name=image_delete_response_items,json=imageDeleteResponseItems" json:"image_delete_response_items,omitempty"`
+	StateCode                int32                            `protobuf:"varint,6,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage             string                           `protobuf:"bytes,7,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerImageRemoveReqResp) Reset()                    { *m = DockerImageRemoveReqResp{} }
+func (m *DockerImageRemoveReqResp) String() string            { return proto.CompactTextString(m) }
+func (*DockerImageRemoveReqResp) ProtoMessage()               {}
+func (*DockerImageRemoveReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{7} }
+
+func (m *DockerImageRemoveReqResp) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *DockerImageRemoveReqResp) GetRef() string {
+	if m != nil {
+		return m.Ref
+	}
+	return ""
+}
+
+func (m *DockerImageRemoveReqResp) GetKeyType() DockerImageRemoveReqResp_KeyType {
+	if m != nil {
+		return m.KeyType
+	}
+	return DockerImageRemoveReqResp_ID
+}
+
+func (m *DockerImageRemoveReqResp) GetImageRemoveOptions() *moby.ImageRemoveOptions {
+	if m != nil {
+		return m.ImageRemoveOptions
+	}
+	return nil
+}
+
+func (m *DockerImageRemoveReqResp) GetImageDeleteResponseItems() []*moby.ImageDeleteResponseItem {
+	if m != nil {
+		return m.ImageDeleteResponseItems
+	}
+	return nil
+}
+
+func (m *DockerImageRemoveReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerImageRemoveReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerImagePruneReqResp struct {
+	Filters           *filters.Args           `protobuf:"bytes,1,opt,name=filters" json:"filters,omitempty"`
+	ImagesPruneReport *moby.ImagesPruneReport `protobuf:"bytes,2,opt,name=images_prune_report,json=imagesPruneReport" json:"images_prune_report,omitempty"`
+	StateCode         int32                   `protobuf:"varint,3,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage      string                  `protobuf:"bytes,4,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerImagePruneReqResp) Reset()                    { *m = DockerImagePruneReqResp{} }
+func (m *DockerImagePruneReqResp) String() string            { return proto.CompactTextString(m) }
+func (*DockerImagePruneReqResp) ProtoMessage()               {}
+func (*DockerImagePruneReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{8} }
+
+func (m *DockerImagePruneReqResp) GetFilters() *filters.Args {
+	if m != nil {
+		return m.Filters
+	}
+	return nil
+}
+
+func (m *DockerImagePruneReqResp) GetImagesPruneReport() *moby.ImagesPruneReport {
+	if m != nil {
+		return m.ImagesPruneReport
+	}
+	return nil
+}
+
+func (m *DockerImagePruneReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerImagePruneReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
 
 type DockerImagePullReqResp struct {
 	RefStr           string                 `protobuf:"bytes,1,opt,name=ref_str,json=refStr,proto3" json:"ref_str,omitempty"`
@@ -51,7 +674,7 @@ type DockerImagePullReqResp struct {
 func (m *DockerImagePullReqResp) Reset()                    { *m = DockerImagePullReqResp{} }
 func (m *DockerImagePullReqResp) String() string            { return proto.CompactTextString(m) }
 func (*DockerImagePullReqResp) ProtoMessage()               {}
-func (*DockerImagePullReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{0} }
+func (*DockerImagePullReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{9} }
 
 func (m *DockerImagePullReqResp) GetRefStr() string {
 	if m != nil {
@@ -88,6 +711,102 @@ func (m *DockerImagePullReqResp) GetStateMessage() string {
 	return ""
 }
 
+type DockerImagePushReqResp struct {
+	RefStr           string                 `protobuf:"bytes,1,opt,name=ref_str,json=refStr,proto3" json:"ref_str,omitempty"`
+	ImagePushOptions *moby.ImagePushOptions `protobuf:"bytes,2,opt,name=image_push_options,json=imagePushOptions" json:"image_push_options,omitempty"`
+	RespBody         []byte                 `protobuf:"bytes,3,opt,name=resp_body,json=respBody,proto3" json:"resp_body,omitempty"`
+	StateCode        int32                  `protobuf:"varint,4,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage     string                 `protobuf:"bytes,5,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerImagePushReqResp) Reset()                    { *m = DockerImagePushReqResp{} }
+func (m *DockerImagePushReqResp) String() string            { return proto.CompactTextString(m) }
+func (*DockerImagePushReqResp) ProtoMessage()               {}
+func (*DockerImagePushReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{10} }
+
+func (m *DockerImagePushReqResp) GetRefStr() string {
+	if m != nil {
+		return m.RefStr
+	}
+	return ""
+}
+
+func (m *DockerImagePushReqResp) GetImagePushOptions() *moby.ImagePushOptions {
+	if m != nil {
+		return m.ImagePushOptions
+	}
+	return nil
+}
+
+func (m *DockerImagePushReqResp) GetRespBody() []byte {
+	if m != nil {
+		return m.RespBody
+	}
+	return nil
+}
+
+func (m *DockerImagePushReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerImagePushReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerImageBuildReqResp struct {
+	BuildContext       []byte                   `protobuf:"bytes,1,opt,name=build_context,json=buildContext,proto3" json:"build_context,omitempty"`
+	ImageBuildOptions  *moby.ImageBuildOptions  `protobuf:"bytes,2,opt,name=image_build_options,json=imageBuildOptions" json:"image_build_options,omitempty"`
+	ImageBuildResponse *moby.ImageBuildResponse `protobuf:"bytes,3,opt,name=image_build_response,json=imageBuildResponse" json:"image_build_response,omitempty"`
+	StateCode          int32                    `protobuf:"varint,4,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage       string                   `protobuf:"bytes,5,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerImageBuildReqResp) Reset()                    { *m = DockerImageBuildReqResp{} }
+func (m *DockerImageBuildReqResp) String() string            { return proto.CompactTextString(m) }
+func (*DockerImageBuildReqResp) ProtoMessage()               {}
+func (*DockerImageBuildReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{11} }
+
+func (m *DockerImageBuildReqResp) GetBuildContext() []byte {
+	if m != nil {
+		return m.BuildContext
+	}
+	return nil
+}
+
+func (m *DockerImageBuildReqResp) GetImageBuildOptions() *moby.ImageBuildOptions {
+	if m != nil {
+		return m.ImageBuildOptions
+	}
+	return nil
+}
+
+func (m *DockerImageBuildReqResp) GetImageBuildResponse() *moby.ImageBuildResponse {
+	if m != nil {
+		return m.ImageBuildResponse
+	}
+	return nil
+}
+
+func (m *DockerImageBuildReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerImageBuildReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
 type DockerNetworkCreateReqResp struct {
 	Name                  string                      `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	NetworkCreate         *moby.NetworkCreate         `protobuf:"bytes,2,opt,name=network_create,json=networkCreate" json:"network_create,omitempty"`
@@ -100,7 +819,7 @@ func (m *DockerNetworkCreateReqResp) Reset()         { *m = DockerNetworkCreateR
 func (m *DockerNetworkCreateReqResp) String() string { return proto.CompactTextString(m) }
 func (*DockerNetworkCreateReqResp) ProtoMessage()    {}
 func (*DockerNetworkCreateReqResp) Descriptor() ([]byte, []int) {
-	return fileDescriptorService, []int{1}
+	return fileDescriptorService, []int{12}
 }
 
 func (m *DockerNetworkCreateReqResp) GetName() string {
@@ -138,64 +857,198 @@ func (m *DockerNetworkCreateReqResp) GetStateMessage() string {
 	return ""
 }
 
-type DockerContainerRunReqResp struct {
-	Config                  *container.Config                     `protobuf:"bytes,1,opt,name=config" json:"config,omitempty"`
-	HostConfig              *container.HostConfig                 `protobuf:"bytes,2,opt,name=host_config,json=hostConfig" json:"host_config,omitempty"`
-	NetworkingConfig        *network.NetworkingConfig             `protobuf:"bytes,3,opt,name=networking_config,json=networkingConfig" json:"networking_config,omitempty"`
-	Name                    string                                `protobuf:"bytes,4,opt,name=name,proto3" json:"name,omitempty"`
-	ContainerCreateResponse *container.ContainerCreateCreatedBody `protobuf:"bytes,5,opt,name=container_create_response,json=containerCreateResponse" json:"container_create_response,omitempty"`
-	StateCode               int32                                 `protobuf:"varint,6,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
-	StateMessage            string                                `protobuf:"bytes,7,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+type DockerNetworkInspectReqResp struct {
+	Id                    string                              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                  string                              `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	KeyType               DockerNetworkInspectReqResp_KeyType `protobuf:"varint,3,opt,name=key_type,json=keyType,proto3,enum=pb.DockerNetworkInspectReqResp_KeyType" json:"key_type,omitempty"`
+	NetworkInspectOptions *moby.NetworkInspectOptions         `protobuf:"bytes,4,opt,name=network_inspect_options,json=networkInspectOptions" json:"network_inspect_options,omitempty"`
+	NetworkResource       *moby.NetworkResource               `protobuf:"bytes,5,opt,name=network_resource,json=networkResource" json:"network_resource,omitempty"`
+	StateCode             int32                               `protobuf:"varint,6,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage          string                              `protobuf:"bytes,7,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
 }
 
-func (m *DockerContainerRunReqResp) Reset()                    { *m = DockerContainerRunReqResp{} }
-func (m *DockerContainerRunReqResp) String() string            { return proto.CompactTextString(m) }
-func (*DockerContainerRunReqResp) ProtoMessage()               {}
-func (*DockerContainerRunReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{2} }
+func (m *DockerNetworkInspectReqResp) Reset()         { *m = DockerNetworkInspectReqResp{} }
+func (m *DockerNetworkInspectReqResp) String() string { return proto.CompactTextString(m) }
+func (*DockerNetworkInspectReqResp) ProtoMessage()    {}
+func (*DockerNetworkInspectReqResp) Descriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{13}
+}
 
-func (m *DockerContainerRunReqResp) GetConfig() *container.Config {
+func (m *DockerNetworkInspectReqResp) GetId() string {
 	if m != nil {
-		return m.Config
+		return m.Id
 	}
-	return nil
+	return ""
 }
 
-func (m *DockerContainerRunReqResp) GetHostConfig() *container.HostConfig {
-	if m != nil {
-		return m.HostConfig
-	}
-	return nil
-}
-
-func (m *DockerContainerRunReqResp) GetNetworkingConfig() *network.NetworkingConfig {
-	if m != nil {
-		return m.NetworkingConfig
-	}
-	return nil
-}
-
-func (m *DockerContainerRunReqResp) GetName() string {
+func (m *DockerNetworkInspectReqResp) GetName() string {
 	if m != nil {
 		return m.Name
 	}
 	return ""
 }
 
-func (m *DockerContainerRunReqResp) GetContainerCreateResponse() *container.ContainerCreateCreatedBody {
+func (m *DockerNetworkInspectReqResp) GetKeyType() DockerNetworkInspectReqResp_KeyType {
 	if m != nil {
-		return m.ContainerCreateResponse
+		return m.KeyType
+	}
+	return DockerNetworkInspectReqResp_ID
+}
+
+func (m *DockerNetworkInspectReqResp) GetNetworkInspectOptions() *moby.NetworkInspectOptions {
+	if m != nil {
+		return m.NetworkInspectOptions
 	}
 	return nil
 }
 
-func (m *DockerContainerRunReqResp) GetStateCode() int32 {
+func (m *DockerNetworkInspectReqResp) GetNetworkResource() *moby.NetworkResource {
+	if m != nil {
+		return m.NetworkResource
+	}
+	return nil
+}
+
+func (m *DockerNetworkInspectReqResp) GetStateCode() int32 {
 	if m != nil {
 		return m.StateCode
 	}
 	return 0
 }
 
-func (m *DockerContainerRunReqResp) GetStateMessage() string {
+func (m *DockerNetworkInspectReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerNetworkListReqResp struct {
+	NetworkListOptions *moby.NetworkListOptions `protobuf:"bytes,1,opt,name=network_list_options,json=networkListOptions" json:"network_list_options,omitempty"`
+	NetworkResources   []*moby.NetworkResource  `protobuf:"bytes,2,rep,name=network_resources,json=networkResources" json:"network_resources,omitempty"`
+	StateCode          int32                    `protobuf:"varint,4,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage       string                   `protobuf:"bytes,5,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerNetworkListReqResp) Reset()                    { *m = DockerNetworkListReqResp{} }
+func (m *DockerNetworkListReqResp) String() string            { return proto.CompactTextString(m) }
+func (*DockerNetworkListReqResp) ProtoMessage()               {}
+func (*DockerNetworkListReqResp) Descriptor() ([]byte, []int) { return fileDescriptorService, []int{14} }
+
+func (m *DockerNetworkListReqResp) GetNetworkListOptions() *moby.NetworkListOptions {
+	if m != nil {
+		return m.NetworkListOptions
+	}
+	return nil
+}
+
+func (m *DockerNetworkListReqResp) GetNetworkResources() []*moby.NetworkResource {
+	if m != nil {
+		return m.NetworkResources
+	}
+	return nil
+}
+
+func (m *DockerNetworkListReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerNetworkListReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerNetworkRemoveReqResp struct {
+	Id           string                             `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name         string                             `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	KeyType      DockerNetworkRemoveReqResp_KeyType `protobuf:"varint,3,opt,name=key_type,json=keyType,proto3,enum=pb.DockerNetworkRemoveReqResp_KeyType" json:"key_type,omitempty"`
+	StateCode    int32                              `protobuf:"varint,4,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage string                             `protobuf:"bytes,5,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerNetworkRemoveReqResp) Reset()         { *m = DockerNetworkRemoveReqResp{} }
+func (m *DockerNetworkRemoveReqResp) String() string { return proto.CompactTextString(m) }
+func (*DockerNetworkRemoveReqResp) ProtoMessage()    {}
+func (*DockerNetworkRemoveReqResp) Descriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{15}
+}
+
+func (m *DockerNetworkRemoveReqResp) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *DockerNetworkRemoveReqResp) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *DockerNetworkRemoveReqResp) GetKeyType() DockerNetworkRemoveReqResp_KeyType {
+	if m != nil {
+		return m.KeyType
+	}
+	return DockerNetworkRemoveReqResp_ID
+}
+
+func (m *DockerNetworkRemoveReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerNetworkRemoveReqResp) GetStateMessage() string {
+	if m != nil {
+		return m.StateMessage
+	}
+	return ""
+}
+
+type DockerNetworkPruneReqResp struct {
+	Filters             *filters.Args             `protobuf:"bytes,1,opt,name=filters" json:"filters,omitempty"`
+	NetworksPruneReport *moby.NetworksPruneReport `protobuf:"bytes,2,opt,name=networks_prune_report,json=networksPruneReport" json:"networks_prune_report,omitempty"`
+	StateCode           int32                     `protobuf:"varint,3,opt,name=state_code,json=stateCode,proto3" json:"state_code,omitempty"`
+	StateMessage        string                    `protobuf:"bytes,4,opt,name=state_message,json=stateMessage,proto3" json:"state_message,omitempty"`
+}
+
+func (m *DockerNetworkPruneReqResp) Reset()         { *m = DockerNetworkPruneReqResp{} }
+func (m *DockerNetworkPruneReqResp) String() string { return proto.CompactTextString(m) }
+func (*DockerNetworkPruneReqResp) ProtoMessage()    {}
+func (*DockerNetworkPruneReqResp) Descriptor() ([]byte, []int) {
+	return fileDescriptorService, []int{16}
+}
+
+func (m *DockerNetworkPruneReqResp) GetFilters() *filters.Args {
+	if m != nil {
+		return m.Filters
+	}
+	return nil
+}
+
+func (m *DockerNetworkPruneReqResp) GetNetworksPruneReport() *moby.NetworksPruneReport {
+	if m != nil {
+		return m.NetworksPruneReport
+	}
+	return nil
+}
+
+func (m *DockerNetworkPruneReqResp) GetStateCode() int32 {
+	if m != nil {
+		return m.StateCode
+	}
+	return 0
+}
+
+func (m *DockerNetworkPruneReqResp) GetStateMessage() string {
 	if m != nil {
 		return m.StateMessage
 	}
@@ -203,9 +1056,29 @@ func (m *DockerContainerRunReqResp) GetStateMessage() string {
 }
 
 func init() {
-	proto.RegisterType((*DockerImagePullReqResp)(nil), "pb.DockerImagePullReqResp")
-	proto.RegisterType((*DockerNetworkCreateReqResp)(nil), "pb.DockerNetworkCreateReqResp")
 	proto.RegisterType((*DockerContainerRunReqResp)(nil), "pb.DockerContainerRunReqResp")
+	proto.RegisterType((*DockerContainerInspectReqResp)(nil), "pb.DockerContainerInspectReqResp")
+	proto.RegisterType((*DockerContainerListReqResp)(nil), "pb.DockerContainerListReqResp")
+	proto.RegisterType((*DockerContainerRemoveReqResp)(nil), "pb.DockerContainerRemoveReqResp")
+	proto.RegisterType((*DockerContainerPruneReqResp)(nil), "pb.DockerContainerPruneReqResp")
+	proto.RegisterType((*DockerImageListReqResp)(nil), "pb.DockerImageListReqResp")
+	proto.RegisterType((*DockerImageInspectReqResp)(nil), "pb.DockerImageInspectReqResp")
+	proto.RegisterType((*DockerImageRemoveReqResp)(nil), "pb.DockerImageRemoveReqResp")
+	proto.RegisterType((*DockerImagePruneReqResp)(nil), "pb.DockerImagePruneReqResp")
+	proto.RegisterType((*DockerImagePullReqResp)(nil), "pb.DockerImagePullReqResp")
+	proto.RegisterType((*DockerImagePushReqResp)(nil), "pb.DockerImagePushReqResp")
+	proto.RegisterType((*DockerImageBuildReqResp)(nil), "pb.DockerImageBuildReqResp")
+	proto.RegisterType((*DockerNetworkCreateReqResp)(nil), "pb.DockerNetworkCreateReqResp")
+	proto.RegisterType((*DockerNetworkInspectReqResp)(nil), "pb.DockerNetworkInspectReqResp")
+	proto.RegisterType((*DockerNetworkListReqResp)(nil), "pb.DockerNetworkListReqResp")
+	proto.RegisterType((*DockerNetworkRemoveReqResp)(nil), "pb.DockerNetworkRemoveReqResp")
+	proto.RegisterType((*DockerNetworkPruneReqResp)(nil), "pb.DockerNetworkPruneReqResp")
+	proto.RegisterEnum("pb.DockerContainerInspectReqResp_KeyType", DockerContainerInspectReqResp_KeyType_name, DockerContainerInspectReqResp_KeyType_value)
+	proto.RegisterEnum("pb.DockerContainerRemoveReqResp_KeyType", DockerContainerRemoveReqResp_KeyType_name, DockerContainerRemoveReqResp_KeyType_value)
+	proto.RegisterEnum("pb.DockerImageInspectReqResp_KeyType", DockerImageInspectReqResp_KeyType_name, DockerImageInspectReqResp_KeyType_value)
+	proto.RegisterEnum("pb.DockerImageRemoveReqResp_KeyType", DockerImageRemoveReqResp_KeyType_name, DockerImageRemoveReqResp_KeyType_value)
+	proto.RegisterEnum("pb.DockerNetworkInspectReqResp_KeyType", DockerNetworkInspectReqResp_KeyType_name, DockerNetworkInspectReqResp_KeyType_value)
+	proto.RegisterEnum("pb.DockerNetworkRemoveReqResp_KeyType", DockerNetworkRemoveReqResp_KeyType_name, DockerNetworkRemoveReqResp_KeyType_value)
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -219,22 +1092,70 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for SimpleService service
 
 type SimpleServiceClient interface {
+	// Run Docker container
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	RunDockerContainer(ctx context.Context, in *DockerContainerRunReqResp, opts ...grpc.CallOption) (*DockerContainerRunReqResp, error)
+	// Inspect Docker container
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	InspectDockerContainer(ctx context.Context, in *DockerContainerInspectReqResp, opts ...grpc.CallOption) (*DockerContainerInspectReqResp, error)
+	// List Docker containers
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	ListDockerContainers(ctx context.Context, in *DockerContainerListReqResp, opts ...grpc.CallOption) (*DockerContainerListReqResp, error)
+	// Remove Docker containers
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	RemoveDockerContainer(ctx context.Context, in *DockerContainerRemoveReqResp, opts ...grpc.CallOption) (*DockerContainerRemoveReqResp, error)
+	// Prune Docker containers
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	PruneDockerContainers(ctx context.Context, in *DockerContainerPruneReqResp, opts ...grpc.CallOption) (*DockerContainerPruneReqResp, error)
+	InspectDockerImage(ctx context.Context, in *DockerImageInspectReqResp, opts ...grpc.CallOption) (*DockerImageInspectReqResp, error)
+	ListDockerImages(ctx context.Context, in *DockerImageListReqResp, opts ...grpc.CallOption) (*DockerImageListReqResp, error)
+	RemoveDockerImage(ctx context.Context, in *DockerImageRemoveReqResp, opts ...grpc.CallOption) (*DockerImageRemoveReqResp, error)
+	PruneDockerImages(ctx context.Context, in *DockerImagePruneReqResp, opts ...grpc.CallOption) (*DockerImagePruneReqResp, error)
 	// Pull Docker image
 	//
 	// Like command of 'docker pull', Input/Output is a same Protobuf/JSON object. For input example:
 	// { "image_ref": "docker.io/nginx" }
 	// For output example:
 	// { "image_ref": "docker.io/nginx", "state_code": 0, "state_message": "SUCCEEDED" }
-	PullImage(ctx context.Context, in *DockerImagePullReqResp, opts ...grpc.CallOption) (*DockerImagePullReqResp, error)
-	// Run Docker container
+	PullDockerImage(ctx context.Context, in *DockerImagePullReqResp, opts ...grpc.CallOption) (*DockerImagePullReqResp, error)
+	BuildDockerImage(ctx context.Context, in *DockerImageBuildReqResp, opts ...grpc.CallOption) (*DockerImageBuildReqResp, error)
+	PushDockerImage(ctx context.Context, in *DockerImagePushReqResp, opts ...grpc.CallOption) (*DockerImagePushReqResp, error)
+	PullDockerImageStreaming(ctx context.Context, in *DockerImagePullReqResp, opts ...grpc.CallOption) (SimpleService_PullDockerImageStreamingClient, error)
+	BuildDockerImageStreaming(ctx context.Context, opts ...grpc.CallOption) (SimpleService_BuildDockerImageStreamingClient, error)
+	PushDockerImageStreaming(ctx context.Context, opts ...grpc.CallOption) (SimpleService_PushDockerImageStreamingClient, error)
+	// Create Docker network - like CLI: docker network create
 	//
-	// For output, plus result fileds:
-	// { ..., "state_code": 0, "state_message": "RUNNING" }
-	RunContainer(ctx context.Context, in *DockerContainerRunReqResp, opts ...grpc.CallOption) (*DockerContainerRunReqResp, error)
-	// Create Docker network
+	// create with IPAM config, for example request:
+	// {} will create bridged network with random name
+	// {"name": "foo"} will create bridged network named foo
+	// {"name": "foo", "networ_create": {"ipam": { "config": {"subnet": "172.30.1.128/25", "172.30.1."}}}}
+	CreateDockerNetwork(ctx context.Context, in *DockerNetworkCreateReqResp, opts ...grpc.CallOption) (*DockerNetworkCreateReqResp, error)
+	// Inspect Docker network
+	// return detailed content
 	//
+	InspectDockerNetwork(ctx context.Context, in *DockerNetworkInspectReqResp, opts ...grpc.CallOption) (*DockerNetworkInspectReqResp, error)
+	// List Docker networks
+	// return all networks
 	//
-	CreateNetwork(ctx context.Context, in *DockerNetworkCreateReqResp, opts ...grpc.CallOption) (*DockerNetworkCreateReqResp, error)
+	ListDockerNetworks(ctx context.Context, in *DockerNetworkListReqResp, opts ...grpc.CallOption) (*DockerNetworkListReqResp, error)
+	// Remove Docker network
+	// remove network with ID or name
+	//
+	RemoveDockerNetwork(ctx context.Context, in *DockerNetworkRemoveReqResp, opts ...grpc.CallOption) (*DockerNetworkRemoveReqResp, error)
+	// Prune Docker networks
+	// clear unused networks
+	//
+	PruneDockerNetworks(ctx context.Context, in *DockerNetworkPruneReqResp, opts ...grpc.CallOption) (*DockerNetworkPruneReqResp, error)
 }
 
 type simpleServiceClient struct {
@@ -245,27 +1166,250 @@ func NewSimpleServiceClient(cc *grpc.ClientConn) SimpleServiceClient {
 	return &simpleServiceClient{cc}
 }
 
-func (c *simpleServiceClient) PullImage(ctx context.Context, in *DockerImagePullReqResp, opts ...grpc.CallOption) (*DockerImagePullReqResp, error) {
-	out := new(DockerImagePullReqResp)
-	err := grpc.Invoke(ctx, "/pb.SimpleService/PullImage", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *simpleServiceClient) RunContainer(ctx context.Context, in *DockerContainerRunReqResp, opts ...grpc.CallOption) (*DockerContainerRunReqResp, error) {
+func (c *simpleServiceClient) RunDockerContainer(ctx context.Context, in *DockerContainerRunReqResp, opts ...grpc.CallOption) (*DockerContainerRunReqResp, error) {
 	out := new(DockerContainerRunReqResp)
-	err := grpc.Invoke(ctx, "/pb.SimpleService/RunContainer", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/RunDockerContainer", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *simpleServiceClient) CreateNetwork(ctx context.Context, in *DockerNetworkCreateReqResp, opts ...grpc.CallOption) (*DockerNetworkCreateReqResp, error) {
+func (c *simpleServiceClient) InspectDockerContainer(ctx context.Context, in *DockerContainerInspectReqResp, opts ...grpc.CallOption) (*DockerContainerInspectReqResp, error) {
+	out := new(DockerContainerInspectReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/InspectDockerContainer", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) ListDockerContainers(ctx context.Context, in *DockerContainerListReqResp, opts ...grpc.CallOption) (*DockerContainerListReqResp, error) {
+	out := new(DockerContainerListReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/ListDockerContainers", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) RemoveDockerContainer(ctx context.Context, in *DockerContainerRemoveReqResp, opts ...grpc.CallOption) (*DockerContainerRemoveReqResp, error) {
+	out := new(DockerContainerRemoveReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/RemoveDockerContainer", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) PruneDockerContainers(ctx context.Context, in *DockerContainerPruneReqResp, opts ...grpc.CallOption) (*DockerContainerPruneReqResp, error) {
+	out := new(DockerContainerPruneReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/PruneDockerContainers", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) InspectDockerImage(ctx context.Context, in *DockerImageInspectReqResp, opts ...grpc.CallOption) (*DockerImageInspectReqResp, error) {
+	out := new(DockerImageInspectReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/InspectDockerImage", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) ListDockerImages(ctx context.Context, in *DockerImageListReqResp, opts ...grpc.CallOption) (*DockerImageListReqResp, error) {
+	out := new(DockerImageListReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/ListDockerImages", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) RemoveDockerImage(ctx context.Context, in *DockerImageRemoveReqResp, opts ...grpc.CallOption) (*DockerImageRemoveReqResp, error) {
+	out := new(DockerImageRemoveReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/RemoveDockerImage", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) PruneDockerImages(ctx context.Context, in *DockerImagePruneReqResp, opts ...grpc.CallOption) (*DockerImagePruneReqResp, error) {
+	out := new(DockerImagePruneReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/PruneDockerImages", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) PullDockerImage(ctx context.Context, in *DockerImagePullReqResp, opts ...grpc.CallOption) (*DockerImagePullReqResp, error) {
+	out := new(DockerImagePullReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/PullDockerImage", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) BuildDockerImage(ctx context.Context, in *DockerImageBuildReqResp, opts ...grpc.CallOption) (*DockerImageBuildReqResp, error) {
+	out := new(DockerImageBuildReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/BuildDockerImage", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) PushDockerImage(ctx context.Context, in *DockerImagePushReqResp, opts ...grpc.CallOption) (*DockerImagePushReqResp, error) {
+	out := new(DockerImagePushReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/PushDockerImage", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) PullDockerImageStreaming(ctx context.Context, in *DockerImagePullReqResp, opts ...grpc.CallOption) (SimpleService_PullDockerImageStreamingClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_SimpleService_serviceDesc.Streams[0], c.cc, "/pb.SimpleService/PullDockerImageStreaming", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &simpleServicePullDockerImageStreamingClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type SimpleService_PullDockerImageStreamingClient interface {
+	Recv() (*DockerImagePullReqResp, error)
+	grpc.ClientStream
+}
+
+type simpleServicePullDockerImageStreamingClient struct {
+	grpc.ClientStream
+}
+
+func (x *simpleServicePullDockerImageStreamingClient) Recv() (*DockerImagePullReqResp, error) {
+	m := new(DockerImagePullReqResp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *simpleServiceClient) BuildDockerImageStreaming(ctx context.Context, opts ...grpc.CallOption) (SimpleService_BuildDockerImageStreamingClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_SimpleService_serviceDesc.Streams[1], c.cc, "/pb.SimpleService/BuildDockerImageStreaming", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &simpleServiceBuildDockerImageStreamingClient{stream}
+	return x, nil
+}
+
+type SimpleService_BuildDockerImageStreamingClient interface {
+	Send(*DockerImageBuildReqResp) error
+	Recv() (*DockerImageBuildReqResp, error)
+	grpc.ClientStream
+}
+
+type simpleServiceBuildDockerImageStreamingClient struct {
+	grpc.ClientStream
+}
+
+func (x *simpleServiceBuildDockerImageStreamingClient) Send(m *DockerImageBuildReqResp) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *simpleServiceBuildDockerImageStreamingClient) Recv() (*DockerImageBuildReqResp, error) {
+	m := new(DockerImageBuildReqResp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *simpleServiceClient) PushDockerImageStreaming(ctx context.Context, opts ...grpc.CallOption) (SimpleService_PushDockerImageStreamingClient, error) {
+	stream, err := grpc.NewClientStream(ctx, &_SimpleService_serviceDesc.Streams[2], c.cc, "/pb.SimpleService/PushDockerImageStreaming", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &simpleServicePushDockerImageStreamingClient{stream}
+	return x, nil
+}
+
+type SimpleService_PushDockerImageStreamingClient interface {
+	Send(*DockerImagePushReqResp) error
+	CloseAndRecv() (*DockerImagePushReqResp, error)
+	grpc.ClientStream
+}
+
+type simpleServicePushDockerImageStreamingClient struct {
+	grpc.ClientStream
+}
+
+func (x *simpleServicePushDockerImageStreamingClient) Send(m *DockerImagePushReqResp) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *simpleServicePushDockerImageStreamingClient) CloseAndRecv() (*DockerImagePushReqResp, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(DockerImagePushReqResp)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *simpleServiceClient) CreateDockerNetwork(ctx context.Context, in *DockerNetworkCreateReqResp, opts ...grpc.CallOption) (*DockerNetworkCreateReqResp, error) {
 	out := new(DockerNetworkCreateReqResp)
-	err := grpc.Invoke(ctx, "/pb.SimpleService/CreateNetwork", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/CreateDockerNetwork", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) InspectDockerNetwork(ctx context.Context, in *DockerNetworkInspectReqResp, opts ...grpc.CallOption) (*DockerNetworkInspectReqResp, error) {
+	out := new(DockerNetworkInspectReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/InspectDockerNetwork", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) ListDockerNetworks(ctx context.Context, in *DockerNetworkListReqResp, opts ...grpc.CallOption) (*DockerNetworkListReqResp, error) {
+	out := new(DockerNetworkListReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/ListDockerNetworks", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) RemoveDockerNetwork(ctx context.Context, in *DockerNetworkRemoveReqResp, opts ...grpc.CallOption) (*DockerNetworkRemoveReqResp, error) {
+	out := new(DockerNetworkRemoveReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/RemoveDockerNetwork", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *simpleServiceClient) PruneDockerNetworks(ctx context.Context, in *DockerNetworkPruneReqResp, opts ...grpc.CallOption) (*DockerNetworkPruneReqResp, error) {
+	out := new(DockerNetworkPruneReqResp)
+	err := grpc.Invoke(ctx, "/pb.SimpleService/PruneDockerNetworks", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -275,78 +1419,451 @@ func (c *simpleServiceClient) CreateNetwork(ctx context.Context, in *DockerNetwo
 // Server API for SimpleService service
 
 type SimpleServiceServer interface {
+	// Run Docker container
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	RunDockerContainer(context.Context, *DockerContainerRunReqResp) (*DockerContainerRunReqResp, error)
+	// Inspect Docker container
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	InspectDockerContainer(context.Context, *DockerContainerInspectReqResp) (*DockerContainerInspectReqResp, error)
+	// List Docker containers
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	ListDockerContainers(context.Context, *DockerContainerListReqResp) (*DockerContainerListReqResp, error)
+	// Remove Docker containers
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	RemoveDockerContainer(context.Context, *DockerContainerRemoveReqResp) (*DockerContainerRemoveReqResp, error)
+	// Prune Docker containers
+	//
+	// For output, plus result fileds:
+	// { ..., "state_code": 0, "state_message": "RUNNING" }
+	PruneDockerContainers(context.Context, *DockerContainerPruneReqResp) (*DockerContainerPruneReqResp, error)
+	InspectDockerImage(context.Context, *DockerImageInspectReqResp) (*DockerImageInspectReqResp, error)
+	ListDockerImages(context.Context, *DockerImageListReqResp) (*DockerImageListReqResp, error)
+	RemoveDockerImage(context.Context, *DockerImageRemoveReqResp) (*DockerImageRemoveReqResp, error)
+	PruneDockerImages(context.Context, *DockerImagePruneReqResp) (*DockerImagePruneReqResp, error)
 	// Pull Docker image
 	//
 	// Like command of 'docker pull', Input/Output is a same Protobuf/JSON object. For input example:
 	// { "image_ref": "docker.io/nginx" }
 	// For output example:
 	// { "image_ref": "docker.io/nginx", "state_code": 0, "state_message": "SUCCEEDED" }
-	PullImage(context.Context, *DockerImagePullReqResp) (*DockerImagePullReqResp, error)
-	// Run Docker container
+	PullDockerImage(context.Context, *DockerImagePullReqResp) (*DockerImagePullReqResp, error)
+	BuildDockerImage(context.Context, *DockerImageBuildReqResp) (*DockerImageBuildReqResp, error)
+	PushDockerImage(context.Context, *DockerImagePushReqResp) (*DockerImagePushReqResp, error)
+	PullDockerImageStreaming(*DockerImagePullReqResp, SimpleService_PullDockerImageStreamingServer) error
+	BuildDockerImageStreaming(SimpleService_BuildDockerImageStreamingServer) error
+	PushDockerImageStreaming(SimpleService_PushDockerImageStreamingServer) error
+	// Create Docker network - like CLI: docker network create
 	//
-	// For output, plus result fileds:
-	// { ..., "state_code": 0, "state_message": "RUNNING" }
-	RunContainer(context.Context, *DockerContainerRunReqResp) (*DockerContainerRunReqResp, error)
-	// Create Docker network
+	// create with IPAM config, for example request:
+	// {} will create bridged network with random name
+	// {"name": "foo"} will create bridged network named foo
+	// {"name": "foo", "networ_create": {"ipam": { "config": {"subnet": "172.30.1.128/25", "172.30.1."}}}}
+	CreateDockerNetwork(context.Context, *DockerNetworkCreateReqResp) (*DockerNetworkCreateReqResp, error)
+	// Inspect Docker network
+	// return detailed content
 	//
+	InspectDockerNetwork(context.Context, *DockerNetworkInspectReqResp) (*DockerNetworkInspectReqResp, error)
+	// List Docker networks
+	// return all networks
 	//
-	CreateNetwork(context.Context, *DockerNetworkCreateReqResp) (*DockerNetworkCreateReqResp, error)
+	ListDockerNetworks(context.Context, *DockerNetworkListReqResp) (*DockerNetworkListReqResp, error)
+	// Remove Docker network
+	// remove network with ID or name
+	//
+	RemoveDockerNetwork(context.Context, *DockerNetworkRemoveReqResp) (*DockerNetworkRemoveReqResp, error)
+	// Prune Docker networks
+	// clear unused networks
+	//
+	PruneDockerNetworks(context.Context, *DockerNetworkPruneReqResp) (*DockerNetworkPruneReqResp, error)
 }
 
 func RegisterSimpleServiceServer(s *grpc.Server, srv SimpleServiceServer) {
 	s.RegisterService(&_SimpleService_serviceDesc, srv)
 }
 
-func _SimpleService_PullImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DockerImagePullReqResp)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SimpleServiceServer).PullImage(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/pb.SimpleService/PullImage",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimpleServiceServer).PullImage(ctx, req.(*DockerImagePullReqResp))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _SimpleService_RunContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SimpleService_RunDockerContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DockerContainerRunReqResp)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimpleServiceServer).RunContainer(ctx, in)
+		return srv.(SimpleServiceServer).RunDockerContainer(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.SimpleService/RunContainer",
+		FullMethod: "/pb.SimpleService/RunDockerContainer",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimpleServiceServer).RunContainer(ctx, req.(*DockerContainerRunReqResp))
+		return srv.(SimpleServiceServer).RunDockerContainer(ctx, req.(*DockerContainerRunReqResp))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SimpleService_CreateNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _SimpleService_InspectDockerContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerContainerInspectReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).InspectDockerContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/InspectDockerContainer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).InspectDockerContainer(ctx, req.(*DockerContainerInspectReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_ListDockerContainers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerContainerListReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).ListDockerContainers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/ListDockerContainers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).ListDockerContainers(ctx, req.(*DockerContainerListReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_RemoveDockerContainer_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerContainerRemoveReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).RemoveDockerContainer(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/RemoveDockerContainer",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).RemoveDockerContainer(ctx, req.(*DockerContainerRemoveReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_PruneDockerContainers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerContainerPruneReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).PruneDockerContainers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/PruneDockerContainers",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).PruneDockerContainers(ctx, req.(*DockerContainerPruneReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_InspectDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerImageInspectReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).InspectDockerImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/InspectDockerImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).InspectDockerImage(ctx, req.(*DockerImageInspectReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_ListDockerImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerImageListReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).ListDockerImages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/ListDockerImages",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).ListDockerImages(ctx, req.(*DockerImageListReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_RemoveDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerImageRemoveReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).RemoveDockerImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/RemoveDockerImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).RemoveDockerImage(ctx, req.(*DockerImageRemoveReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_PruneDockerImages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerImagePruneReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).PruneDockerImages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/PruneDockerImages",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).PruneDockerImages(ctx, req.(*DockerImagePruneReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_PullDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerImagePullReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).PullDockerImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/PullDockerImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).PullDockerImage(ctx, req.(*DockerImagePullReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_BuildDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerImageBuildReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).BuildDockerImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/BuildDockerImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).BuildDockerImage(ctx, req.(*DockerImageBuildReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_PushDockerImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerImagePushReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).PushDockerImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/PushDockerImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).PushDockerImage(ctx, req.(*DockerImagePushReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_PullDockerImageStreaming_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(DockerImagePullReqResp)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(SimpleServiceServer).PullDockerImageStreaming(m, &simpleServicePullDockerImageStreamingServer{stream})
+}
+
+type SimpleService_PullDockerImageStreamingServer interface {
+	Send(*DockerImagePullReqResp) error
+	grpc.ServerStream
+}
+
+type simpleServicePullDockerImageStreamingServer struct {
+	grpc.ServerStream
+}
+
+func (x *simpleServicePullDockerImageStreamingServer) Send(m *DockerImagePullReqResp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _SimpleService_BuildDockerImageStreaming_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SimpleServiceServer).BuildDockerImageStreaming(&simpleServiceBuildDockerImageStreamingServer{stream})
+}
+
+type SimpleService_BuildDockerImageStreamingServer interface {
+	Send(*DockerImageBuildReqResp) error
+	Recv() (*DockerImageBuildReqResp, error)
+	grpc.ServerStream
+}
+
+type simpleServiceBuildDockerImageStreamingServer struct {
+	grpc.ServerStream
+}
+
+func (x *simpleServiceBuildDockerImageStreamingServer) Send(m *DockerImageBuildReqResp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *simpleServiceBuildDockerImageStreamingServer) Recv() (*DockerImageBuildReqResp, error) {
+	m := new(DockerImageBuildReqResp)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _SimpleService_PushDockerImageStreaming_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SimpleServiceServer).PushDockerImageStreaming(&simpleServicePushDockerImageStreamingServer{stream})
+}
+
+type SimpleService_PushDockerImageStreamingServer interface {
+	SendAndClose(*DockerImagePushReqResp) error
+	Recv() (*DockerImagePushReqResp, error)
+	grpc.ServerStream
+}
+
+type simpleServicePushDockerImageStreamingServer struct {
+	grpc.ServerStream
+}
+
+func (x *simpleServicePushDockerImageStreamingServer) SendAndClose(m *DockerImagePushReqResp) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *simpleServicePushDockerImageStreamingServer) Recv() (*DockerImagePushReqResp, error) {
+	m := new(DockerImagePushReqResp)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _SimpleService_CreateDockerNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DockerNetworkCreateReqResp)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SimpleServiceServer).CreateNetwork(ctx, in)
+		return srv.(SimpleServiceServer).CreateDockerNetwork(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/pb.SimpleService/CreateNetwork",
+		FullMethod: "/pb.SimpleService/CreateDockerNetwork",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SimpleServiceServer).CreateNetwork(ctx, req.(*DockerNetworkCreateReqResp))
+		return srv.(SimpleServiceServer).CreateDockerNetwork(ctx, req.(*DockerNetworkCreateReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_InspectDockerNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerNetworkInspectReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).InspectDockerNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/InspectDockerNetwork",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).InspectDockerNetwork(ctx, req.(*DockerNetworkInspectReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_ListDockerNetworks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerNetworkListReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).ListDockerNetworks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/ListDockerNetworks",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).ListDockerNetworks(ctx, req.(*DockerNetworkListReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_RemoveDockerNetwork_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerNetworkRemoveReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).RemoveDockerNetwork(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/RemoveDockerNetwork",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).RemoveDockerNetwork(ctx, req.(*DockerNetworkRemoveReqResp))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SimpleService_PruneDockerNetworks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DockerNetworkPruneReqResp)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SimpleServiceServer).PruneDockerNetworks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/pb.SimpleService/PruneDockerNetworks",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SimpleServiceServer).PruneDockerNetworks(ctx, req.(*DockerNetworkPruneReqResp))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -356,1097 +1873,206 @@ var _SimpleService_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*SimpleServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PullImage",
-			Handler:    _SimpleService_PullImage_Handler,
+			MethodName: "RunDockerContainer",
+			Handler:    _SimpleService_RunDockerContainer_Handler,
 		},
 		{
-			MethodName: "RunContainer",
-			Handler:    _SimpleService_RunContainer_Handler,
+			MethodName: "InspectDockerContainer",
+			Handler:    _SimpleService_InspectDockerContainer_Handler,
 		},
 		{
-			MethodName: "CreateNetwork",
-			Handler:    _SimpleService_CreateNetwork_Handler,
+			MethodName: "ListDockerContainers",
+			Handler:    _SimpleService_ListDockerContainers_Handler,
+		},
+		{
+			MethodName: "RemoveDockerContainer",
+			Handler:    _SimpleService_RemoveDockerContainer_Handler,
+		},
+		{
+			MethodName: "PruneDockerContainers",
+			Handler:    _SimpleService_PruneDockerContainers_Handler,
+		},
+		{
+			MethodName: "InspectDockerImage",
+			Handler:    _SimpleService_InspectDockerImage_Handler,
+		},
+		{
+			MethodName: "ListDockerImages",
+			Handler:    _SimpleService_ListDockerImages_Handler,
+		},
+		{
+			MethodName: "RemoveDockerImage",
+			Handler:    _SimpleService_RemoveDockerImage_Handler,
+		},
+		{
+			MethodName: "PruneDockerImages",
+			Handler:    _SimpleService_PruneDockerImages_Handler,
+		},
+		{
+			MethodName: "PullDockerImage",
+			Handler:    _SimpleService_PullDockerImage_Handler,
+		},
+		{
+			MethodName: "BuildDockerImage",
+			Handler:    _SimpleService_BuildDockerImage_Handler,
+		},
+		{
+			MethodName: "PushDockerImage",
+			Handler:    _SimpleService_PushDockerImage_Handler,
+		},
+		{
+			MethodName: "CreateDockerNetwork",
+			Handler:    _SimpleService_CreateDockerNetwork_Handler,
+		},
+		{
+			MethodName: "InspectDockerNetwork",
+			Handler:    _SimpleService_InspectDockerNetwork_Handler,
+		},
+		{
+			MethodName: "ListDockerNetworks",
+			Handler:    _SimpleService_ListDockerNetworks_Handler,
+		},
+		{
+			MethodName: "RemoveDockerNetwork",
+			Handler:    _SimpleService_RemoveDockerNetwork_Handler,
+		},
+		{
+			MethodName: "PruneDockerNetworks",
+			Handler:    _SimpleService_PruneDockerNetworks_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "PullDockerImageStreaming",
+			Handler:       _SimpleService_PullDockerImageStreaming_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "BuildDockerImageStreaming",
+			Handler:       _SimpleService_BuildDockerImageStreaming_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "PushDockerImageStreaming",
+			Handler:       _SimpleService_PushDockerImageStreaming_Handler,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "pb/service.proto",
 }
-
-func (m *DockerImagePullReqResp) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *DockerImagePullReqResp) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.RefStr) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintService(dAtA, i, uint64(len(m.RefStr)))
-		i += copy(dAtA[i:], m.RefStr)
-	}
-	if m.ImagePullOptions != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.ImagePullOptions.Size()))
-		n1, err := m.ImagePullOptions.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n1
-	}
-	if len(m.RespBody) > 0 {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintService(dAtA, i, uint64(len(m.RespBody)))
-		i += copy(dAtA[i:], m.RespBody)
-	}
-	if m.StateCode != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.StateCode))
-	}
-	if len(m.StateMessage) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintService(dAtA, i, uint64(len(m.StateMessage)))
-		i += copy(dAtA[i:], m.StateMessage)
-	}
-	return i, nil
-}
-
-func (m *DockerNetworkCreateReqResp) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *DockerNetworkCreateReqResp) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Name) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintService(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if m.NetworkCreate != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.NetworkCreate.Size()))
-		n2, err := m.NetworkCreate.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n2
-	}
-	if m.NetworkCreateResponse != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.NetworkCreateResponse.Size()))
-		n3, err := m.NetworkCreateResponse.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n3
-	}
-	if m.StateCode != 0 {
-		dAtA[i] = 0x20
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.StateCode))
-	}
-	if len(m.StateMessage) > 0 {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintService(dAtA, i, uint64(len(m.StateMessage)))
-		i += copy(dAtA[i:], m.StateMessage)
-	}
-	return i, nil
-}
-
-func (m *DockerContainerRunReqResp) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *DockerContainerRunReqResp) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Config != nil {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.Config.Size()))
-		n4, err := m.Config.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n4
-	}
-	if m.HostConfig != nil {
-		dAtA[i] = 0x12
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.HostConfig.Size()))
-		n5, err := m.HostConfig.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n5
-	}
-	if m.NetworkingConfig != nil {
-		dAtA[i] = 0x1a
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.NetworkingConfig.Size()))
-		n6, err := m.NetworkingConfig.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n6
-	}
-	if len(m.Name) > 0 {
-		dAtA[i] = 0x22
-		i++
-		i = encodeVarintService(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if m.ContainerCreateResponse != nil {
-		dAtA[i] = 0x2a
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.ContainerCreateResponse.Size()))
-		n7, err := m.ContainerCreateResponse.MarshalTo(dAtA[i:])
-		if err != nil {
-			return 0, err
-		}
-		i += n7
-	}
-	if m.StateCode != 0 {
-		dAtA[i] = 0x30
-		i++
-		i = encodeVarintService(dAtA, i, uint64(m.StateCode))
-	}
-	if len(m.StateMessage) > 0 {
-		dAtA[i] = 0x3a
-		i++
-		i = encodeVarintService(dAtA, i, uint64(len(m.StateMessage)))
-		i += copy(dAtA[i:], m.StateMessage)
-	}
-	return i, nil
-}
-
-func encodeVarintService(dAtA []byte, offset int, v uint64) int {
-	for v >= 1<<7 {
-		dAtA[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	dAtA[offset] = uint8(v)
-	return offset + 1
-}
-func (m *DockerImagePullReqResp) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.RefStr)
-	if l > 0 {
-		n += 1 + l + sovService(uint64(l))
-	}
-	if m.ImagePullOptions != nil {
-		l = m.ImagePullOptions.Size()
-		n += 1 + l + sovService(uint64(l))
-	}
-	l = len(m.RespBody)
-	if l > 0 {
-		n += 1 + l + sovService(uint64(l))
-	}
-	if m.StateCode != 0 {
-		n += 1 + sovService(uint64(m.StateCode))
-	}
-	l = len(m.StateMessage)
-	if l > 0 {
-		n += 1 + l + sovService(uint64(l))
-	}
-	return n
-}
-
-func (m *DockerNetworkCreateReqResp) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovService(uint64(l))
-	}
-	if m.NetworkCreate != nil {
-		l = m.NetworkCreate.Size()
-		n += 1 + l + sovService(uint64(l))
-	}
-	if m.NetworkCreateResponse != nil {
-		l = m.NetworkCreateResponse.Size()
-		n += 1 + l + sovService(uint64(l))
-	}
-	if m.StateCode != 0 {
-		n += 1 + sovService(uint64(m.StateCode))
-	}
-	l = len(m.StateMessage)
-	if l > 0 {
-		n += 1 + l + sovService(uint64(l))
-	}
-	return n
-}
-
-func (m *DockerContainerRunReqResp) Size() (n int) {
-	var l int
-	_ = l
-	if m.Config != nil {
-		l = m.Config.Size()
-		n += 1 + l + sovService(uint64(l))
-	}
-	if m.HostConfig != nil {
-		l = m.HostConfig.Size()
-		n += 1 + l + sovService(uint64(l))
-	}
-	if m.NetworkingConfig != nil {
-		l = m.NetworkingConfig.Size()
-		n += 1 + l + sovService(uint64(l))
-	}
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovService(uint64(l))
-	}
-	if m.ContainerCreateResponse != nil {
-		l = m.ContainerCreateResponse.Size()
-		n += 1 + l + sovService(uint64(l))
-	}
-	if m.StateCode != 0 {
-		n += 1 + sovService(uint64(m.StateCode))
-	}
-	l = len(m.StateMessage)
-	if l > 0 {
-		n += 1 + l + sovService(uint64(l))
-	}
-	return n
-}
-
-func sovService(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
-}
-func sozService(x uint64) (n int) {
-	return sovService(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *DockerImagePullReqResp) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowService
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: DockerImagePullReqResp: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DockerImagePullReqResp: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RefStr", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RefStr = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ImagePullOptions", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ImagePullOptions == nil {
-				m.ImagePullOptions = &moby.ImagePullOptions{}
-			}
-			if err := m.ImagePullOptions.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RespBody", wireType)
-			}
-			var byteLen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				byteLen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if byteLen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + byteLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RespBody = append(m.RespBody[:0], dAtA[iNdEx:postIndex]...)
-			if m.RespBody == nil {
-				m.RespBody = []byte{}
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCode", wireType)
-			}
-			m.StateCode = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.StateCode |= (int32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateMessage", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.StateMessage = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipService(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *DockerNetworkCreateReqResp) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowService
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: DockerNetworkCreateReqResp: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DockerNetworkCreateReqResp: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NetworkCreate", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.NetworkCreate == nil {
-				m.NetworkCreate = &moby.NetworkCreate{}
-			}
-			if err := m.NetworkCreate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NetworkCreateResponse", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.NetworkCreateResponse == nil {
-				m.NetworkCreateResponse = &moby.NetworkCreateResponse{}
-			}
-			if err := m.NetworkCreateResponse.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCode", wireType)
-			}
-			m.StateCode = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.StateCode |= (int32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateMessage", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.StateMessage = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipService(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *DockerContainerRunReqResp) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowService
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: DockerContainerRunReqResp: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: DockerContainerRunReqResp: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Config", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.Config == nil {
-				m.Config = &container.Config{}
-			}
-			if err := m.Config.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field HostConfig", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.HostConfig == nil {
-				m.HostConfig = &container.HostConfig{}
-			}
-			if err := m.HostConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field NetworkingConfig", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.NetworkingConfig == nil {
-				m.NetworkingConfig = &network.NetworkingConfig{}
-			}
-			if err := m.NetworkingConfig.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 4:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 5:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ContainerCreateResponse", wireType)
-			}
-			var msglen int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				msglen |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			if msglen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + msglen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			if m.ContainerCreateResponse == nil {
-				m.ContainerCreateResponse = &container.ContainerCreateCreatedBody{}
-			}
-			if err := m.ContainerCreateResponse.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
-				return err
-			}
-			iNdEx = postIndex
-		case 6:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateCode", wireType)
-			}
-			m.StateCode = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.StateCode |= (int32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 7:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field StateMessage", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthService
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.StateMessage = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		default:
-			iNdEx = preIndex
-			skippy, err := skipService(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthService
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func skipService(dAtA []byte) (n int, err error) {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return 0, ErrIntOverflowService
-			}
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-			return iNdEx, nil
-		case 1:
-			iNdEx += 8
-			return iNdEx, nil
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowService
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			iNdEx += length
-			if length < 0 {
-				return 0, ErrInvalidLengthService
-			}
-			return iNdEx, nil
-		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return 0, ErrIntOverflowService
-					}
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipService(dAtA[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-			}
-			return iNdEx, nil
-		case 4:
-			return iNdEx, nil
-		case 5:
-			iNdEx += 4
-			return iNdEx, nil
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-	}
-	panic("unreachable")
-}
-
-var (
-	ErrInvalidLengthService = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowService   = fmt.Errorf("proto: integer overflow")
-)
 
 func init() { proto.RegisterFile("pb/service.proto", fileDescriptorService) }
 
 var fileDescriptorService = []byte{
-	// 617 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x54, 0xcd, 0x6e, 0xd3, 0x4c,
-	0x14, 0xfd, 0x9c, 0x26, 0xe9, 0x97, 0x49, 0x52, 0xd2, 0x29, 0x6d, 0x12, 0x97, 0x58, 0xc1, 0x80,
-	0x14, 0x2a, 0xd5, 0x16, 0x41, 0x62, 0x91, 0x65, 0x53, 0x21, 0x58, 0x50, 0x90, 0xf3, 0x00, 0x96,
-	0x7f, 0x26, 0xae, 0x55, 0x67, 0xc6, 0x8c, 0xc7, 0x45, 0x59, 0x82, 0xc4, 0x13, 0xb0, 0xe1, 0x91,
-	0x58, 0x56, 0x62, 0xc3, 0x12, 0x05, 0x1e, 0x04, 0x79, 0x66, 0xec, 0x24, 0x6d, 0x68, 0x37, 0x6c,
-	0xdc, 0xe9, 0xb9, 0x67, 0xee, 0x9d, 0x73, 0xee, 0xbd, 0x01, 0xad, 0xd8, 0x35, 0x13, 0x44, 0x2f,
-	0x43, 0x0f, 0x19, 0x31, 0x25, 0x8c, 0xc0, 0x52, 0xec, 0xaa, 0x0f, 0x02, 0x42, 0x82, 0x08, 0x99,
-	0x4e, 0x1c, 0x9a, 0x0e, 0xc6, 0x84, 0x39, 0x2c, 0x24, 0x38, 0x11, 0x0c, 0x15, 0xc6, 0xae, 0x39,
-	0x23, 0xee, 0x9c, 0x7f, 0x24, 0xf6, 0x30, 0xc7, 0x3c, 0x82, 0x99, 0x13, 0x62, 0x44, 0x97, 0x27,
-	0x49, 0xe9, 0xe5, 0x14, 0x8c, 0xd8, 0x07, 0x42, 0x2f, 0xf2, 0xbf, 0x22, 0xac, 0xff, 0x50, 0xc0,
-	0xc1, 0x29, 0xf1, 0x2e, 0x10, 0x7d, 0x3d, 0x73, 0x02, 0xf4, 0x2e, 0x8d, 0x22, 0x0b, 0xbd, 0xb7,
-	0x50, 0x12, 0xc3, 0x36, 0xd8, 0xa6, 0x68, 0x6a, 0x27, 0x8c, 0x76, 0x94, 0xbe, 0x32, 0xa8, 0x59,
-	0x55, 0x8a, 0xa6, 0x13, 0x46, 0xe1, 0x29, 0x80, 0x61, 0x46, 0xb6, 0xe3, 0x34, 0x8a, 0x6c, 0x12,
-	0xf3, 0x57, 0x76, 0x4a, 0x7d, 0x65, 0x50, 0x1f, 0x1e, 0x18, 0xfc, 0x79, 0x45, 0xb2, 0xb7, 0x22,
-	0x6a, 0xb5, 0xc2, 0x6b, 0x08, 0x3c, 0x04, 0x35, 0x8a, 0x92, 0xd8, 0x76, 0x89, 0x3f, 0xef, 0x6c,
-	0xf5, 0x95, 0x41, 0xc3, 0xfa, 0x3f, 0x03, 0x4e, 0x88, 0x3f, 0x87, 0x3d, 0x00, 0x12, 0xe6, 0x30,
-	0x64, 0x7b, 0xc4, 0x47, 0x9d, 0x72, 0x5f, 0x19, 0x54, 0xac, 0x1a, 0x47, 0xc6, 0xc4, 0x47, 0xf0,
-	0x11, 0x68, 0x8a, 0xf0, 0x0c, 0x25, 0x89, 0x13, 0xa0, 0x4e, 0x85, 0x3f, 0xb0, 0xc1, 0xc1, 0x37,
-	0x02, 0xd3, 0x3f, 0x97, 0x80, 0x2a, 0xa4, 0x9d, 0x09, 0xc9, 0x63, 0x8a, 0x1c, 0x86, 0x72, 0x79,
-	0x10, 0x94, 0xb1, 0x33, 0x43, 0x52, 0x1b, 0x3f, 0xc3, 0x11, 0xd8, 0x91, 0xf6, 0xd8, 0x1e, 0x27,
-	0x4b, 0x55, 0x7b, 0x42, 0xd5, 0x7a, 0x9e, 0x26, 0x5e, 0xfd, 0x17, 0x4e, 0x40, 0x7b, 0xfd, 0xae,
-	0x9d, 0xa9, 0x21, 0x38, 0x41, 0x5c, 0x5d, 0x7d, 0x78, 0xb8, 0x29, 0x89, 0xa4, 0x58, 0xfb, 0x78,
-	0x13, 0xfc, 0x4f, 0x7c, 0xf8, 0xb8, 0x05, 0xba, 0xc2, 0x87, 0x71, 0x3e, 0x1b, 0x56, 0x8a, 0x73,
-	0x1b, 0x9e, 0x82, 0xaa, 0x47, 0xf0, 0x34, 0x0c, 0xb8, 0x11, 0xf5, 0xe1, 0xae, 0xb1, 0x9c, 0xa0,
-	0x31, 0x0f, 0x58, 0x92, 0x00, 0x5f, 0x80, 0xfa, 0x39, 0x49, 0x98, 0x2d, 0xf9, 0xc2, 0x9a, 0xfd,
-	0x15, 0xfe, 0x2b, 0x92, 0x30, 0x79, 0x07, 0x9c, 0x17, 0x67, 0xf8, 0x12, 0xec, 0x4a, 0x75, 0x21,
-	0x0e, 0xf2, 0xdb, 0xc2, 0x93, 0xae, 0x91, 0x8f, 0xe3, 0x59, 0xc1, 0x90, 0x19, 0x5a, 0xf8, 0x1a,
-	0x52, 0x74, 0xac, 0xbc, 0xd2, 0x31, 0x07, 0x74, 0x8b, 0xfa, 0x37, 0x7c, 0xaf, 0xf0, 0x1a, 0x4f,
-	0xd6, 0x15, 0x89, 0x93, 0xf0, 0x59, 0x7c, 0xfd, 0x6c, 0xe4, 0xac, 0xb6, 0xb7, 0x1e, 0xfb, 0x4b,
-	0x0f, 0xaa, 0x77, 0xf6, 0x60, 0xfb, 0x66, 0x0f, 0x86, 0x57, 0x25, 0xd0, 0x9c, 0x84, 0xb3, 0x38,
-	0x42, 0x13, 0xb1, 0xf6, 0xd0, 0x06, 0xb5, 0x6c, 0x1b, 0xf8, 0xa2, 0x40, 0xd5, 0x88, 0x5d, 0x63,
-	0xf3, 0x1a, 0xaa, 0xb7, 0xc4, 0x74, 0xf5, 0xd3, 0xf7, 0xdf, 0x5f, 0x4a, 0xf7, 0xf5, 0x7b, 0xe6,
-	0xe5, 0x33, 0xd3, 0xe7, 0x9c, 0xe3, 0x6c, 0x29, 0x47, 0xca, 0x11, 0x0c, 0x40, 0xc3, 0x4a, 0x71,
-	0x21, 0x18, 0xf6, 0x96, 0x79, 0x36, 0xcc, 0x81, 0x7a, 0x7b, 0x58, 0xef, 0xf2, 0x4a, 0x7b, 0xfa,
-	0xce, 0x4a, 0x25, 0x9a, 0xe2, 0xac, 0x50, 0x0a, 0x9a, 0xc2, 0x31, 0xd9, 0x42, 0xa8, 0x2d, 0x53,
-	0x6d, 0xda, 0x3c, 0xf5, 0x8e, 0xb8, 0xfe, 0x98, 0xd7, 0xd2, 0xf4, 0xee, 0x4a, 0x2d, 0x39, 0x0c,
-	0xc7, 0xa2, 0xc5, 0x23, 0xe5, 0xe8, 0xa4, 0xf5, 0x6d, 0xa1, 0x29, 0x57, 0x0b, 0x4d, 0xf9, 0xb9,
-	0xd0, 0x94, 0xaf, 0xbf, 0xb4, 0xff, 0xdc, 0x2a, 0xff, 0x49, 0x7b, 0xfe, 0x27, 0x00, 0x00, 0xff,
-	0xff, 0x79, 0x0e, 0xbf, 0x62, 0x5e, 0x05, 0x00, 0x00,
+	// 1742 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x59, 0x4b, 0x6f, 0xdc, 0xd4,
+	0x17, 0x8f, 0x27, 0xef, 0x93, 0xd7, 0xe4, 0xe6, 0xe5, 0x78, 0x32, 0x6d, 0xe2, 0xb6, 0xff, 0xa6,
+	0x7f, 0xa9, 0x93, 0x12, 0x24, 0x90, 0xca, 0x82, 0x36, 0x49, 0x0b, 0x09, 0xf4, 0x21, 0x07, 0x75,
+	0x03, 0xd2, 0x68, 0x1e, 0x37, 0x33, 0x26, 0x33, 0xb6, 0xb1, 0x3d, 0x4d, 0x07, 0x16, 0x20, 0x24,
+	0xd4, 0x0f, 0xc0, 0x02, 0x36, 0x6c, 0xf9, 0x1c, 0x7c, 0x02, 0x58, 0xb0, 0x80, 0x5d, 0x17, 0x74,
+	0xcd, 0x37, 0x40, 0x42, 0xbe, 0x0f, 0xcf, 0xf5, 0xf5, 0x8d, 0x4d, 0xa2, 0xe9, 0x26, 0xe3, 0x39,
+	0xe7, 0xf8, 0x9c, 0x7b, 0x7e, 0xe7, 0x71, 0xcf, 0x99, 0x40, 0xd1, 0xab, 0xef, 0x04, 0xd8, 0x7f,
+	0x6e, 0x37, 0x70, 0xc5, 0xf3, 0xdd, 0xd0, 0x45, 0x05, 0xaf, 0x6e, 0x6c, 0xb4, 0x5c, 0xb7, 0xd5,
+	0xc1, 0x3b, 0x35, 0xcf, 0xde, 0xa9, 0x39, 0x8e, 0x1b, 0xd6, 0x42, 0xdb, 0x75, 0x02, 0x2a, 0x61,
+	0x20, 0xaf, 0xbe, 0xd3, 0x75, 0xeb, 0x7d, 0xf2, 0x87, 0xd1, 0xb6, 0x38, 0xad, 0xe1, 0x3a, 0x61,
+	0xcd, 0x76, 0xb0, 0x3f, 0x78, 0x62, 0x22, 0x65, 0x2e, 0xe2, 0xe0, 0xf0, 0xcc, 0xf5, 0x4f, 0xf9,
+	0xa7, 0xcc, 0x3e, 0xb1, 0x3b, 0x21, 0xf6, 0x03, 0xfe, 0x49, 0xd9, 0xe6, 0xaf, 0xa3, 0xb0, 0x7e,
+	0xe0, 0x36, 0x4e, 0xb1, 0xbf, 0xcf, 0xf5, 0x5a, 0x3d, 0xc7, 0xc2, 0x5f, 0x58, 0x38, 0xf0, 0xd0,
+	0x2d, 0x98, 0x68, 0xb8, 0xce, 0x89, 0xdd, 0xd2, 0xb5, 0x4d, 0x6d, 0x7b, 0x66, 0x77, 0xb1, 0x32,
+	0xb0, 0xbe, 0x4f, 0x18, 0x16, 0x13, 0x40, 0xef, 0xc0, 0x4c, 0xdb, 0x0d, 0xc2, 0x2a, 0x93, 0x2f,
+	0x10, 0xf9, 0x15, 0x41, 0xfe, 0x43, 0x37, 0x08, 0xd9, 0x3b, 0xd0, 0x8e, 0x9f, 0xd1, 0x43, 0x58,
+	0x64, 0x07, 0xb6, 0x9d, 0x16, 0x7f, 0x7b, 0x94, 0xbc, 0xbd, 0x5e, 0xe1, 0xae, 0x3c, 0x8e, 0x25,
+	0x98, 0x86, 0xa2, 0x23, 0x51, 0x10, 0x82, 0x31, 0xa7, 0xd6, 0xc5, 0xfa, 0xd8, 0xa6, 0xb6, 0x3d,
+	0x6d, 0x91, 0x67, 0x74, 0x00, 0xc8, 0xee, 0xd6, 0x5a, 0xb8, 0xea, 0xf5, 0x3a, 0x9d, 0xaa, 0xeb,
+	0x11, 0xb4, 0xf5, 0x71, 0xa2, 0x7c, 0xb5, 0x42, 0x60, 0x3e, 0x8c, 0xf8, 0x4f, 0x7b, 0x9d, 0xce,
+	0x13, 0xca, 0xb5, 0x8a, 0xb6, 0x44, 0x41, 0x6d, 0x28, 0xc7, 0x5e, 0x54, 0x1b, 0x3e, 0xae, 0x85,
+	0x98, 0x7d, 0x34, 0xab, 0x75, 0xb7, 0xd9, 0xd7, 0x27, 0x88, 0xc2, 0x1b, 0x49, 0x6c, 0xe8, 0xd3,
+	0x3e, 0x91, 0xa3, 0x7f, 0x9b, 0x7b, 0x6e, 0xb3, 0x6f, 0x19, 0x8d, 0x73, 0x79, 0xa8, 0x0c, 0x10,
+	0x84, 0x44, 0xbd, 0xdb, 0xc4, 0xfa, 0xe4, 0xa6, 0xb6, 0x3d, 0x6e, 0x4d, 0x13, 0xca, 0xbe, 0xdb,
+	0xc4, 0xe8, 0x1a, 0xcc, 0x51, 0x76, 0x17, 0x07, 0x41, 0xad, 0x85, 0xf5, 0x29, 0xe2, 0xeb, 0x2c,
+	0x21, 0x3e, 0xa2, 0x34, 0xf3, 0xe7, 0x02, 0x94, 0xa5, 0x80, 0x1e, 0x3a, 0x81, 0x87, 0x1b, 0x21,
+	0x0f, 0xea, 0x3c, 0x14, 0xec, 0x26, 0x09, 0xe8, 0xb4, 0x55, 0xb0, 0x9b, 0x31, 0x72, 0x85, 0x04,
+	0x72, 0x53, 0xa7, 0xb8, 0x5f, 0x0d, 0xfb, 0x1e, 0x26, 0xc1, 0x98, 0xdf, 0xbd, 0x55, 0xf1, 0xea,
+	0x95, 0x4c, 0xc5, 0x95, 0x8f, 0x70, 0xff, 0x93, 0xbe, 0x87, 0xad, 0xc9, 0x53, 0xfa, 0x80, 0xee,
+	0xc2, 0xfc, 0x00, 0xb9, 0xcf, 0x03, 0xd7, 0x21, 0xd1, 0x99, 0xd9, 0x5d, 0xa2, 0xd8, 0xc7, 0x7a,
+	0x8e, 0x8e, 0x9f, 0x3c, 0xb6, 0xe6, 0x62, 0xd1, 0xa3, 0xc0, 0x75, 0x24, 0x2c, 0xc6, 0x73, 0xb1,
+	0x98, 0x50, 0x60, 0x51, 0x82, 0x49, 0x76, 0x26, 0x34, 0x01, 0x85, 0xc3, 0x83, 0xe2, 0x08, 0x9a,
+	0x82, 0xb1, 0xc7, 0xf7, 0x1f, 0x3d, 0x28, 0x6a, 0xe6, 0x5f, 0x1a, 0x18, 0x92, 0x3f, 0x1f, 0xdb,
+	0x41, 0x8c, 0xd2, 0x53, 0x58, 0x1d, 0x9c, 0xbd, 0x63, 0x07, 0x61, 0x9c, 0x3f, 0xb4, 0x14, 0x0c,
+	0xc9, 0x87, 0xe8, 0x5d, 0x9e, 0x43, 0xcb, 0x0d, 0x05, 0x15, 0xed, 0x00, 0xc4, 0xf4, 0x40, 0x2f,
+	0x6c, 0x8e, 0x6e, 0xcf, 0xec, 0x2e, 0x48, 0x5a, 0x2c, 0x41, 0x44, 0x82, 0x60, 0x34, 0x17, 0x82,
+	0x31, 0x05, 0x04, 0xbf, 0x14, 0x60, 0x43, 0xae, 0x6f, 0xdc, 0x75, 0x9f, 0xe3, 0x8b, 0x64, 0xc3,
+	0x7e, 0x2a, 0x1b, 0xb6, 0x15, 0xd9, 0x90, 0xd0, 0x9b, 0x4e, 0x86, 0x67, 0xa0, 0x0f, 0x00, 0xf5,
+	0x89, 0x6c, 0x0c, 0x29, 0x4d, 0x8b, 0x0d, 0x19, 0x0c, 0x22, 0xc4, 0x41, 0x1d, 0x84, 0x23, 0x41,
+	0x7f, 0xf3, 0x89, 0xf2, 0x4a, 0x83, 0x92, 0xe4, 0xea, 0x53, 0xbf, 0xe7, 0xc4, 0x08, 0xde, 0x84,
+	0x49, 0xd6, 0x53, 0x59, 0x6a, 0xcc, 0x55, 0x78, 0x8f, 0xbd, 0xef, 0xb7, 0x02, 0x8b, 0x73, 0xd1,
+	0x31, 0xac, 0x0d, 0xa2, 0x5b, 0xf5, 0x22, 0x1d, 0x55, 0x1f, 0x7b, 0xae, 0x1f, 0xb2, 0x76, 0x59,
+	0x92, 0x00, 0x08, 0x98, 0x9d, 0x48, 0xc4, 0x5a, 0x69, 0xa8, 0xc8, 0x92, 0xfb, 0x63, 0xb9, 0xee,
+	0x8f, 0x2b, 0xdc, 0x7f, 0xa5, 0xc1, 0x2a, 0xf5, 0x90, 0xb4, 0x43, 0xb1, 0x0c, 0xe2, 0x16, 0xaa,
+	0x28, 0x01, 0xb1, 0x85, 0x8a, 0xe9, 0x4f, 0x5b, 0xa8, 0x98, 0xfa, 0xef, 0xc1, 0x02, 0xd5, 0x12,
+	0xf4, 0xba, 0xdd, 0x9a, 0x6f, 0x63, 0x9e, 0xff, 0x48, 0x50, 0x71, 0x4c, 0x78, 0x7d, 0x6b, 0xde,
+	0x1e, 0x7c, 0xb3, 0xf1, 0x70, 0xca, 0xe0, 0xc7, 0x02, 0xbf, 0xe6, 0x88, 0xa9, 0x9c, 0x8e, 0x58,
+	0x84, 0x51, 0x1f, 0x9f, 0xb0, 0x12, 0x88, 0x1e, 0xd1, 0xbd, 0x54, 0x05, 0xdc, 0x18, 0x54, 0x80,
+	0x42, 0x65, 0x3a, 0xfd, 0xdf, 0x85, 0x39, 0x0a, 0x81, 0x4d, 0x05, 0x59, 0xce, 0x8b, 0x00, 0x70,
+	0x15, 0xb3, 0xb6, 0xf0, 0x6d, 0x28, 0xf9, 0x6d, 0xa4, 0xf3, 0x7b, 0x12, 0x46, 0xad, 0x07, 0x0f,
+	0x8b, 0x9a, 0xf9, 0x72, 0x14, 0x74, 0xc1, 0x8f, 0xec, 0xee, 0x90, 0x46, 0xe6, 0xfd, 0x14, 0x32,
+	0xd7, 0x25, 0x64, 0x72, 0xfa, 0xc2, 0x11, 0x2c, 0x53, 0x60, 0x94, 0x3d, 0x41, 0x17, 0xf0, 0x49,
+	0xf6, 0x03, 0x9a, 0x97, 0xc9, 0x5e, 0xf0, 0x19, 0x94, 0xa8, 0xae, 0x26, 0xee, 0xe0, 0x30, 0x52,
+	0x19, 0x78, 0xae, 0x13, 0xe0, 0xaa, 0x1d, 0xe2, 0x6e, 0x74, 0xf3, 0x47, 0x39, 0x57, 0x16, 0x54,
+	0x1e, 0x10, 0x39, 0x8b, 0x89, 0x1d, 0x86, 0xb8, 0x6b, 0xe9, 0xb6, 0x9a, 0x21, 0x27, 0xe2, 0x44,
+	0x6e, 0x24, 0x26, 0x2f, 0x18, 0x89, 0xdf, 0x34, 0x58, 0x13, 0x70, 0xbb, 0x5c, 0x93, 0xf9, 0x00,
+	0x96, 0x88, 0x03, 0xca, 0x06, 0xb3, 0x26, 0xb8, 0x9e, 0x68, 0x2e, 0x8b, 0xb6, 0x4c, 0x1a, 0x4a,
+	0xd9, 0xfd, 0x99, 0x6c, 0x2c, 0xd1, 0x54, 0xc5, 0x1d, 0x5a, 0x83, 0x49, 0x1f, 0x9f, 0x54, 0x83,
+	0xd0, 0x67, 0xe9, 0x35, 0xe1, 0xe3, 0x93, 0xe3, 0xd0, 0x3f, 0x67, 0x68, 0x2b, 0x5c, 0x70, 0x68,
+	0x2b, 0xc1, 0x74, 0x14, 0x7c, 0x3a, 0xa0, 0x45, 0x87, 0x9f, 0xb5, 0xa6, 0x22, 0x82, 0x62, 0xce,
+	0xba, 0x5c, 0xcf, 0x4c, 0xb9, 0x16, 0xb4, 0x2f, 0xe2, 0x5a, 0xd0, 0xce, 0x74, 0x2d, 0x68, 0xcb,
+	0xae, 0xc5, 0x94, 0x37, 0xef, 0xda, 0x0f, 0x85, 0x44, 0x1e, 0xee, 0xf5, 0xec, 0x4e, 0x93, 0xfb,
+	0x76, 0x0d, 0xe6, 0xea, 0xd1, 0xf7, 0x68, 0x52, 0x0f, 0xf1, 0x8b, 0x90, 0x78, 0x38, 0x6b, 0xcd,
+	0x12, 0xe2, 0x3e, 0xa5, 0xc5, 0x39, 0x58, 0xa5, 0xa2, 0x49, 0x47, 0xc5, 0x1c, 0x24, 0xaa, 0xb9,
+	0xa7, 0x34, 0x07, 0x45, 0xd2, 0xa0, 0x37, 0x50, 0x45, 0xbc, 0x9c, 0xd9, 0x7e, 0xa0, 0xcb, 0x9a,
+	0x78, 0xb9, 0xb2, 0xde, 0x90, 0xa0, 0x0d, 0x05, 0x99, 0xef, 0x0a, 0x7c, 0x66, 0x64, 0x1b, 0x09,
+	0x9d, 0xde, 0x39, 0x38, 0x7c, 0x76, 0xd2, 0x84, 0xd9, 0xe9, 0x2e, 0xcc, 0xb3, 0x5d, 0x85, 0x2d,
+	0x0d, 0x0c, 0x06, 0x36, 0x03, 0x27, 0xf5, 0xcc, 0x39, 0xe2, 0xd7, 0x68, 0x60, 0x48, 0xbe, 0x2b,
+	0x23, 0x50, 0x52, 0x29, 0xe1, 0x20, 0xac, 0x38, 0x2a, 0xf2, 0x50, 0x70, 0xf8, 0xa7, 0xc0, 0x47,
+	0x22, 0x66, 0xfa, 0x12, 0x2b, 0xc6, 0x5e, 0xea, 0xe2, 0xb8, 0x39, 0xb8, 0x38, 0x94, 0x6a, 0xd3,
+	0x77, 0x87, 0x00, 0x10, 0xbb, 0x56, 0xa5, 0xeb, 0x23, 0x09, 0x10, 0x53, 0xc7, 0x13, 0x8e, 0x03,
+	0x94, 0x24, 0xa3, 0x7b, 0xc0, 0xb7, 0xcb, 0x08, 0x6e, 0xb7, 0xe7, 0x37, 0x30, 0xdb, 0x19, 0x57,
+	0x12, 0xda, 0x2c, 0xc6, 0xb4, 0x16, 0x9c, 0x24, 0x61, 0x28, 0x17, 0x45, 0xe6, 0x48, 0xfa, 0xb7,
+	0xc6, 0xef, 0x6c, 0x76, 0x16, 0x71, 0x64, 0x3b, 0x82, 0x65, 0x7e, 0x7e, 0xc5, 0xd0, 0xa6, 0x27,
+	0x7c, 0x10, 0xc7, 0x36, 0xe4, 0xa4, 0x68, 0x68, 0x2f, 0xde, 0xce, 0x63, 0x2c, 0xf8, 0xe8, 0x76,
+	0x0e, 0x18, 0x45, 0x09, 0x8c, 0x60, 0x28, 0x09, 0xf7, 0x5a, 0x93, 0x0a, 0xef, 0xe2, 0x4b, 0xcc,
+	0xfd, 0x54, 0xbe, 0xfd, 0x2f, 0x95, 0x6f, 0x39, 0xa3, 0xca, 0x30, 0x3c, 0xc9, 0x8c, 0xeb, 0x1f,
+	0x1a, 0x1f, 0x53, 0xd9, 0x81, 0x2e, 0x37, 0x03, 0x3c, 0x02, 0x9e, 0xda, 0xca, 0x29, 0x60, 0x3d,
+	0x11, 0xb9, 0xc4, 0x1c, 0xb0, 0xe4, 0xa4, 0x89, 0xc3, 0x98, 0x04, 0x76, 0x7f, 0x42, 0x30, 0x77,
+	0x6c, 0x77, 0xbd, 0x0e, 0x3e, 0xa6, 0x3f, 0x8b, 0xa1, 0x33, 0x40, 0x56, 0xcf, 0x91, 0x16, 0x2b,
+	0x54, 0x56, 0x2d, 0x96, 0xf1, 0x0f, 0x52, 0x46, 0x36, 0xdb, 0xbc, 0xf6, 0xed, 0xef, 0xaf, 0xbf,
+	0x2f, 0x94, 0x4d, 0x7d, 0xe7, 0xf9, 0x5b, 0x3b, 0x4d, 0x22, 0x76, 0x3b, 0x5e, 0x9b, 0x6e, 0xfb,
+	0x3d, 0xe7, 0xae, 0xf6, 0x7f, 0xf4, 0x52, 0x83, 0x55, 0x56, 0xf2, 0xb2, 0xf5, 0xad, 0xdc, 0x1f,
+	0x39, 0x8c, 0x7c, 0x11, 0xf3, 0x26, 0x39, 0xc5, 0x96, 0xb9, 0xa1, 0x3c, 0x05, 0x6b, 0x54, 0xd1,
+	0x49, 0xbe, 0x84, 0xe5, 0xa8, 0xd8, 0x24, 0x6d, 0x01, 0xba, 0xa2, 0xb0, 0x21, 0x54, 0xb8, 0x91,
+	0xc3, 0x37, 0x4d, 0x72, 0x80, 0x0d, 0x73, 0x4d, 0x79, 0x80, 0x4e, 0x10, 0xd9, 0xfe, 0x1a, 0x56,
+	0x68, 0xb6, 0xcb, 0x18, 0x6c, 0xe6, 0xad, 0xf6, 0x46, 0xae, 0x44, 0xce, 0x01, 0xfc, 0x6e, 0x74,
+	0x80, 0x6f, 0x34, 0x58, 0x21, 0x59, 0x96, 0x72, 0xff, 0xaa, 0x42, 0xbf, 0x58, 0x08, 0x46, 0x9e,
+	0x80, 0x79, 0x83, 0xd8, 0xbf, 0x6a, 0x1a, 0x4a, 0xfb, 0xa4, 0x24, 0xa2, 0x23, 0x9c, 0x01, 0x4a,
+	0x24, 0x02, 0x99, 0x24, 0xc4, 0x14, 0x54, 0x6c, 0x76, 0x46, 0x36, 0x5b, 0x99, 0x82, 0x64, 0x1a,
+	0x11, 0x03, 0xdf, 0x81, 0xe2, 0x20, 0xf0, 0x74, 0x1a, 0x47, 0x86, 0xa4, 0x57, 0x0c, 0x78, 0x06,
+	0xcf, 0xdc, 0x24, 0x06, 0x0d, 0x73, 0x25, 0x65, 0x30, 0xea, 0xfe, 0x91, 0xb5, 0x00, 0x16, 0xc5,
+	0x50, 0x53, 0x2f, 0x37, 0xb2, 0xb6, 0x34, 0x23, 0x93, 0xab, 0x0c, 0x2f, 0x35, 0x49, 0x77, 0xb8,
+	0xc8, 0xa8, 0x07, 0x8b, 0x42, 0x74, 0x99, 0x8f, 0x25, 0x49, 0x6d, 0x22, 0xaa, 0x59, 0x4c, 0x73,
+	0x8b, 0x98, 0x2c, 0x99, 0xab, 0x29, 0x93, 0x71, 0x34, 0x4f, 0x61, 0x21, 0xda, 0x00, 0x44, 0x27,
+	0x65, 0xdc, 0x84, 0x05, 0xc4, 0xc8, 0xe0, 0x65, 0x60, 0x1a, 0x2d, 0x25, 0x91, 0x31, 0x17, 0x8a,
+	0x64, 0xbc, 0x14, 0xad, 0xc9, 0x0e, 0x88, 0x83, 0xb3, 0x91, 0xc5, 0xcc, 0xf0, 0x8e, 0x0c, 0xbe,
+	0xb1, 0x77, 0x41, 0x3b, 0xdb, 0xbb, 0x78, 0x07, 0x31, 0x32, 0x78, 0x99, 0xde, 0x05, 0xed, 0xc8,
+	0xd8, 0x33, 0xd0, 0x25, 0x28, 0x8f, 0x43, 0x1f, 0xd7, 0xba, 0xb6, 0xd3, 0xba, 0x34, 0xa6, 0x23,
+	0x77, 0x34, 0xf4, 0x29, 0xac, 0xcb, 0xa8, 0x0d, 0x14, 0x5f, 0x1e, 0xbe, 0x91, 0x6d, 0xed, 0x8e,
+	0x46, 0x0f, 0x9d, 0x40, 0x28, 0xeb, 0xd0, 0xff, 0x0d, 0xaa, 0x91, 0x6d, 0x0d, 0x7d, 0x05, 0x4b,
+	0x74, 0x84, 0x4e, 0xdc, 0xcc, 0x62, 0x93, 0x56, 0x2d, 0x03, 0x46, 0x0e, 0xdf, 0xbc, 0x4e, 0xa2,
+	0x70, 0xc5, 0x5c, 0x17, 0xa2, 0xc0, 0x6e, 0xdf, 0xdb, 0x74, 0xda, 0xa7, 0x6d, 0x7a, 0x39, 0xd1,
+	0xa2, 0xb8, 0xf5, 0xab, 0x39, 0xb3, 0xb2, 0x91, 0x27, 0xa0, 0xec, 0x91, 0xdc, 0xbe, 0xd0, 0xaa,
+	0x7c, 0x40, 0x83, 0x56, 0xc5, 0x47, 0x06, 0xb1, 0x7b, 0xa4, 0x27, 0x50, 0x23, 0x93, 0xab, 0x4c,
+	0x3f, 0x6e, 0x98, 0xde, 0x4d, 0x67, 0xb0, 0x24, 0x36, 0xac, 0xf3, 0x11, 0x4f, 0x36, 0xad, 0x1c,
+	0x7e, 0xa6, 0x61, 0x7a, 0x27, 0xbd, 0x80, 0x25, 0xa1, 0x69, 0xc5, 0xde, 0x96, 0x53, 0x8a, 0x13,
+	0x8d, 0x2b, 0x9b, 0xad, 0xbc, 0x11, 0xb8, 0x59, 0xde, 0xbc, 0xea, 0x13, 0xe4, 0xdf, 0x71, 0x6f,
+	0xff, 0x1b, 0x00, 0x00, 0xff, 0xff, 0x8a, 0xfd, 0x13, 0xb7, 0x39, 0x1c, 0x00, 0x00,
 }

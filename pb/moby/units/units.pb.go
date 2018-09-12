@@ -2,22 +2,20 @@
 // source: pb/moby/units/units.proto
 
 /*
-	Package units is a generated protocol buffer package.
+Package units is a generated protocol buffer package.
 
-	It is generated from these files:
-		pb/moby/units/units.proto
+It is generated from these files:
+	pb/moby/units/units.proto
 
-	It has these top-level messages:
-		Ulimit
-		UnitsUlimit
+It has these top-level messages:
+	Ulimit
+	Rlimit
 */
 package units
 
-import proto "github.com/golang/protobuf/proto"
+import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
-
-import io "io"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -28,7 +26,7 @@ var _ = math.Inf
 // is compatible with the proto package it is being compiled against.
 // A compilation error at this line likely means your copy of the
 // proto package needs to be updated.
-const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
+const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
 // Ulimit is a human friendly version of Rlimit.
 // type Ulimit struct
@@ -69,35 +67,35 @@ func (m *Ulimit) GetSoft() int64 {
 
 // Rlimit specifies the resources limits, such as max open files.
 // type Rlimit struct
-type UnitsUlimit struct {
-	// Type int 0x60json:"type,omitempty"0x60
+type Rlimit struct {
+	// Type int `json:"type,omitempty"`
 	Type int32 `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`
-	// Hard uint64 0x60json:"hard,omitempty"0x60
+	// Hard uint64 `json:"hard,omitempty"`
 	Hard uint64 `protobuf:"varint,2,opt,name=hard,proto3" json:"hard,omitempty"`
-	// Soft uint64 0x60json:"soft,omitempty"0x60
+	// Soft uint64 `json:"soft,omitempty"`
 	Soft uint64 `protobuf:"varint,3,opt,name=soft,proto3" json:"soft,omitempty"`
 }
 
-func (m *UnitsUlimit) Reset()                    { *m = UnitsUlimit{} }
-func (m *UnitsUlimit) String() string            { return proto.CompactTextString(m) }
-func (*UnitsUlimit) ProtoMessage()               {}
-func (*UnitsUlimit) Descriptor() ([]byte, []int) { return fileDescriptorUnits, []int{1} }
+func (m *Rlimit) Reset()                    { *m = Rlimit{} }
+func (m *Rlimit) String() string            { return proto.CompactTextString(m) }
+func (*Rlimit) ProtoMessage()               {}
+func (*Rlimit) Descriptor() ([]byte, []int) { return fileDescriptorUnits, []int{1} }
 
-func (m *UnitsUlimit) GetType() int32 {
+func (m *Rlimit) GetType() int32 {
 	if m != nil {
 		return m.Type
 	}
 	return 0
 }
 
-func (m *UnitsUlimit) GetHard() uint64 {
+func (m *Rlimit) GetHard() uint64 {
 	if m != nil {
 		return m.Hard
 	}
 	return 0
 }
 
-func (m *UnitsUlimit) GetSoft() uint64 {
+func (m *Rlimit) GetSoft() uint64 {
 	if m != nil {
 		return m.Soft
 	}
@@ -106,469 +104,20 @@ func (m *UnitsUlimit) GetSoft() uint64 {
 
 func init() {
 	proto.RegisterType((*Ulimit)(nil), "units.Ulimit")
-	proto.RegisterType((*UnitsUlimit)(nil), "units.UnitsUlimit")
+	proto.RegisterType((*Rlimit)(nil), "units.Rlimit")
 }
-func (m *Ulimit) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *Ulimit) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if len(m.Name) > 0 {
-		dAtA[i] = 0xa
-		i++
-		i = encodeVarintUnits(dAtA, i, uint64(len(m.Name)))
-		i += copy(dAtA[i:], m.Name)
-	}
-	if m.Hard != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintUnits(dAtA, i, uint64(m.Hard))
-	}
-	if m.Soft != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintUnits(dAtA, i, uint64(m.Soft))
-	}
-	return i, nil
-}
-
-func (m *UnitsUlimit) Marshal() (dAtA []byte, err error) {
-	size := m.Size()
-	dAtA = make([]byte, size)
-	n, err := m.MarshalTo(dAtA)
-	if err != nil {
-		return nil, err
-	}
-	return dAtA[:n], nil
-}
-
-func (m *UnitsUlimit) MarshalTo(dAtA []byte) (int, error) {
-	var i int
-	_ = i
-	var l int
-	_ = l
-	if m.Type != 0 {
-		dAtA[i] = 0x8
-		i++
-		i = encodeVarintUnits(dAtA, i, uint64(m.Type))
-	}
-	if m.Hard != 0 {
-		dAtA[i] = 0x10
-		i++
-		i = encodeVarintUnits(dAtA, i, uint64(m.Hard))
-	}
-	if m.Soft != 0 {
-		dAtA[i] = 0x18
-		i++
-		i = encodeVarintUnits(dAtA, i, uint64(m.Soft))
-	}
-	return i, nil
-}
-
-func encodeVarintUnits(dAtA []byte, offset int, v uint64) int {
-	for v >= 1<<7 {
-		dAtA[offset] = uint8(v&0x7f | 0x80)
-		v >>= 7
-		offset++
-	}
-	dAtA[offset] = uint8(v)
-	return offset + 1
-}
-func (m *Ulimit) Size() (n int) {
-	var l int
-	_ = l
-	l = len(m.Name)
-	if l > 0 {
-		n += 1 + l + sovUnits(uint64(l))
-	}
-	if m.Hard != 0 {
-		n += 1 + sovUnits(uint64(m.Hard))
-	}
-	if m.Soft != 0 {
-		n += 1 + sovUnits(uint64(m.Soft))
-	}
-	return n
-}
-
-func (m *UnitsUlimit) Size() (n int) {
-	var l int
-	_ = l
-	if m.Type != 0 {
-		n += 1 + sovUnits(uint64(m.Type))
-	}
-	if m.Hard != 0 {
-		n += 1 + sovUnits(uint64(m.Hard))
-	}
-	if m.Soft != 0 {
-		n += 1 + sovUnits(uint64(m.Soft))
-	}
-	return n
-}
-
-func sovUnits(x uint64) (n int) {
-	for {
-		n++
-		x >>= 7
-		if x == 0 {
-			break
-		}
-	}
-	return n
-}
-func sozUnits(x uint64) (n int) {
-	return sovUnits(uint64((x << 1) ^ uint64((int64(x) >> 63))))
-}
-func (m *Ulimit) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowUnits
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: Ulimit: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: Ulimit: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Name", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowUnits
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthUnits
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Name = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Hard", wireType)
-			}
-			m.Hard = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowUnits
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Hard |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Soft", wireType)
-			}
-			m.Soft = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowUnits
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Soft |= (int64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipUnits(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthUnits
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func (m *UnitsUlimit) Unmarshal(dAtA []byte) error {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		preIndex := iNdEx
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return ErrIntOverflowUnits
-			}
-			if iNdEx >= l {
-				return io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		fieldNum := int32(wire >> 3)
-		wireType := int(wire & 0x7)
-		if wireType == 4 {
-			return fmt.Errorf("proto: UnitsUlimit: wiretype end group for non-group")
-		}
-		if fieldNum <= 0 {
-			return fmt.Errorf("proto: UnitsUlimit: illegal tag %d (wire type %d)", fieldNum, wire)
-		}
-		switch fieldNum {
-		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Type", wireType)
-			}
-			m.Type = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowUnits
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Type |= (int32(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Hard", wireType)
-			}
-			m.Hard = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowUnits
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Hard |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Soft", wireType)
-			}
-			m.Soft = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowUnits
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.Soft |= (uint64(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		default:
-			iNdEx = preIndex
-			skippy, err := skipUnits(dAtA[iNdEx:])
-			if err != nil {
-				return err
-			}
-			if skippy < 0 {
-				return ErrInvalidLengthUnits
-			}
-			if (iNdEx + skippy) > l {
-				return io.ErrUnexpectedEOF
-			}
-			iNdEx += skippy
-		}
-	}
-
-	if iNdEx > l {
-		return io.ErrUnexpectedEOF
-	}
-	return nil
-}
-func skipUnits(dAtA []byte) (n int, err error) {
-	l := len(dAtA)
-	iNdEx := 0
-	for iNdEx < l {
-		var wire uint64
-		for shift := uint(0); ; shift += 7 {
-			if shift >= 64 {
-				return 0, ErrIntOverflowUnits
-			}
-			if iNdEx >= l {
-				return 0, io.ErrUnexpectedEOF
-			}
-			b := dAtA[iNdEx]
-			iNdEx++
-			wire |= (uint64(b) & 0x7F) << shift
-			if b < 0x80 {
-				break
-			}
-		}
-		wireType := int(wire & 0x7)
-		switch wireType {
-		case 0:
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowUnits
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				iNdEx++
-				if dAtA[iNdEx-1] < 0x80 {
-					break
-				}
-			}
-			return iNdEx, nil
-		case 1:
-			iNdEx += 8
-			return iNdEx, nil
-		case 2:
-			var length int
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return 0, ErrIntOverflowUnits
-				}
-				if iNdEx >= l {
-					return 0, io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				length |= (int(b) & 0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			iNdEx += length
-			if length < 0 {
-				return 0, ErrInvalidLengthUnits
-			}
-			return iNdEx, nil
-		case 3:
-			for {
-				var innerWire uint64
-				var start int = iNdEx
-				for shift := uint(0); ; shift += 7 {
-					if shift >= 64 {
-						return 0, ErrIntOverflowUnits
-					}
-					if iNdEx >= l {
-						return 0, io.ErrUnexpectedEOF
-					}
-					b := dAtA[iNdEx]
-					iNdEx++
-					innerWire |= (uint64(b) & 0x7F) << shift
-					if b < 0x80 {
-						break
-					}
-				}
-				innerWireType := int(innerWire & 0x7)
-				if innerWireType == 4 {
-					break
-				}
-				next, err := skipUnits(dAtA[start:])
-				if err != nil {
-					return 0, err
-				}
-				iNdEx = start + next
-			}
-			return iNdEx, nil
-		case 4:
-			return iNdEx, nil
-		case 5:
-			iNdEx += 4
-			return iNdEx, nil
-		default:
-			return 0, fmt.Errorf("proto: illegal wireType %d", wireType)
-		}
-	}
-	panic("unreachable")
-}
-
-var (
-	ErrInvalidLengthUnits = fmt.Errorf("proto: negative length found during unmarshaling")
-	ErrIntOverflowUnits   = fmt.Errorf("proto: integer overflow")
-)
 
 func init() { proto.RegisterFile("pb/moby/units/units.proto", fileDescriptorUnits) }
 
 var fileDescriptorUnits = []byte{
-	// 154 bytes of a gzipped FileDescriptorProto
+	// 131 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x2c, 0x48, 0xd2, 0xcf,
 	0xcd, 0x4f, 0xaa, 0xd4, 0x2f, 0xcd, 0xcb, 0x2c, 0x29, 0x86, 0x90, 0x7a, 0x05, 0x45, 0xf9, 0x25,
 	0xf9, 0x42, 0xac, 0x60, 0x8e, 0x92, 0x0b, 0x17, 0x5b, 0x68, 0x4e, 0x66, 0x6e, 0x66, 0x89, 0x90,
 	0x10, 0x17, 0x4b, 0x5e, 0x62, 0x6e, 0xaa, 0x04, 0xa3, 0x02, 0xa3, 0x06, 0x67, 0x10, 0x98, 0x0d,
 	0x12, 0xcb, 0x48, 0x2c, 0x4a, 0x91, 0x60, 0x52, 0x60, 0xd4, 0x60, 0x0e, 0x02, 0xb3, 0x41, 0x62,
-	0xc5, 0xf9, 0x69, 0x25, 0x12, 0xcc, 0x10, 0x31, 0x10, 0x5b, 0xc9, 0x93, 0x8b, 0x3b, 0x14, 0x64,
-	0x1c, 0xc2, 0xa8, 0x92, 0xca, 0x02, 0x88, 0x51, 0xac, 0x41, 0x60, 0x36, 0x8a, 0x51, 0x2c, 0x58,
-	0x8c, 0x62, 0x81, 0x18, 0xe5, 0x24, 0x70, 0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f,
-	0x1e, 0xc9, 0x31, 0xce, 0x78, 0x2c, 0xc7, 0x90, 0xc4, 0x06, 0x76, 0xb0, 0x31, 0x20, 0x00, 0x00,
-	0xff, 0xff, 0x9b, 0x02, 0x56, 0xeb, 0xcd, 0x00, 0x00, 0x00,
+	0xc5, 0xf9, 0x69, 0x25, 0x12, 0xcc, 0x10, 0x31, 0x10, 0x1b, 0x64, 0x4a, 0x10, 0xdc, 0x94, 0x92,
+	0xca, 0x02, 0x88, 0x29, 0xac, 0x41, 0x60, 0x36, 0x8a, 0x29, 0x2c, 0x58, 0x4c, 0x61, 0x81, 0x98,
+	0x92, 0xc4, 0x06, 0x76, 0x99, 0x31, 0x20, 0x00, 0x00, 0xff, 0xff, 0x11, 0x6c, 0xd6, 0xab, 0xb6,
+	0x00, 0x00, 0x00,
 }

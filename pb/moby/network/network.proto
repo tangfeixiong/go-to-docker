@@ -28,24 +28,24 @@ message IPAM {
 // IPAMConfig represents IPAM configurations
 // type IPAMConfig struct
 message IPAMConfig {
-	// Subnet string 0x60json:",omitempty"0x60
+	// Subnet string `json:",omitempty"`
 	string subnet = 1;
-	// IPRange string 0x60json:",omitempty"0x60
+	// IPRange string `json:",omitempty"`
 	string ip_range = 2;
-	// Gateway string 0x60json:",omitempty"0x60
+	// Gateway string `json:",omitempty"`
 	string gateway = 3;
-	// AuxAddress map[string]string 0x60json:"AuxiliaryAddresses,omitempty"
+	// AuxAddress map[string]string `json:"AuxiliaryAddresses,omitempty"
 	map<string, string> aux_address = 4;
 }
 
 // EndpointIPAMConfig represents IPAM configurations for the endpoint
 // type EndpointIPAMConfig struct
 message EndpointIPAMConfig {
-	// IPv4Address string 0x60json:",omitempty"0x60
+	// IPv4Address string `json:",omitempty"`
 	string ipv4_address = 1;
-	// IPv6Address string 0x60json:",omitempty"0x60
+	// IPv6Address string `json:",omitempty"`
 	string ipv6_address = 2;
-	// LinkLocalIPs []string 0x60json:",omitempty"0x60
+	// LinkLocalIPs []string `json:",omitempty"`
 	repeated string link_local_ips = 3;
 }
 

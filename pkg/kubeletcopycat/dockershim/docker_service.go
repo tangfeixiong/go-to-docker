@@ -34,10 +34,11 @@ const (
 	// or a regular container.
 	// TODO: This is not backward compatible with older containers. We will
 	// need to add filtering based on names.
-	containerTypeLabelKey       = "io.stackdocker.docker.type"
+	containerTypeLabelKey       = "io.kubernetes.docker.type"
+	containerTypeLabelSandbox   = "podsandbox"
 	containerTypeLabelContainer = "container"
-
-	customizedLabelKey = "io.stackdocker.customization"
+	containerLogPathLabelKey    = "io.kubernetes.container.logpath"
+	sandboxIDLabelKey           = "io.kubernetes.sandbox.id"
 
 	// The expiration time of version cache
 	versionCacheTTL = 60 * time.Second
@@ -70,7 +71,7 @@ type DockerService interface {
 	/* DockerLegacyService */ // docker_legacy_service.go
 }
 
-var internalLabelKeys []string = []string{containerTypeLabelKey, customizedLabelKey}
+var internalLabelKeys []string = []string{containerTypeLabelKey, containerLogPathLabelKey, sandboxIDLabelKey}
 
 // ClientConfig is parameters used to initialize docker client
 type ClientConfig struct {
@@ -85,7 +86,7 @@ type ClientConfig struct {
 
 // NetDockerClientFromConfig create a docker client from given configure
 // return nil if nil configure is given.
-func NewDockerClientFromConfig(config *ClientConfig) /* libdocker.Interface */ *libdocker.DockerClient {
+func NewDockerClientFromConfig(config *ClientConfig) libdocker.Interface {
 	if config != nil {
 		// Create docker client.
 		client := libdocker.ConnectToDockerOrDie(
@@ -103,14 +104,14 @@ func NewDockerClientFromConfig(config *ClientConfig) /* libdocker.Interface */ *
 
 // NOTE: Anything passed to DockerService should be enventually handled in another way when we switch to running the shim as a different process.
 func NewDockerService(config *ClientConfig, /* podSandboxImage string, streamingConfig *streaming.Config, pluginSettings *NetworkPluginSettings,
-	   cgroupsName string, kubeCgroupDriver string, dockershimRootDir string,*/startLocalStreamingServer boo) (DockerService, error) {
+	   cgroupsName string, kubeCgroupDriver string, dockershimRootDir string,*/startLocalStreamingServer bool) (DockerService, error) {
 
-	client := NewDockerClientFromConfig(client)
+	client := NewDockerClientFromConfig(config)
 
 	c := libdocker.NewInstrumentedInterface(client)
 
 	ds := &dockerService{
-		client: c,
+		client:                    c,
 		startLocalStreamingServer: startLocalStreamingServer,
 		networkReady:              make(map[string]bool),
 	}
@@ -125,7 +126,7 @@ func NewDockerService(config *ClientConfig, /* podSandboxImage string, streaming
 }
 
 type dockerService struct {
-	client/* libdocker.Interface */ *libdocker.DockerClient
+	client libdocker.Interface
 	/* os               kubercontainer.OSInterface */
 	podSandboxImage string
 	/* streamingRuntime *streamingRuntime */ //docker_streaming.go
@@ -152,7 +153,7 @@ type dockerService struct {
 
 // dockerVersion gets the version information from docker.
 func (ds *dockerService) getDockerVersion() (*dockertypes.Version, error) {
-	v, erv := ds.client.Version()
+	v, err := ds.client.Version()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get docker version: %v", err)
 	}
@@ -178,7 +179,7 @@ func (ds *dockerService) Start() error {
 	return nil
 }
 
-func (ds *dockerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (ds *dockerService) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	/* if ds.streamingServer != nil {
 		ds.streamingServer.ServeHTTP(w, r)
 	} else {
@@ -190,7 +191,7 @@ func (ds *dockerServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // getDockerAPIVersion gets the semver-compatible docker api version.
-func (ds *dockerService) getDockerAPIVersion() (*semver.Version, ererror) {
+func (ds *dockerService) getDockerAPIVersion() (*semver.Version, error) {
 	var dv *dockertypes.Version
 	var err error
 	/* if ds.versionCache != nil {
@@ -203,7 +204,7 @@ func (ds *dockerService) getDockerAPIVersion() (*semver.Version, ererror) {
 		return nil, err
 	}
 
-	apiVersion, erv := semver.Parse(dv.APIVersion)
+	apiVersion, err := semver.Parse(dv.APIVersion)
 	if err != nil {
 		return nil, err
 	}

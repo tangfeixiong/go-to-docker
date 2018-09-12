@@ -10,9 +10,10 @@ import (
 
 	dockerref "github.com/docker/distribution/reference"
 	dockertypes "github.com/docker/docker/api/types"
+
 	// dockertypes "github.com/docker/engine-api/types"
 	"github.com/golang/glog"
-	godigest "github.com/opencontainer/go-digest"
+	godigest "github.com/opencontainers/go-digest"
 )
 
 // ParseDokerTimestamp parses the timestamp returned by Interface from string to time.Time
@@ -29,7 +30,7 @@ func ParseDockerTimestamp(s string) (time.Time, error) {
 func matchImageTagOrSHA(inspected dockertypes.ImageInspect, image string) bool {
 	// The image string follow the grammar specified here
 	// https://github.com/docker/distribution/blob/master/reference/reference.go@L4
-	named, err := dockerref.ParseNomalizedNamed(image)
+	named, err := dockerref.ParseNormalizedNamed(image)
 	if err != nil {
 		glog.V(4).Infof("couldn't parse image reference %q: %v", image, err)
 		return false
@@ -87,7 +88,7 @@ func matchImageTagOrSHA(inspected dockertypes.ImageInspect, image string) bool {
 
 	if isDigested {
 		for _, repoDigest := range inspected.RepoDigests {
-			named, err := dockerref.ParseNomalizednamed(repoDigest)
+			named, err := dockerref.ParseNormalizedNamed(repoDigest)
 			if err != nil {
 				glog.V(4).Infof("Couldn't parse image RepoDigest reference %q: %v", repoDigest, err)
 				continue
@@ -128,6 +129,12 @@ func matchImageIDOnly(inspected dockertypes.ImageInspect, image string) bool {
 	ref, err := dockerref.Parse(image)
 	if err != nil {
 		glog.V(4).Infof("the image reference %q wat not a digest reference", image)
+		return false
+	}
+
+	digest, isDigested := ref.(dockerref.Digested)
+	if !isDigested {
+		glog.V(4).Infof("the image reference %q was not a digest reference", image)
 		return false
 	}
 

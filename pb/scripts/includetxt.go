@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"os"
@@ -18,7 +19,22 @@ func main() {
 			name := strings.TrimPrefix(f.Name(), "service.")
 			out.Write([]byte(strings.TrimSuffix(name, ".json") + " = `"))
 			f, _ := os.Open(f.Name())
-			io.Copy(out, f)
+			origs := new(bytes.Buffer)
+			io.Copy(origs, f)
+			dests := new(bytes.Buffer)
+			for {
+				b, err := origs.ReadByte()
+				if err == io.EOF {
+					break
+				}
+				if b != byte('`') {
+					dests.WriteByte(b)
+				} else {
+					dests.WriteString("0x60")
+				}
+			}
+			io.Copy(out, dests)
+			//io.Copy(out, f)
 			out.Write([]byte("`\n"))
 		}
 	}

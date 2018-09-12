@@ -30,7 +30,7 @@ const (
 
 // Interface is an abstract interface for testability. It abstracts the interface of docker client.
 type Interface interface {
-	ListContainers(options dockertypes.ContainerListOptions) ([]dockertypes.Containers, error)
+	ListContainers(options dockertypes.ContainerListOptions) ([]dockertypes.Container, error)
 	InspectContainer(id string) (*dockertypes.ContainerJSON, error)
 	InspectContainerWithSize(id string) (*dockertypes.ContainerJSON, error)
 	CreateContainer(dockertypes.ContainerCreateConfig) (*dockercontainer.ContainerCreateCreatedBody, error)
@@ -41,10 +41,10 @@ type Interface interface {
 	InspectImageByRef(imageRef string) (*dockertypes.ImageInspect, error)
 	InspectImageByID(imageID string) (*dockertypes.ImageInspect, error)
 	ListImages(opts dockertypes.ImageListOptions) ([]dockertypes.ImageSummary, error)
-	PullImages(image string, auth dockertypes.AuthConfig, opts dockertypes.ImagePullOptions) error
+	PullImage(image string, auth dockertypes.AuthConfig, opts dockertypes.ImagePullOptions) error
 	RemoveImage(image string, opts dockertypes.ImageRemoveOptions) ([]dockertypes.ImageDeleteResponseItem, error)
 	ImageHistory(id string) ([]dockerimagetypes.HistoryResponseItem, error)
-	Logs(string, ddockertypes.ContainerLogsOptions, StreamOptions) eerror
+	Logs(string, dockertypes.ContainerLogsOptions, StreamOptions) error
 	Version() (*dockertypes.Version, error)
 	Info() (*dockertypes.Info, error)
 	CreateExec(string, dockertypes.ExecConfig) (*dockertypes.IDResponse, error)
@@ -61,7 +61,7 @@ type Interface interface {
 func getDockerClient(dockerEndpoint string) (*dockerapi.Client, error) {
 	if len(dockerEndpoint) > 0 {
 		glog.Infof("Connecting to docker on %s", dockerEndpoint)
-		return dockerapi.NewClent(dockerEndpoint, "", nil, nil)
+		return dockerapi.NewClient(dockerEndpoint, "", nil, nil)
 	}
 	return dockerapi.NewEnvClient()
 }
@@ -73,25 +73,23 @@ func getDockerClient(dockerEndpoint string) (*dockerapi.Client, error) {
 // will be canncelled and throw oout an error. If requestTimeout is 0, a default
 // value will be applied.
 func ConnectToDockerOrDie(dockerEndpoint string, requestTimeout, imagePullProgressDeadline time.Duration,
-	withTraceDisabled bool, enableSleep bool) /* Interface */ *DockerClient {
+	withTraceDisabled bool, enableSleep bool) Interface {
 
 	if dockerEndpoint == FakeDockerEndpoint {
-		glog.Fatalln("Fake docker client not implemented")
-		//		fakeClient := NewFakeDockerClient()
-		//		if withTraceDisabled {
-		//			fakeClient = fakeClient.WithTraceDisabled()
-		//		}
+		fakeClient := NewFakeDockerClient()
+		if withTraceDisabled {
+			fakeClient = fakeClient.WithTraceDisabled()
+		}
 
-		//		if enableSleep {
-		//			fakeClient.EnableSleep = true
-		//		}
-		//		return fakeClient
+		if enableSleep {
+			fakeClient.EnableSleep = true
+		}
+		return fakeClient
 	}
-
 	client, err := getDockerClient(dockerEndpoint)
 	if err != nil {
 		glog.Fatalf("Couldn't connect to docker: %c", err)
 	}
 	glog.Infof("Start docker client with request timeout=%v", requestTimeout)
-	return newDockerClient(client, requestTimeout, imagePullProgressDeadline)
+	return newKubeDockerClient(client, requestTimeout, imagePullProgressDeadline)
 }
