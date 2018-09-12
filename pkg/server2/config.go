@@ -12,8 +12,8 @@ type Config struct {
 
 func NewConfig() *Config {
 	config := &Config{
-		Port:             10052,
-		dockerconfigjson: simple.CustomeDockerConfigJSON,
+		Port:             10053,
+		dockerconfigjson: simple.CustomDockerConfigJSON,
 	}
 
 	return config

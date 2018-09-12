@@ -1,6 +1,29 @@
 #!/bin/bash -e
 
+host="127.0.0.1:10053"
+if [[ ${1} =~ --addr=.* ]]; then
+    host=${1#*=}
+    shift
+fi
+
 case $1 in
+    docker-network-create)
+        curl -X POST http://$host/v1/docker-network-create -H "Content-Type: application/json" -d \
+'{
+  "name": "",
+  "network_create":
+    {
+	}
+}'
+        ;;		
+    docker-network-rm)
+        id=""
+        [ $# > 1 ] && id=$2
+        curl -X POST http://$host/v1/docker-network-rm -H "Content-Type: application/json" -d \
+"{
+  \"id\": \"$id\"
+}"
+        ;;		
     test-runcontainer)
 	    curl -X POST http://172.17.4.50:10052/v1/containers -d \
 '{

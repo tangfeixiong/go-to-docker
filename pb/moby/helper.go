@@ -23,10 +23,13 @@ const (
 )
 
 var (
-	ErrNilPointer             = errors.New("found nil pointer")
-	ErrImagePullOptionsIsNil  = errors.New("ImagePullOptions not specified")
-	ErrImageBuildOptionsIsNil = errors.New("ImageBuildOptions is nil")
-	ErrNetworkCreateIsNil     = errors.New("NetworkCreate not specified")
+	ErrNilPointer                      = errors.New("found nil pointer")
+	ErrImagePullOptionsIsNil           = errors.New("ImagePullOptions not specified")
+	ErrImagePushOptionsIsNil           = errors.New("ImagePushOptions not specified")
+	ErrImageBuildOptionsIsNil          = errors.New("ImageBuildOptions is nil")
+	ErrImageBuildDockefileNotSpecified = errors.New("Dockefile not specified")
+	ErrImageBuildOptCtxNotSpecified    = errors.New("Option context not specified")
+	ErrNetworkCreateIsNil              = errors.New("NetworkCreate not specified")
 )
 
 func (m *ContainerListOptions) DeepCopyChecked() (*ContainerListOptions, []error) {
@@ -431,6 +434,9 @@ func (m *ImageBuildOptions) DeepCopyChecked() (*ImageBuildOptions, []error) {
 	for _, v := range m.Tags {
 		tgt.Tags = append(tgt.Tags, v)
 	}
+	if len(m.Dockerfile) == 0 {
+		errorList = append(errorList, ErrImageBuildDockefileNotSpecified)
+	}
 	for _, v := range m.Ulimits {
 		if v != nil {
 			tgt.Ulimits = append(tgt.Ulimits, &unitspb.Ulimit{
@@ -461,6 +467,9 @@ func (m *ImageBuildOptions) DeepCopyChecked() (*ImageBuildOptions, []error) {
 			}
 			tgt.AuthConfigs[k] = ele
 		}
+	}
+	if len(m.Context) == 0 {
+		errorList = append(errorList, ErrImageBuildOptCtxNotSpecified)
 	}
 	for _, v := range m.Context {
 		tgt.Context = append(tgt.Context, v)
@@ -585,45 +594,47 @@ func (m *ImageBuildOptions) ExportIntoDockerApiType() (obj dockertypes.ImageBuil
 	return
 }
 
-func ConvertFromDockerApiTypeImageInspect(s dockertypes.ImageInspect) (dst *ImageInspect) {
-	dst = &ImageInspect{
-		Id:              s.ID,
-		RepoTags:        ([]string)(nil),
-		RepoDigests:     ([]string)(nil),
-		Parent:          s.Parent,
-		Comment:         s.Comment,
-		Created:         s.Created,
-		Container:       s.Container,
-		ContainerConfig: (*containerpb.Config)(nil),
-		DockerVersion:   s.DockerVersion,
-		Author:          s.Author,
-		Config:          (*containerpb.Config)(nil),
-		Architecture:    s.Architecture,
-		Os:              s.Os,
-		OsVersion:       s.OsVersion,
-		Size_:           s.Size,
-		VirtualSize:     s.VirtualSize,
-		GraphDriver:     (*GraphDriverData)(nil),
-		RootFs:          (*RootFS)(nil),
-		Metadata:        (*ImageMetadata)(nil),
-	}
-	if s.RepoTags != nil {
-		dst.RepoTags = make([]string, len(s.RepoTags))
-		for _, v := range s.RepoTags {
-			dst.RepoTags = append(dst.RepoTags, v)
+func ConvertFromDockerApiTypeImageInspect(s *dockertypes.ImageInspect) (dst *ImageInspect) {
+	if s != nil {
+		dst = &ImageInspect{
+			Id:              s.ID,
+			RepoTags:        ([]string)(nil),
+			RepoDigests:     ([]string)(nil),
+			Parent:          s.Parent,
+			Comment:         s.Comment,
+			Created:         s.Created,
+			Container:       s.Container,
+			ContainerConfig: (*containerpb.Config)(nil),
+			DockerVersion:   s.DockerVersion,
+			Author:          s.Author,
+			Config:          (*containerpb.Config)(nil),
+			Architecture:    s.Architecture,
+			Os:              s.Os,
+			OsVersion:       s.OsVersion,
+			Size_:           s.Size,
+			VirtualSize:     s.VirtualSize,
+			GraphDriver:     (*GraphDriverData)(nil),
+			RootFs:          (*RootFS)(nil),
+			Metadata:        (*ImageMetadata)(nil),
 		}
-	}
-	if s.RepoDigests != nil {
-		dst.RepoDigests = make([]string, len(s.RepoDigests))
-		for _, v := range s.RepoDigests {
-			dst.RepoDigests = append(dst.RepoDigests, v)
+		if s.RepoTags != nil {
+			dst.RepoTags = make([]string, len(s.RepoTags))
+			for _, v := range s.RepoTags {
+				dst.RepoTags = append(dst.RepoTags, v)
+			}
 		}
+		if s.RepoDigests != nil {
+			dst.RepoDigests = make([]string, len(s.RepoDigests))
+			for _, v := range s.RepoDigests {
+				dst.RepoDigests = append(dst.RepoDigests, v)
+			}
+		}
+		dst.ContainerConfig = containerpb.ConvertFromDockerApiTypeConfig(s.ContainerConfig)
+		dst.Config = containerpb.ConvertFromDockerApiTypeConfig(s.Config)
+		dst.GraphDriver = convertFromDockerApiTypeGraphDriverData(s.GraphDriver)
+		dst.RootFs = convertFromDockerApiTypeRootFS(s.RootFS)
+		dst.Metadata = convertFromDockerApiTypeImageMetaData(s.Metadata)
 	}
-	dst.ContainerConfig = containerpb.ConvertFromDockerApiTypeConfig(s.ContainerConfig)
-	dst.Config = containerpb.ConvertFromDockerApiTypeConfig(s.Config)
-	dst.GraphDriver = convertFromDockerApiTypeGraphDriverData(s.GraphDriver)
-	dst.RootFs = convertFromDockerApiTypeRootFS(s.RootFS)
-	dst.Metadata = convertFromDockerApiTypeImageMetaData(s.Metadata)
 	return
 }
 
@@ -700,7 +711,7 @@ func ConvertFromDockerApiTypeImageDeleteResponseItem(s dockertypes.ImageDeleteRe
 	return
 }
 
-func ConvertFromDockerApiTypeImagePruneReport(s dockertypes.ImagesPruneReport) (dst *ImagesPruneReport) {
+func ConvertFromDockerApiTypeImagesPruneReport(s dockertypes.ImagesPruneReport) (dst *ImagesPruneReport) {
 	dst = &ImagesPruneReport{
 		ImagesDeleted:  make([]*ImageDeleteResponseItem, len(s.ImagesDeleted)),
 		SpaceReclaimed: s.SpaceReclaimed,

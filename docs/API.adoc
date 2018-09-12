@@ -1,5 +1,46 @@
 = Instruction
 
+== Docker Bridged Network
+
+=== Create
+
+CLI curl
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ ./runtests_curl.sh --addr=172.17.4.59:10053 docker-network-create
+{"name":"stackdocker-br2lpzwp4wn","network_create":{"check_duplicate":false,"driver":"","scope":"","enable_ipv6":false,"ipam":{"driver":"","options":{},"config":[]},"internal":false,"attachable":false,"ingress":false,"config_only":false,"config_from":{"network":""},"options":{},"labels":{}},"network_create_response":{"id":"c7cdbadb41d290ad33ba79149fb61df4ef0ad9449a7b7f62e9ffc9b5f90edf68","warning":""},"state_code":0,"state_message":"created"}
+----
+
+CLI investigation via docker
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ docker network ls
+NETWORK ID          NAME                                  DRIVER              SCOPE
+ff440256465f        bridge                                bridge              local
+05f9661b589a        host                                  host                local
+dce70daba980        none                                  null                local
+c7cdbadb41d2        stackdocker-br2lpzwp4wn               bridge              local
+----
+
+=== Delete
+
+CLI curl
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ ./runtests_curl.sh docker-network-rm c7cdbadb41d2
+{"id":"c7cdbadb41d2","name":"","key_type":"ID","state_code":0,"state_message":"removed"}
+----
+
+CLI investigation via docker
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ docker network ls
+NETWORK ID          NAME                                  DRIVER              SCOPE
+ff440256465f        bridge                                bridge              local
+05f9661b589a        host                                  host                local
+dce70daba980        none                                  null                local
+----
+
+
+
+== V0.1
+
 Batch run
 ----
 fanhonglingdeMacBook-Pro:go-to-docker fanhongling$ curl -X POST http://172.17.4.50:10052/v1/provisions -d '{"name":"fighter1-and-target1","namespace":"default","metadata":{"categroy_name":"basic-web-security","class_name":"http-protocol","field_name":"http-method"},"provisionings":[{"config":{"image":"nginx","exposed_ports":{"value":{"80":"webui"}}},"host_config":{"port_bindings":{"value":{"80":{"host_port":"80"}}}},"network_config":{},"container_name":"nginx"}]}'

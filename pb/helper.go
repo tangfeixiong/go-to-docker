@@ -17,10 +17,11 @@ import (
 )
 
 var (
-	errRequestRequired   = errors.New("request required")
-	errImgRefRequired    = errors.New("image ref required")
-	errImgKeyRequired    = errors.New("image ID or name required")
-	errImgKeyTypeIllegal = errors.New("illegal key, either 1(ID) or 2(name) permitted")
+	errRequestRequired             = errors.New("request required")
+	errImgRefRequired              = errors.New("image ref required")
+	errImgKeyRequired              = errors.New("image ID or name required")
+	errImgKeyTypeIllegal           = errors.New("illegal key, either 1(ID) or 2(name) permitted")
+	errImgBuildContextNotSpecified = errors.New("image build context not specified")
 )
 
 func (m *DockerContainerRunReqResp) DeepCopyChecked() (*DockerContainerRunReqResp, error) {
@@ -193,44 +194,6 @@ func (m *DockerContainerPruneReqResp) DeepCopyCheckedArgs() (*DockerContainerPru
 	return obj, nil
 }
 
-func (m *DockerImagePullReqResp) DeepCopyCheckedArgs() (*DockerImagePullReqResp, error) {
-	if m == nil {
-		return new(DockerImagePullReqResp), errRequestRequired
-	}
-
-	errorList := []error{}
-	tgt := &DockerImagePullReqResp{
-		RefStr:           m.RefStr,
-		ImagePullOptions: new(mobypb.ImagePullOptions),
-		RespBody:         make([]byte, 0),
-	}
-
-	if len(m.RefStr) == 0 {
-		errorList = append(errorList, errImgRefRequired)
-	}
-
-	var errs []error
-	tgt.ImagePullOptions, errs = m.ImagePullOptions.DeepCopyChecked()
-	errorList = append(errorList, errs...)
-
-	msgBuf := bytes.Buffer{}
-	for _, err := range errorList {
-		switch {
-		case err == mobypb.ErrNilPointer:
-			glog.Warningln("Image pull options not specified")
-		default:
-			glog.Warningf("Unknown error: %v", err)
-			msgBuf.WriteString(err.Error())
-			msgBuf.WriteString("; ")
-		}
-	}
-	if msgBuf.Len() != 0 {
-		msgBuf.Truncate(msgBuf.Len() - 2)
-		return tgt, fmt.Errorf("args checked errors: %v", msgBuf.String())
-	}
-	return tgt, nil
-}
-
 func (m *DockerImageInspectReqResp) DeepCopyCheckedArgs() (*DockerImageInspectReqResp, error) {
 	if m == nil {
 		return new(DockerImageInspectReqResp), errRequestRequired
@@ -277,7 +240,7 @@ func (m *DockerImageListReqResp) DeepCopyCheckedArgs() (*DockerImageListReqResp,
 	errorList := []error{}
 	tgt := &DockerImageListReqResp{
 		ImageListOptions: new(mobypb.ImageListOptions),
-		ImageSummaries:   ([]*mobypb.ImageSummary)(nil),
+		ImageSummaries:   make([]*mobypb.ImageSummary, 0),
 	}
 
 	var errs []error
@@ -313,7 +276,7 @@ func (m *DockerImageRemoveReqResp) DeepCopyCheckedArgs() (*DockerImageRemoveReqR
 		Ref:                      m.Ref,
 		KeyType:                  m.KeyType,
 		ImageRemoveOptions:       new(mobypb.ImageRemoveOptions),
-		ImageDeleteResponseItems: ([]*mobypb.ImageDeleteResponseItem)(nil),
+		ImageDeleteResponseItems: make([]*mobypb.ImageDeleteResponseItem, 0),
 	}
 
 	switch {
@@ -365,10 +328,154 @@ func (m *DockerImagePruneReqResp) DeepCopyCheckedArgs() (*DockerImagePruneReqRes
 	return tgt, nil
 }
 
+func (m *DockerImagePullReqResp) DeepCopyCheckedArgs() (*DockerImagePullReqResp, error) {
+	if m == nil {
+		return new(DockerImagePullReqResp), errRequestRequired
+	}
+
+	errorList := []error{}
+	tgt := &DockerImagePullReqResp{
+		RefStr:           m.RefStr,
+		ImagePullOptions: new(mobypb.ImagePullOptions),
+		RespBody:         make([]byte, 0),
+	}
+
+	if len(m.RefStr) == 0 {
+		errorList = append(errorList, errImgRefRequired)
+	}
+
+	var errs []error
+	tgt.ImagePullOptions, errs = m.ImagePullOptions.DeepCopyChecked()
+	errorList = append(errorList, errs...)
+
+	msgBuf := bytes.Buffer{}
+	for _, err := range errorList {
+		switch {
+		case err == mobypb.ErrNilPointer:
+			glog.Warningln("Image pull options not specified")
+		default:
+			glog.Warningf("Unknown error: %v", err)
+			msgBuf.WriteString(err.Error())
+			msgBuf.WriteString("; ")
+		}
+	}
+	if msgBuf.Len() != 0 {
+		msgBuf.Truncate(msgBuf.Len() - 2)
+		return tgt, fmt.Errorf("args checked errors: %v", msgBuf.String())
+	}
+	return tgt, nil
+}
+
+func (m *DockerImagePushReqResp) DeepCopyCheckedArgs() (*DockerImagePushReqResp, error) {
+	if m == nil {
+		return new(DockerImagePushReqResp), errRequestRequired
+	}
+
+	errorList := []error{}
+	tgt := &DockerImagePushReqResp{
+		RefStr:           m.RefStr,
+		ImagePushOptions: new(mobypb.ImagePushOptions),
+		RespBody:         make([]byte, 0),
+	}
+
+	if len(m.RefStr) == 0 {
+		errorList = append(errorList, errImgRefRequired)
+	}
+
+	var errs []error
+	tgt.ImagePushOptions, errs = m.ImagePushOptions.DeepCopyChecked()
+	errorList = append(errorList, errs...)
+
+	msgBuf := bytes.Buffer{}
+	for _, err := range errorList {
+		switch {
+		case err == mobypb.ErrNilPointer:
+			glog.Warningln("Image push options not specified")
+		default:
+			glog.Warningf("Unknown error: %v", err)
+			msgBuf.WriteString(err.Error())
+			msgBuf.WriteString("; ")
+		}
+	}
+	if msgBuf.Len() != 0 {
+		msgBuf.Truncate(msgBuf.Len() - 2)
+		return tgt, fmt.Errorf("args checked errors: %v", msgBuf.String())
+	}
+	return tgt, nil
+}
+
+func (m *DockerImageBuildReqResp) DeepCopyCheckedArgs() (*DockerImageBuildReqResp, error) {
+	if m == nil {
+		return new(DockerImageBuildReqResp), errRequestRequired
+	}
+
+	errorList := []error{}
+	tgt := &DockerImageBuildReqResp{
+		BuildContext:       ([]byte)(nil),
+		ImageBuildOptions:  (*mobypb.ImageBuildOptions)(nil),
+		ImageBuildResponse: (*mobypb.ImageBuildResponse)(nil),
+	}
+
+	if len(m.BuildContext) == 0 {
+		errorList = append(errorList, errImgBuildContextNotSpecified)
+	} else {
+		tgt.BuildContext = make([]byte, len(m.BuildContext))
+		for _, v := range m.BuildContext {
+			tgt.BuildContext = append(tgt.BuildContext, v)
+		}
+	}
+
+	var errs []error
+	tgt.ImageBuildOptions, errs = m.ImageBuildOptions.DeepCopyChecked()
+	errorList = append(errorList, errs...)
+
+	msgBuf := bytes.Buffer{}
+	for _, err := range errorList {
+		switch {
+		case err == errImgBuildContextNotSpecified:
+			if tgt.ImageBuildOptions != nil && len(tgt.ImageBuildOptions.Dockerfile) == 0 {
+				glog.Errorln(err.Error())
+				errorList = append(errorList, err)
+			} else {
+				glog.Warningln(err.Error())
+			}
+		case err == mobypb.ErrImageBuildOptionsIsNil:
+			if len(tgt.BuildContext) == 0 {
+				glog.Errorln(err.Error())
+				errorList = append(errorList, err)
+			} else {
+				glog.Warningln(err.Error())
+			}
+		case err == mobypb.ErrImageBuildDockefileNotSpecified:
+			if tgt.ImageBuildOptions == nil && len(tgt.BuildContext) == 0 {
+				glog.Errorln(err.Error())
+				errorList = append(errorList, err)
+			} else {
+				glog.Warningln(err.Error())
+			}
+		case err == mobypb.ErrImageBuildOptCtxNotSpecified:
+			break
+		case err == mobypb.ErrNilPointer:
+			glog.Errorf("Image build options not specified")
+			msgBuf.WriteString(err.Error())
+			msgBuf.WriteString("; ")
+		default:
+			glog.Warningf("Unknown error: %v", err)
+			msgBuf.WriteString(err.Error())
+			msgBuf.WriteString("; ")
+		}
+	}
+	if msgBuf.Len() != 0 {
+		msgBuf.Truncate(msgBuf.Len() - 2)
+		return tgt, fmt.Errorf("args checked errors: %v", msgBuf.String())
+	}
+	return tgt, nil
+}
+
 func (req *DockerNetworkCreateReqResp) DeepCopyCheckedArgs() (*DockerNetworkCreateReqResp, error) {
 	resp := new(DockerNetworkCreateReqResp)
 	if req == nil {
-		return resp, fmt.Errorf("Docker network create request required")
+		return resp, errRequestRequired
 	}
 
 	if len(req.Name) == 0 {
@@ -436,15 +543,16 @@ func (m *DockerNetworkInspectReqResp) DeepCopyCheckedArgs() (*DockerNetworkInspe
 	return obj, nil
 }
 
-func (req *DockerNetworkListReqResp) CopyWithRequestValidation() (*DockerNetworkListReqResp, error) {
-	resp := new(DockerNetworkListReqResp)
-	if req != nil {
-		resp.NetworkListOptions = req.NetworkListOptions.DeepCopyChecked()
+func (m *DockerNetworkListReqResp) DeepCopyCheckedArgs() (*DockerNetworkListReqResp, error) {
+	obj := new(DockerNetworkListReqResp)
+	if obj != nil {
+		obj.NetworkListOptions = m.NetworkListOptions.DeepCopyChecked()
+		obj.NetworkResources = make([]*mobypb.NetworkResource, 0)
 	}
-	return resp, nil
+	return obj, nil
 }
 
-func (m *DockerNetworkRemoveReqResp) CopyWithRequestValidation() (*DockerNetworkRemoveReqResp, error) {
+func (m *DockerNetworkRemoveReqResp) DeepCopyCheckedArgs() (*DockerNetworkRemoveReqResp, error) {
 	obj := new(DockerNetworkRemoveReqResp)
 	if m == nil {
 		return obj, fmt.Errorf("Docker network remove request required")
@@ -474,10 +582,11 @@ func (m *DockerNetworkRemoveReqResp) CopyWithRequestValidation() (*DockerNetwork
 	return obj, nil
 }
 
-func (req *DockerNetworkPruneReqResp) CopyInputArgsChecked() (*DockerNetworkPruneReqResp, error) {
-	resp := new(DockerNetworkPruneReqResp)
-	if req != nil {
-		resp.Filters = req.Filters.DeepCopyChecked()
+func (m *DockerNetworkPruneReqResp) DeepCopyCheckedArgs() (*DockerNetworkPruneReqResp, error) {
+	obj := new(DockerNetworkPruneReqResp)
+	if m != nil {
+		obj.Filters = m.Filters.DeepCopyChecked()
+		obj.NetworksPruneReport = (*mobypb.NetworksPruneReport)(nil)
 	}
-	return resp, nil
+	return obj, nil
 }

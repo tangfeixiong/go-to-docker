@@ -7,6 +7,9 @@ docs/*.txt
 *.crt
 *.key
 
+java/client-msgo2docker
+runtests_curl.txt
+
 metering/Dockerfile.exporter
 metering/Dockerfile.collector
 tracing/Dockerfile.agent

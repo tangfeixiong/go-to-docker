@@ -52,4 +52,6 @@ func newServe2Command() *cobra.Command {
 
 	command.Flags().StringVar(&opt.LogLevel, "loglevel", "2", "for glog")
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+
+	return command
 }

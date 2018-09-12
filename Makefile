@@ -5,7 +5,7 @@ GOPATHD?=/home/vagrant/go
 
 IMG_NS?=docker.io/tangfeixiong
 IMG_REPO?=go-to-docker
-IMG_TAG?=0.1
+IMG_TAG?=0.2
 GIT_COMMIT=$(shell date +%y%m%d%H%M)-git$(shell git rev-parse --short=7 HEAD)
 REGISTRY_HOST?=172.17.4.50:5000
 
@@ -195,7 +195,7 @@ go-build:
 	#@CGO_ENABLED=0 go build -v -o ./bin/gotodocker -tags netgo -installsuffix netgo -ldflags "-s" ./
 
 docker-build: go-build
-	docker build -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) ./
+	docker build --force-rm --no-cache -t $(IMG_NS)/$(IMG_REPO):$(IMG_TAG) ./
 
 docker-push: docker-build
 	docker push $(IMG_NS)/$(IMG_REPO):$(IMG_TAG)

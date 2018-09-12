@@ -77,7 +77,7 @@ func (ms *MicroServer) Start() error {
 	if err != nil {
 		panic(err)
 	}
-	ms.httpServer, err = newHTTP(ctx, ms.host, ms.port)
+	ms.httpServer, err = newHTTP(ctx, ms.host, ms.config.Port)
 	if err != nil {
 		panic(err)
 	}
@@ -103,7 +103,7 @@ func newGRPC(ctx context.Context, ms *MicroServer) (*grpc.Server, error) {
 }
 
 func newHTTP(ctx context.Context, host string, port int) (*http.Server, error) {
-	router := http.NewServerMux()
+	router := http.NewServeMux()
 	router.HandleFunc("/swagger.json", func(w http.ResponseWriter, req *http.Request) {
 		io.Copy(w, strings.NewReader(pb.Swagger))
 	})
@@ -116,12 +116,12 @@ func newHTTP(ctx context.Context, host string, port int) (*http.Server, error) {
 	}
 	router.Handle("/", gw)
 
-	return &httpServer{
-		Addr:         host,
-		Handler:      router,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		IdleTimeout:  120 * time.Second,
+	return &http.Server{
+		Addr:    host,
+		Handler: router,
+		// ReadTimeout:  5 * time.Second,
+		// WriteTimeout: 10 * time.Second,
+		// IdleTimeout:  120 * time.Second,
 	}, nil
 }
 
@@ -135,13 +135,13 @@ func newGateway(ctx context.Context, host string) (http.Handler, error) {
 	conn, err := grpc.Dial(host, opts...)
 	if err != nil {
 		fmt.Printf("Failed to dial: %v\n", err)
-		return err
+		return nil, err
 	}
 
 	// gwMux := runtime.NewServerMux()
 	// Change JSON serializer to include empty fields with default values
-	gwMux := runtime.NewServerMux(
-		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPB{
+	gwMux := runtime.NewServeMux(
+		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
 			OrigName:     true,
 			EmitDefaults: true}),
 		runtime.WithProtoErrorHandler(runtime.DefaultHTTPProtoErrorHandler),
@@ -150,7 +150,7 @@ func newGateway(ctx context.Context, host string) (http.Handler, error) {
 	err = pb.RegisterSimpleServiceHandler(ctx, gwMux, conn)
 	if err != nil {
 		fmt.Printf("Unable to instantiate gRPC Gateway: %v", err)
-		return err
+		return nil, err
 	}
 	return gwMux, nil
 }
