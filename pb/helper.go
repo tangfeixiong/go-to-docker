@@ -47,7 +47,7 @@ func (m *DockerContainerRunReqResp) DeepCopyChecked() (*DockerContainerRunReqRes
 	obj.NetworkingConfig, errorList = m.NetworkingConfig.DeepCopyChecked()
 	checkedErrors = append(checkedErrors, errorList...)
 	errorList = errorList[:0]
-	obj.Name = obj.Name
+	obj.Name = m.Name
 	if len(obj.Name) == 0 {
 		glog.Warningln("container name not specified")
 	}

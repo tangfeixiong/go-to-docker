@@ -1,6 +1,6 @@
 # go-to-docker
 
-A Micro-Service working around Docker (http://docs.docker.com/) Remote API (version 1.26+, docker 1.11+) & Registry API (v2)
+A Micro-Service working around Docker (http://docs.docker.com/) Remote API (version 1.23+, docker 1.11+) & Registry API (v2)
 
 Feature: based on gRPC and gRPC-Gateway (insecure mode)
 
@@ -76,7 +76,7 @@ I0912 21:33:46.401586       1 network.go:38] docker network cd1526477a81d27a2b37
 ### OpanAPI
 
 swagger 2.0
-[屏幕快照 2018-09-12 下午2.46.33.png](./docs/屏幕快照%202018-09-12%20下午2.46.33.png)
+![屏幕快照 2018-09-12 下午2.46.33.png](./docs/屏幕快照%202018-09-12%20下午2.46.33.png)
 
 
 ### More

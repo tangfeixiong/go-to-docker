@@ -1,4 +1,4 @@
-= Instruction
+= Reference
 
 == Docker Bridged Network
 
@@ -37,6 +37,130 @@ ff440256465f        bridge                                bridge              lo
 dce70daba980        none                                  null                local
 ----
 
+== Docker Container
+
+=== Run
+
+CLI curl (notice: example image is tomcat, version is 8)
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ ./runtests_curl.sh --addr=172.17.4.59:10053 docker-container-run tomcat
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100  4606  100  4606    0     0   2803      0  0:00:01  0:00:01 --:--:--  2803
+{"config":{"hostname":"","domainname":"","user":"","attach_stdin":false,"attach_stdout":false,"attach_stderr":false,"exposed_ports":{"internal_map":{"8080":{}}},"tty":false,"open_stdin":false,"stdin_once":false,"env":[],"cmd":[],"healthcheck":null,"args_escaped":false,"image":"tomcat","volumes":{"/tmp/example":{}},"working_dir":"","entrypoint":[],"network_disabled":false,"mac_address":"","on_build":[],"labels":{},"stop_signal":"","stop_timeout":null,"shell":[]},"host_config":{"binds":["/tmp/sample.war:/usr/local/tomcat/webapps/sample.war:ro"],"container_id_file":"","log_config":null,"network_mode":"stackdocker-brj5lp62cw7","port_bindings":{"internal_map":{"8080":{"internal_list":[{"host_ip":"","host_port":"24680"}]}}},"restart_policy":null,"auto_remove":false,"volume_driver":"","volumes_from":[],"cap_add":[],"cap_drop":[],"dns":[],"dns_options":[],"dns_search":[],"extra_hosts":[],"group_add":[],"ipc_mode":"","cgroup":"","links":[],"oom_score_adj":0,"pid_mode":"","privileged":false,"publish_all_ports":false,"readonly_rootfs":false,"security_opt":[],"storage_opt":{},"tmpfs":{},"uts_mode":"","userns_mode":"","shm_size":"0","sysctls":{},"runtime":"","console_size_height":0,"console_size_width":0,"isolation":"","resources":{"cpu_shares":"0","memory":"300000000","nano_cpus":"0","cgroup_parent":"","blkio_weight":0,"blkio_weight_device":[],"blkio_device_read_bps":[],"blkio_device_write_bps":[],"blkio_device_read_iops":[],"blkio_device_write_iops":[],"cpu_period":"0","cpu_quota":"0","cpu_realtime_period":"0","cpu_realtime_runtime":"0","cpuset_cpus":"","cpuset_mems":"","devices":[],"device_cgroup_rules":[],"disk_quota":"0","kernel_memory":"0","memory_reservation":"0","memory_swap":"0","memory_swappiness":null,"oom_kill_disable":null,"pids_limit":"0","ulimits":[],"cpu_count":"0","cpu_percent":"0","io_maximum_iops":"0","io_maximum_bandwidth":"0"},"mounts":[],"masked_paths":[],"readonly_paths":[],"init":null},"networking_config":{"endpoints_config":{}},"name":"","image_pull_options":{"all":false,"registry_auth":"","privilege_func":"","platform":""},"container_create_created_body":{"id":"9c2f425eb22db8358d73f4eb33a48135d3288c129ab18259756f6e6d114a925f","warnings":[]},"state_code":0,"state_message":"started"}
+----
+
+CLI investigation via docker
+* Container
+----
+[vagrant@kubedev-172-17-4-59 ~]$ docker ps -f name=tomcat-example
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS                                              NAMES
+9c2f425eb22d        tomcat              "catalina.sh run"   15 minutes ago      Up 15 minutes       0.0.0.0:24680->8080/tcp, 0.0.0.0:32769->8080/tcp   tomcat-example
+----
+
+* Network
+----
+[vagrant@kubedev-172-17-4-59 ~]$ docker network inspect stackdocker-brj5lp62cw7
+[
+    {
+        "Name": "stackdocker-brj5lp62cw7",
+        "Id": "cd1526477a81d27a2b3751903dd268cc92c1bad453f495ac974407ba61f0eb04",
+        "Created": "2018-09-12T21:33:31.253554115Z",
+        "Scope": "local",
+        "Driver": "bridge",
+        "EnableIPv6": false,
+        "IPAM": {
+            "Driver": "default",
+            "Options": null,
+            "Config": [
+                {
+                    "Subnet": "172.21.0.0/16",
+                    "Gateway": "172.21.0.1"
+                }
+            ]
+        },
+        "Internal": false,
+        "Attachable": false,
+        "Containers": {
+            "9c2f425eb22db8358d73f4eb33a48135d3288c129ab18259756f6e6d114a925f": {
+                "Name": "tomcat-example",
+                "EndpointID": "e6e672f39a091d22ddcbc748fb61ffe827cdc631bbde280b89c5a3f64c07b68f",
+                "MacAddress": "02:42:ac:15:00:02",
+                "IPv4Address": "172.21.0.2/16",
+                "IPv6Address": ""
+            }
+        },
+        "Options": {},
+        "Labels": {}
+    }
+]
+----
+
+* Logs
+---
+[vagrant@kubedev-172-17-4-59 ~]$ docker logs go-to-docker 
+......
+I0913 20:37:59.144831       1 provider.go:108] Refreshing cache for provider: *credentialprovider.defaultDockerConfigProvider
+I0913 20:37:59.146694       1 provider.go:108] Refreshing cache for provider: *simple.simpleProvider
+I0913 20:38:09.152187       1 docker_client.go:334] Pulling image "tomcat": "Trying to pull repository docker.io/library/tomcat ... "
+I0913 20:38:19.150229       1 docker_client.go:334] Pulling image "tomcat": "5cee356eda6b: Downloading [=========================>                         ]  5.455MB/10.74MB"
+I0913 20:38:29.151015       1 docker_client.go:334] Pulling image "tomcat": "05d1a5232b46: Downloading [=================================================> ]  45.03MB/45.31MB"
+I0913 20:38:39.150697       1 docker_client.go:334] Pulling image "tomcat": "9b6a6eddb2d9: Downloading [=====================>                             ]  4.644MB/10.6MB"
+I0913 20:38:49.150301       1 docker_client.go:334] Pulling image "tomcat": "2c9d39b4bfc1: Downloading [======================================>            ]   94.4MB/122.1MB"
+I0913 20:38:59.150839       1 docker_client.go:334] Pulling image "tomcat": "2c9d39b4bfc1: Extracting [===============================>                   ]  75.76MB/122.1MB"
+I0913 20:39:05.064450       1 docker_client.go:337] Stop pulling image "tomcat": "Status: Downloaded newer image for docker.io/tomcat:latest"
+I0913 20:45:11.842115       1 container.go:43] docker container 9c2f425eb22db8358d73f4eb33a48135d3288c129ab18259756f6e6d114a925f created
+I0913 20:45:12.233620       1 container.go:52] docker container 9c2f425eb22db8358d73f4eb33a48135d3288c129ab18259756f6e6d114a925f started
+---
+
+Web
+---
+[vagrant@kubedev-172-17-4-59 ~]$ curl http://172.17.4.59:24680/sample/
+<html>
+<head>
+<title>Sample "Hello, World" Application</title>
+</head>
+<body bgcolor=white>
+
+<table border="0">
+<tr>
+<td>
+<img src="images/tomcat.gif">
+</td>
+<td>
+<h1>Sample "Hello, World" Application</h1>
+<p>This is the home page for a sample application used to illustrate the
+source directory organization of a web application utilizing the principles
+outlined in the Application Developer's Guide.
+</td>
+</tr>
+</table>
+
+<p>To prove that they work, you can execute either of the following links:
+<ul>
+<li>To a <a href="hello.jsp">JSP page</a>.
+<li>To a <a href="hello">servlet</a>.
+</ul>
+
+</body>
+</html>
+---
+:imagesdir: ./
+image::屏幕快照%202018-09-13%20下午2.09.01.png[屏幕快照\ 2018-09-13\ 下午2.09.01.png]
+
+=== Delete
+
+CLI curl
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ ./runtests_curl.sh --addr=172.17.4.59:10053 docker-container-rm fe96ec25a501c82b5b2f6c0702ac314df1e5f5ed1bc98919cf8875860c
+{"id":"fe96ec25a501c82b5b2f6c0702ac314df1e55c4c64f5ed1bc98919cf8875860c","name":"","key_type":"ID","container_remove_options":{"remove_volumes":true,"remove_links":false,"force":true},"state_code":0,"state_message":"removed"}
+----
+
+CLI investigation via docker
+----
+[vagrant@kubedev-172-17-4-59 ~]$ docker ps -a -f name=tomcat-example
+CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
+----
 
 
 == V0.1

@@ -18,10 +18,96 @@ case $1 in
         ;;		
     docker-network-rm)
         id=""
-        [ $# > 1 ] && id=$2
+        [ $# -gt 1 ] && id=$2
         curl -X POST http://$host/v1/docker-network-rm -H "Content-Type: application/json" -d \
 "{
   \"id\": \"$id\"
+}"
+        ;;		
+    docker-container-run)
+        if [ $# -eq 1 ]; then
+            echo "Usage: runtest_curl.sh docker-container-run tomcat" > /dev/stderr
+        elif [ $2 = "tomcat" ]; then
+            curl -jkSL https://tomcat.apache.org/tomcat-8.0-doc/appdev/sample/sample.war -o /tmp/sample.war
+	        curl -X POST http://$host/v1/docker-container-run -H "Content-Type: application/json" -d \
+'{
+  "config":
+    {
+      "image": "tomcat",
+      "cmd": [
+      ],
+      "entrypoint": [
+      ],
+      "env": [
+      ],
+      "exposed_ports":
+        {
+          "internal_map": 
+            {
+              "8080": {}
+            }
+        },
+      "volumes":
+        {
+          "/tmp/example": {}
+        }
+    },
+  "host_config":
+    {
+      "binds": [
+        "/tmp/sample.war:/usr/local/tomcat/webapps/sample.war:ro"
+      ],
+      "network_mode": "stackdocker-brj5lp62cw7",
+      "port_bindings":
+        {
+          "internal_map":
+            {
+              "8080":
+                {
+                  "internal_list": [
+                    {
+                      "host_ip": "",
+                      "host_port": ""
+                    }
+                  ]
+                }
+            }
+        },
+      "resources":
+        {
+          "memory": 300000000
+        }
+    },
+  "networking_config":
+    {
+      "stackdocker-brj5lp62cw7":
+        {
+           "ipam_config": {},
+           "network_id": "cd1526477a81d27a2b3751903dd268cc92c1bad453f495ac974407ba61f0eb04" 
+        }
+    },
+  "name": "tomcat-example",
+  "image_pull_options":
+    {
+      "registry_auth": ""  
+    }
+}'
+        else 
+            echo "If you should test docker image other than tomcat, please let me know" > /dev/stdout
+        fi
+        ;;
+    docker-container-rm)
+        id=""
+        [ $# > 1 ] && id=$2
+        curl -X POST http://$host/v1/docker-container-rm -H "Content-Type: application/json" -d \
+"{
+  \"id\": \"$id\",
+  \"container_remove_options\":
+    {
+      \"remove_volumes\": true,
+      \"remove_links\": false,
+      \"force\": true
+    }
 }"
         ;;		
     test-runcontainer)
