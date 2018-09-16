@@ -10,14 +10,20 @@ github.com/gogo/protobuf/
 github.com/golang/glog/
 github.com/golang/protobuf/
 github.com/grpc-ecosystem/grpc-gateway/
+github.com/jteeuwen/go-bindata/
 github.com/mwitkow/go-proto-validators/
 github.com/opencontainers/go-digest/
+github.com/openshift/source-to-image/
+github.com/openshift/imagebuilder/
 github.com/prometheus/client_golang/
 github.com/rakyll/statik/
 github.com/soheilhy/cmux/
+github.com/xanzy/go-gitlab/
 
 golang.org/
 google.golang.org/
+
+gopkg.in/src-d/go-git.v4/
 
 k8s.io/api/
 k8s.io/apimachinery/

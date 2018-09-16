@@ -72,7 +72,7 @@ func (m *DockerContainerRunReqResp) DeepCopyChecked() (*DockerContainerRunReqRes
 		case err == mobypb.ErrImagePullOptionsIsNil:
 			glog.Warningln(err.Error())
 		default:
-			glog.Warning("Unknown error: %v", err)
+			glog.Warningf("Unknown error: %v", err)
 			msgBuf.WriteString(err.Error())
 		}
 	}

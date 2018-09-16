@@ -1,4 +1,6 @@
-= Reference
+= Reference: draft
+Version 0.2, 13.9.2018
+:imagesdir: ./
 
 == Docker Bridged Network
 
@@ -51,6 +53,7 @@ CLI curl (notice: example image is tomcat, version is 8)
 ----
 
 CLI investigation via docker
+
 * Container
 ----
 [vagrant@kubedev-172-17-4-59 ~]$ docker ps -f name=tomcat-example
@@ -145,7 +148,7 @@ outlined in the Application Developer's Guide.
 </body>
 </html>
 ---
-:imagesdir: ./
+
 image::屏幕快照%202018-09-13%20下午2.09.01.png[屏幕快照\ 2018-09-13\ 下午2.09.01.png]
 
 === Delete

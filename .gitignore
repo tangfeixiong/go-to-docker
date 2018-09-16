@@ -7,6 +7,7 @@ docs/*.txt
 *.crt
 *.key
 
+pkg/**/*.txt
 java/client-msgo2docker
 runtests_curl.txt
 

@@ -9,7 +9,7 @@ IMG_TAG?=0.2
 GIT_COMMIT=$(shell date +%y%m%d%H%M)-git$(shell git rev-parse --short=7 HEAD)
 REGISTRY_HOST?=172.17.4.50:5000
 
-all: protoc-grpc docker-push
+all: protoc-grpc gen-statik go-bindata docker-push
 
 protoc-grpc: protoc-moby
 	protoc -I/usr/local/include -I. \
@@ -187,6 +187,14 @@ gen-statik:
 	#@cp ./pb/service.swagger.json ./third_party/OpenAPI/
 	@go generate ./pkg/ui
 
+go-bindata:
+	$(eval gobin:=$(shell go env GOBIN))
+	@if [[ ! -f $(gobin)/go-bindata ]]; then \
+		go install ./vendor/github.com/jteeuwen/go-bindata/...; \
+	fi
+	@pkg=artifact; src=template/...; output_file=pkg/api/$${pkg}/artifact_file.go; \
+		go-bindata -nocompress -o $${output_file} -prefix $${PWD} -pkg $${pkg} $${src}
+
 go-install:
 	go install -v ./
 
@@ -208,4 +216,4 @@ docker-cgo:
 docker-run:
 	$(info $(shell ./bootstrap.sh $(REGISTRY_HOST) "/etc/docker/certs.d/$(REGISTRY_HOST)/ca.crt"))
 
-.PHONY: all protoc-grpc protoc-moby go-install go-build docker-build docker-push docker-cgo docker-run
+.PHONY: all protoc-grpc protoc-moby gen-statik go-bindata go-install go-build docker-build docker-push docker-cgo docker-run

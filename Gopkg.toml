@@ -66,6 +66,14 @@ required = [
   name = "github.com/opencontainers/go-digest"
 
 [[constraint]]
+  revision = "fbd4f31c568b767447302e08fb3531b33bcbf837"
+  name = "github.com/openshift/imagebuilder"
+
+[[constraint]]
+  revision = "ac6dc9858fa90b751686436fea9a951f183c79bb"
+  name = "github.com/openshift/source-to-image"
+
+[[constraint]]
   # version = "v0.8.0-83-ge7e9030" // kubernetes
   revision = "e7e903064f5e9eb5da98208bae10b475d4db0f8c"
   name = "github.com/prometheus/client_golang"
@@ -73,6 +81,10 @@ required = [
 [[constraint]]
   revision = "f7603f4e1c90a14f48a7170db2d625c5ce04db6b"
   name = "github.com/soheilhy/cmux"
+
+[[constraint]]
+  revision = "0e1a0aad2f7404e9ad14018b02315af5c2f12ffb"
+  name = "github.com/xanzy/go-gitlab"
 
 [[constraint]]
   revision = "de0752318171da717af4ce24d0a2e8626afaeb11"
@@ -92,6 +104,12 @@ required = [
   # revision = "383e8b2c3b9e36c4076b235b32537292176bae20" // grpc-gateway
   revision = "09f6ed296fc66555a25fe4ce95173148778dfa85"
   name = "google.golang.org/genproto"
+
+[[constraint]]
+  # mirror https://github.com/src-d/go-git
+  # version = "v4.7.0"
+  revision = "d3cec13ac0b195bfb897ed038a08b5130ab9969e"
+  name = "gopkg.in/src-d/go-git.v4"
 
 [[constraint]]
   revision = "012f271b5d41baad56190c5f1ae19bff16df0fd8"

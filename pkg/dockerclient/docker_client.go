@@ -9,9 +9,6 @@ import (
 	// "github.com/docker/go-connections/tlsconfig"
 	"github.com/golang/glog"
 
-	// openshiftstiapi "github.com/openshift/source-to-image/pkg/api"
-	// openshiftstidocker "github.com/openshift/source-to-image/pkg/docker"
-
 	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/dockershim"
 	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/dockershim/libdocker"
 )
@@ -20,7 +17,7 @@ type DockerClient struct {
 	DockerApiClient *dockerapi.Client
 	// criHandler dockershim.DockerService
 	KubeDockerClient libdocker.Interface
-	//OpenshiftStiDockerClient: docker.Docker
+	//OpenshiftS2iDockerClient: docker.Docker
 }
 
 // refer to
@@ -74,57 +71,3 @@ func getDockerClient(dockerEndpoint string) (*dockerapi.Client, error) {
 	}
 	return dockerapi.NewEnvClient()
 }
-
-// Refer to
-// - https://github.com/openshift/source-to-image/blob/master/pkg/docker/docker.go#L276-L277
-// NewEngineAPIClient creates a new Docker engine API client
-/*
-func NewEngineAPIClient(config *openshiftstiapi.DockerConfig) (*dockerapi.Client, error) {
-	var httpClient *http.Client
-
-	if config.UseTLS || config.TLSVerify {
-		tlscOptions := tlsconfig.Options{
-			InsecureSkipVerify: !config.TLSVerify,
-		}
-
-		if _, err := os.Stat(config.CAFile); !os.IsNotExist(err) {
-			tlscOptions.CAFile = config.CAFile
-		}
-		if _, err := os.Stat(config.CertFile); !os.IsNotExist(err) {
-			tlscOptions.CertFile = config.CertFile
-		}
-		if _, err := os.Stat(config.KeyFile); !os.IsNotExist(err) {
-			tlscOptions.KeyFile = config.KeyFile
-		}
-
-		tlsc, err := tlsconfig.Client(tlscOptions)
-		if err != nil {
-			return nil, err
-		}
-
-		httpClient = &http.Client{
-			Transport: &http.Transport{
-				TLSClientConfig: tlsc,
-			},
-		}
-	}
-	return dockerapi.NewClient(config.Endpoint, os.Getenv("DOCKER_API_VERSION"), httpClient, nil)
-}
-*/
-
-// Refer to
-// - https://github.com/openshift/source-to-image/blob/master/pkg/docker/docker.go#L309
-// New creates a new implementation of the STI Docker interface
-/*
-func New(client Client, auth api.AuthConfig) Docker {
-	return &stiDocker{
-		client: client,
-		pullAuth: dockertypes.AuthConfig{
-			Username:      auth.Username,
-			Password:      auth.Password,
-			Email:         auth.Email,
-			ServerAddress: auth.ServerAddress,
-		},
-	}
-}
-*/
