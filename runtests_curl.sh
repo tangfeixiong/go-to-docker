@@ -110,6 +110,21 @@ case $1 in
     }
 }"
         ;;		
+    docker-image-build)
+        curl -X POST http://$host/v1/docker-image-build -H "Content-Type: application/json" -d \
+'{
+  "build_context": "CkZST00gYWxwaW5lClJVTiBhcGsgYWRkIC0tdXBkYXRlIG5ldGNhdC1vcGVuYnNkICYmIHJtIC1yZiAvdmFyL2NhY2hlL2Fway8qClJVTiBlY2hvIC1lICIjIS9iaW4vc2hcblwgCnNldCAtZVxuXAp3aGlsZSB0cnVlOyBkbyBlY2hvIC1lIFwiSFRUUC8xLjEgMjAwIE9LXG5cbiBcJChkYXRlKSBIZWxsbyB3b3JsZFwiIHwgbmMgLWwgODA7IGRvbmUiID4gL2VudHJ5cG9pbnQuc2ggXAogICAgJiYgY2htb2QgK3ggL2VudHJ5cG9pbnQuc2gKIyBSVU4gdG91Y2ggL2VudHJ5cG9pbnQuc2ggJiYgY2htb2QgK3ggL2VudHJ5cG9pbnQuc2ggJiYgZWNobyAtZSAiIyEvYmluL3NoXG5zZXQgLWVcbndoaWxlIHRydWU7IGRvIG5jIC1sIDgwIDwgaW5kZXguaHRtbDsgZG9uZSIgPiAvZW50cnlwb2ludC5zaApSVU4gZWNobyAtZSAiXG5cCjxodG1sPlwKICAgICAgICA8aGVhZD5cCiAgICAgICAgICAgICAgICA8dGl0bGU+SGVsbG8gUGFnZTwvdGl0bGU+XAogICAgICAgIDwvaGVhZD5cCiAgICAgICAgPGJvZHk+XAogICAgICAgICAgICAgICAgPGgxPkhlbGxvPC9oMT5cCiAgICAgICAgICAgICAgICA8aDI+Q29udGFpbmVyPC9oMj5cCiAgICAgICAgICAgICAgICA8cD5Qb3dlcmVkIGJ5IG5jPC9wPlwKICAgICAgICA8L2JvZHk+XAo8L2h0bWw+XAoiID4gL2luZGV4Lmh0bWwKCkVOVFJZUE9JTlQgWyIvZW50cnlwb2ludC5zaCJdCkVYUE9TRSA4MAo=",
+  "image_build_options":
+    {
+        "tags": ["tangfeixiong/hello-world:netcat-http"],
+        "no_cache": true,
+        "suppress_output": true,
+        "remove": true,
+        "force_remove": true,
+        "pull_parent": true
+	}
+}'
+        ;;
     test-runcontainer)
 	    curl -X POST http://172.17.4.50:10052/v1/containers -d \
 '{

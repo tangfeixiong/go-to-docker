@@ -1,5 +1,5 @@
 /*
-[vagrant@kubedev-172-17-4-59 go-to-docker]$ GOPATH=/Users/fanhongling/Downloads/workspace/:/Users/fanhongling/go go test -test.v -run ImageBuild_api ./pkg/dockerclient/
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ GOPATH=/Users/fanhongling/Downloads/workspace/:/Users/fanhongling/go go test -test.v -run ImageBuild ./pkg/dockerclient/
 */
 package dockerclient
 
@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -20,10 +21,12 @@ import (
 
 	dockertypes "github.com/docker/docker/api/types"
 
+	"github.com/tangfeixiong/go-to-docker/pb"
+	mobypb "github.com/tangfeixiong/go-to-docker/pb/moby"
 	"github.com/tangfeixiong/go-to-docker/pkg/api/artifact"
 )
 
-func TestImageBuild_api_dockerfile(t *testing.T) {
+func TestImageBuildDockerfileAPI(t *testing.T) {
 	wd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
@@ -148,12 +151,64 @@ func dockerfileFromTemplate(dir string, t *testing.T) ([]byte, []string) {
 
 	dockerfile := &bytes.Buffer{}
 	tte := template.Must(template.New("basedgofs").Parse(string(asset)))
-	err = tte.Execute(dockerfile, struct{ SrcStr string }{
+	err = tte.Execute(dockerfile, struct{ SrcStr, DstDir string }{
 		SrcStr: "/",
+		DstDir: "",
 	})
 	if err != nil {
 		t.Skip(err)
 	}
 
 	return dockerfile.Bytes(), src
+}
+
+var (
+	dockerfile []byte = []byte(`
+FROM alpine
+RUN apk add --update netcat-openbsd && rm -rf /var/cache/apk/*
+RUN echo -e "#!/bin/sh\n\ 
+set -e\n\
+while true; do echo -e \"HTTP/1.1 200 OK\n\n \$(date) Hello world\" | nc -l 80; done" > /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+# RUN touch /entrypoint.sh && chmod +x /entrypoint.sh && echo -e "#!/bin/sh\nset -e\nwhile true; do nc -l 80 < index.html; done" > /entrypoint.sh
+RUN echo -e "\n\
+<html>\
+        <head>\
+                <title>Hello Page</title>\
+        </head>\
+        <body>\
+                <h1>Hello</h1>\
+                <h2>Container</h2>\
+                <p>Powered by nc</p>\
+        </body>\
+</html>\
+" > /index.html
+
+ENTRYPOINT ["/entrypoint.sh"]
+EXPOSE 80
+`)
+	dockerfileB64 string = "CkZST00gYWxwaW5lClJVTiBhcGsgYWRkIC0tdXBkYXRlIG5ldGNhdC1vcGVuYnNkICYmIHJtIC1yZiAvdmFyL2NhY2hlL2Fway8qClJVTiBlY2hvIC1lICIjIS9iaW4vc2hcblwgCnNldCAtZVxuXAp3aGlsZSB0cnVlOyBkbyBuYyAtbCA4MCA8IGluZGV4Lmh0bWw7IGRvbmUiID4gL2VudHJ5cG9pbnQuc2ggXAogICAgJiYgY2htb2QgK3ggL2VudHJ5cG9pbnQuc2gKUlVOIGVjaG8gLWUgIlxuXAo8aHRtbD5cCiAgICAgICAgPGhlYWQ+XAogICAgICAgICAgICAgICAgPHRpdGxlPkhlbGxvIFBhZ2U8L3RpdGxlPlwKICAgICAgICA8L2hlYWQ+XAogICAgICAgIDxib2R5PlwKICAgICAgICAgICAgICAgIDxoMT5IZWxsbzwvaDE+XAogICAgICAgICAgICAgICAgPGgyPkNvbnRhaW5lcjwvaDI+XAogICAgICAgICAgICAgICAgPHA+UG93ZXJlZCBieSBuYzwvcD5cCiAgICAgICAgPC9ib2R5PlwKPC9odG1sPlwKIiA+IC9pbmRleC5odG1sCgpFTlRSWVBPSU5UIFsiL2VudHJ5cG9pbnQuc2giXQpFWFBPU0UgODAK"
+)
+
+func TestImageBuildClientAll(t *testing.T) {
+	dockerfileB64 = base64.StdEncoding.EncodeToString(dockerfile)
+	fmt.Println(dockerfileB64)
+
+	client := NewOrDie()
+	req := &pb.DockerImageBuildReqResp{
+		BuildContext: dockerfile,
+		ImageBuildOptions: &mobypb.ImageBuildOptions{
+			Tags:           []string{"tangfeixiong/hello-world:netcat-http"},
+			NoCache:        true,
+			SuppressOutput: true,
+			Remove:         true,
+			ForceRemove:    true,
+			PullParent:     true,
+		},
+	}
+	resp, err := client.BuildImage(context.Background(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(resp.ImageBuildResponse.Body))
 }

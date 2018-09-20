@@ -10,6 +10,7 @@ docs/*.txt
 pkg/**/*.txt
 java/client-msgo2docker
 runtests_curl.txt
+s2icopycat
 
 metering/Dockerfile.exporter
 metering/Dockerfile.collector

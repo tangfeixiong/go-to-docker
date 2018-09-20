@@ -4,11 +4,16 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 
 	"github.com/golang/glog"
 
 	"github.com/tangfeixiong/go-to-docker/pb"
 	mobypb "github.com/tangfeixiong/go-to-docker/pb/moby"
+	"github.com/tangfeixiong/go-to-docker/pkg/filearchiver/tarball"
 	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/dockershim/libdocker"
 )
 
@@ -16,9 +21,10 @@ const (
 	ILLEGAL_PARAMETER = 1000
 	DOCKER_NOT_READY  = 1001
 
-	IMAGE_PULL_STARTED  = 1
-	IMAGE_PUSH_STARTED  = 1
-	IMAGE_BUILD_STARTED = 1
+	IMAGE_PULL_STARTED        = 1
+	IMAGE_PUSH_STARTED        = 1
+	IMAGE_BUILD_STARTED       = 1
+	IMAGE_BUILD_NOT_RESPONSED = 80
 )
 
 func (cli *DockerClient) ListImages(ctx context.Context, req *pb.DockerImageListReqResp) (*pb.DockerImageListReqResp, error) {
@@ -203,6 +209,53 @@ func (cli *DockerClient) BuildImage(ctx context.Context, req *pb.DockerImageBuil
 		return resp, fmt.Errorf("unable to build docker image: %v", err)
 	}
 	client := cli.KubeDockerClient
+
+	var buildcontextReader io.Reader
+	var tar *tarball.TapArchiver
+	dockerfilePath := "Dockerfile"
+	buildMetadata := pb.NewImageBuildMetadata(req.BuildContext)
+	if buildMetadata.IsDockerfile() {
+		tmpdir, err := ioutil.TempDir(os.TempDir(), "dockerbuildupload")
+		if err != nil {
+			glog.Errorf("Unable to build image: %v", err)
+			return resp, fmt.Errorf("unable to build docker image: %v", err)
+		}
+		dockerfilePath = filepath.Join(tmpdir, "Dockerfile")
+		err = ioutil.WriteFile(dockerfilePath, req.BuildContext, 0644)
+		if err != nil {
+			glog.Errorf("Unable to build image: %v", err)
+			return resp, fmt.Errorf("unable to build docker image: %v", err)
+		}
+		tar = tarball.New()
+		buildcontextReader = tar.CreateTarStreamReader(tmpdir, false)
+		opts := req.ImageBuildOptions.ExportIntoDockerApiType()
+		opts.NoCache = true
+		opts.SuppressOutput = true
+		opts.Remove = true
+		opts.ForceRemove = true
+		opts.PullParent = true
+		cctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+		buildresponse, err := cli.DockerApiClient.ImageBuild(cctx, buildcontextReader, opts)
+		if err != nil {
+			glog.Errorf("Failed to build image: %v", err)
+			return resp, fmt.Errorf("failed to build docker image: %v", err)
+		}
+		defer buildresponse.Body.Close()
+		buf := &bytes.Buffer{}
+		_, err = io.Copy(buf, buildresponse.Body)
+		if err != nil {
+			glog.Errorf("Unexpected to retrieve build response: %v", err)
+			resp.StateCode = IMAGE_BUILD_NOT_RESPONSED
+			resp.StateMessage = fmt.Sprintf("Unexpected to retrieve build response: %v", err)
+		} else {
+			resp.ImageBuildResponse = &mobypb.ImageBuildResponse{
+				Body:   buf.Bytes(),
+				OsType: buildresponse.OSType,
+			}
+		}
+		return resp, nil
+	}
 
 	buf := bytes.NewBuffer(req.BuildContext)
 

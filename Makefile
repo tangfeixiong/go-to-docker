@@ -187,12 +187,28 @@ gen-statik:
 	#@cp ./pb/service.swagger.json ./third_party/OpenAPI/
 	@go generate ./pkg/ui
 
-go-bindata:
+go-bindata-dockerfile:
 	$(eval gobin:=$(shell go env GOBIN))
 	@if [[ ! -f $(gobin)/go-bindata ]]; then \
 		go install ./vendor/github.com/jteeuwen/go-bindata/...; \
 	fi
 	@pkg=artifact; src=template/...; output_file=pkg/api/$${pkg}/artifact_file.go; \
+		go-bindata -nocompress -o $${output_file} -prefix $${PWD} -pkg $${pkg} $${src}
+
+go-bindata-openapi:
+	$(eval gobin:=$(shell go env GOBIN))
+	@if [[ ! -f $(gobin)/go-bindata ]]; then \
+		go install ./vendor/github.com/jteeuwen/go-bindata/...; \
+	fi
+	@pkg=openapi; src=third_party/OpenAPI/...; output_file=pkg/ui/data/$${pkg}/openapidatafile.go; \
+		go-bindata -nocompress -o $${output_file} -prefix $${PWD} -pkg $${pkg} $${src}
+
+go-bindata-swagger:
+	$(eval gobin:=$(shell go env GOBIN))
+	@if [[ ! -f $(gobin)/go-bindata ]]; then \
+		go install ./vendor/github.com/jteeuwen/go-bindata/...; \
+	fi
+	@pkg=swagger; src=third_party/swagger/...; output_file=pkg/ui/data/$${pkg}/datafile.go; \
 		go-bindata -nocompress -o $${output_file} -prefix $${PWD} -pkg $${pkg} $${src}
 
 go-install:

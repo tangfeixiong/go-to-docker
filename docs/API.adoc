@@ -165,6 +165,107 @@ CLI investigation via docker
 CONTAINER ID        IMAGE               COMMAND             CREATED             STATUS              PORTS               NAMES
 ----
 
+== Docker Image
+
+=== Build
+
+CLI curl
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ ./runtests_curl.sh docker-image-build
+{"build_context":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKRlJPTSBhbHBpbmUKUlVOIGFwayBhZGQgLS11cGRhdGUgbmV0Y2F0LW9wZW5ic2QgJiYgcm0gLXJmIC92YXIvY2FjaGUvYXBrLyoKUlVOIGVjaG8gLWUgIiMhL2Jpbi9zaFxuXCAKc2V0IC1lXG5cCndoaWxlIHRydWU7IGRvIGVjaG8gLWUgXCJIVFRQLzEuMSAyMDAgT0tcblxuIFwkKGRhdGUpIEhlbGxvIHdvcmxkXCIgfCBuYyAtbCA4MDsgZG9uZSIgPiAvZW50cnlwb2ludC5zaCBcCiAgICAmJiBjaG1vZCAreCAvZW50cnlwb2ludC5zaAojIFJVTiB0b3VjaCAvZW50cnlwb2ludC5zaCAmJiBjaG1vZCAreCAvZW50cnlwb2ludC5zaCAmJiBlY2hvIC1lICIjIS9iaW4vc2hcbnNldCAtZVxud2hpbGUgdHJ1ZTsgZG8gbmMgLWwgODAgPCBpbmRleC5odG1sOyBkb25lIiA+IC9lbnRyeXBvaW50LnNoClJVTiBlY2hvIC1lICJcblwKPGh0bWw+XAogICAgICAgIDxoZWFkPlwKICAgICAgICAgICAgICAgIDx0aXRsZT5IZWxsbyBQYWdlPC90aXRsZT5cCiAgICAgICAgPC9oZWFkPlwKICAgICAgICA8Ym9keT5cCiAgICAgICAgICAgICAgICA8aDE+SGVsbG88L2gxPlwKICAgICAgICAgICAgICAgIDxoMj5Db250YWluZXI8L2gyPlwKICAgICAgICAgICAgICAgIDxwPlBvd2VyZWQgYnkgbmM8L3A+XAogICAgICAgIDwvYm9keT5cCjwvaHRtbD5cCiIgPiAvaW5kZXguaHRtbAoKRU5UUllQT0lOVCBbIi9lbnRyeXBvaW50LnNoIl0KRVhQT1NFIDgwCg==","image_build_options":{"tags":["tangfeixiong/hello-world:netcat-http"],"suppress_output":true,"remote_context":"","no_cache":true,"remove":true,"force_remove":true,"pull_parent":true,"isolation":"","cpu_set_cpus":"","cpu_set_mems":"","cpu_shares":"0","cpu_quota":"0","cpu_period":"0","memory":"0","memory_swap":"0","cgroup_parent":"","network_mode":"","shm_size":"0","dockerfile":"","ulimits":[],"build_args":{},"auth_configs":{},"context":null,"labels":{},"squash":false,"cache_from":[],"security_opt":[],"extra_hosts":[],"target":"","session_id":"","platform":"","version":"","build_id":""},"image_build_response":{"body":"eyJzdHJlYW0iOiJzaGEyNTY6ZmI2OWY4ZjYxYmRhM2M0MDU5M2VlYWJkNDE2Y2FkNjFiNWMwM2E3ZGNmY2FlNDQyODE5MDk4Mjg1NmVlYTVjN1xuIn0NCg==","os_type":"linux"},"state_code":0,"state_message":""}[vagrant@kubedev-172-17-4-59 go-to-docker]$ 
+----
+
+* Reponse
+
+image_build_reponse body is a base64 encoded string
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ echo "eyJzdHJlYW0iOiJzaGEyNTY6ZmI2OWY4ZjYxYmRhM2M0MDU5M2VlYWJkNDE2Y2FkNjFiNWMwM2E3ZGNmY2FlNDQyODE5MDk4Mjg1NmVlYTVjN1xuIn0NCg==" | base64 -d
+{"stream":"sha256:fb69f8f61bda3c40593eeabd416cad61b5c03a7dcfcae4428190982856eea5c7\n"}
+----
+
+state_code equal 0 meaning SUCCEEDED, otherwise maybe failure in some progress
+
+* Request
+
+build_context could be a base64 encoded Dockerfile
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ echo "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKRlJPTSBhbHBpbmUKUlVOIGFwayBhZGQgLS11cGRhdGUgbmV0Y2F0LW9wZW5ic2QgJiYgcm0gLXJmIC92YXIvY2FjaGUvYXBrLyoKUlVOIGVjaG8gLWUgIiMhL2Jpbi9zaFxuXCAKc2V0IC1lXG5cCndoaWxlIHRydWU7IGRvIGVjaG8gLWUgXCJIVFRQLzEuMSAyMDAgT0tcblxuIFwkKGRhdGUpIEhlbGxvIHdvcmxkXCIgfCBuYyAtbCA4MDsgZG9uZSIgPiAvZW50cnlwb2ludC5zaCBcCiAgICAmJiBjaG1vZCAreCAvZW50cnlwb2ludC5zaAojIFJVTiB0b3VjaCAvZW50cnlwb2ludC5zaCAmJiBjaG1vZCAreCAvZW50cnlwb2ludC5zaCAmJiBlY2hvIC1lICIjIS9iaW4vc2hcbnNldCAtZVxud2hpbGUgdHJ1ZTsgZG8gbmMgLWwgODAgPCBpbmRleC5odG1sOyBkb25lIiA+IC9lbnRyeXBvaW50LnNoClJVTiBlY2hvIC1lICJcblwKPGh0bWw+XAogICAgICAgIDxoZWFkPlwKICAgICAgICAgICAgICAgIDx0aXRsZT5IZWxsbyBQYWdlPC90aXRsZT5cCiAgICAgICAgPC9oZWFkPlwKICAgICAgICA8Ym9keT5cCiAgICAgICAgICAgICAgICA8aDE+SGVsbG88L2gxPlwKICAgICAgICAgICAgICAgIDxoMj5Db250YWluZXI8L2gyPlwKICAgICAgICAgICAgICAgIDxwPlBvd2VyZWQgYnkgbmM8L3A+XAogICAgICAgIDwvYm9keT5cCjwvaHRtbD5cCiIgPiAvaW5kZXguaHRtbAoKRU5UUllQT0lOVCBbIi9lbnRyeXBvaW50LnNoIl0KRVhQT1NFIDgwCg==" | base64 -d
+
+FROM alpine
+RUN apk add --update netcat-openbsd && rm -rf /var/cache/apk/*
+RUN echo -e "#!/bin/sh\n\ 
+set -e\n\
+while true; do echo -e \"HTTP/1.1 200 OK\n\n \$(date) Hello world\" | nc -l 80; done" > /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+
+# RUN touch /entrypoint.sh && chmod +x /entrypoint.sh && echo -e "#!/bin/sh\nset -e\nwhile true; do nc -l 80 < index.html; done" > /entrypoint.sh
+RUN echo -e "\n\
+<html>\
+        <head>\
+                <title>Hello Page</title>\
+        </head>\
+        <body>\
+                <h1>Hello</h1>\
+                <h2>Container</h2>\
+                <p>Powered by nc</p>\
+        </body>\
+</html>\
+" > /index.html
+
+ENTRYPOINT ["/entrypoint.sh"]
+EXPOSE 80
+----
+
+note: encode a Dockerfile cli like
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ base64 -w0 Dockerfile.alpine 
+RlJPTSBhbHBpbmU6ZWRnZQpMQUJFTCAibWFpbnRhaW5lciI9InRhbmdmZWl4aW9uZyA8dGFuZ...*snippet*...
+----
+
+* Image
+
+CLI investigation via docker
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ docker images
+REPOSITORY                                               TAG                 IMAGE ID            CREATED             SIZE
+tangfeixiong/hello-world                                 netcat-http         fb69f8f61bda        3 minutes ago       4.54 MB
+----
+
+note: remove noname images
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ docker image prune       
+WARNING! This will remove all dangling images.
+Are you sure you want to continue? [y/N] y
+Total reclaimed space: 0 B
+----
+
+or in past
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ docker rmi $(docker images -aqf dangling=true)
+----
+
+* Test
+
+Client via curl
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ curl http://localhost:43210/
+ Thu Sep 20 10:50:02 UTC 2018 <h1>Hello world</h1>
+
+^C
+----
+
+Server container
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ docker run -ti --name test -p43210:80 tangfeixiong/hello-world:netcat-http
+GET / HTTP/1.1
+Host: localhost:43210
+User-Agent: curl/7.53.1
+Accept: */*
+
+----
+
+
+
 
 == V0.1
 

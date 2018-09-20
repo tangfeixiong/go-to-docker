@@ -81,7 +81,7 @@ var _templateDockerfileGofileserverBasedGoTpl = []byte(`FROM docker.io/tangfeixi
 LABEL maintainer="tangfeixiong" mailto="tangfx128@gmail.com"
 
 # RUN apk add ospd-netstat --update --repository http://dl-6.alpinelinux.org/alpine/edge/community && rm -rf /var/cache/apk/*
-COPY {{.SrcStr}} /tmp/download/
+COPY {{.SrcStr}} /tmp/download/{{.DstDir}}
 WORKDIR /tmp/download
 CMD ["/gofileserver", "-dir", "/tmp/download"]
 EXPOSE 48080`)
@@ -96,7 +96,7 @@ func templateDockerfileGofileserverBasedGoTpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "template/Dockerfile.gofileserver-based.go-tpl", size: 467, mode: os.FileMode(420), modTime: time.Unix(1537049859, 0)}
+	info := bindataFileInfo{name: "template/Dockerfile.gofileserver-based.go-tpl", size: 478, mode: os.FileMode(420), modTime: time.Unix(1537342301, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

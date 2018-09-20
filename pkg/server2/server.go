@@ -108,6 +108,7 @@ func newHTTP(ctx context.Context, host string, port int) (*http.Server, error) {
 		io.Copy(w, strings.NewReader(pb.Swagger))
 	})
 	serveSwagger(router)
+	serveReSTful(router)
 
 	// initialize grpc-gateway
 	gw, err := newGateway(ctx, fmt.Sprintf("localhost:%d", port))
