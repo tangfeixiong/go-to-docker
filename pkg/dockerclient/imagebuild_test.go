@@ -49,7 +49,7 @@ func TestImageBuildDockerfileAPI(t *testing.T) {
 
 	dockerfile := "Dockerfile.gofileserver-based"
 	opts := dockertypes.ImageBuildOptions{
-		Tags:           []string{"tangfeixiong/basegofs"},
+		Tags:           []string{"tangfeixiong/basedongofileserver"},
 		NoCache:        true,
 		SuppressOutput: false,
 		Remove:         true,
@@ -190,15 +190,48 @@ EXPOSE 80
 	dockerfileB64 string = "CkZST00gYWxwaW5lClJVTiBhcGsgYWRkIC0tdXBkYXRlIG5ldGNhdC1vcGVuYnNkICYmIHJtIC1yZiAvdmFyL2NhY2hlL2Fway8qClJVTiBlY2hvIC1lICIjIS9iaW4vc2hcblwgCnNldCAtZVxuXAp3aGlsZSB0cnVlOyBkbyBuYyAtbCA4MCA8IGluZGV4Lmh0bWw7IGRvbmUiID4gL2VudHJ5cG9pbnQuc2ggXAogICAgJiYgY2htb2QgK3ggL2VudHJ5cG9pbnQuc2gKUlVOIGVjaG8gLWUgIlxuXAo8aHRtbD5cCiAgICAgICAgPGhlYWQ+XAogICAgICAgICAgICAgICAgPHRpdGxlPkhlbGxvIFBhZ2U8L3RpdGxlPlwKICAgICAgICA8L2hlYWQ+XAogICAgICAgIDxib2R5PlwKICAgICAgICAgICAgICAgIDxoMT5IZWxsbzwvaDE+XAogICAgICAgICAgICAgICAgPGgyPkNvbnRhaW5lcjwvaDI+XAogICAgICAgICAgICAgICAgPHA+UG93ZXJlZCBieSBuYzwvcD5cCiAgICAgICAgPC9ib2R5PlwKPC9odG1sPlwKIiA+IC9pbmRleC5odG1sCgpFTlRSWVBPSU5UIFsiL2VudHJ5cG9pbnQuc2giXQpFWFBPU0UgODAK"
 )
 
-func TestImageBuildClientAll(t *testing.T) {
+func TestImageBuildClientDockerfile(t *testing.T) {
+	client := NewOrDie()
+
 	dockerfileB64 = base64.StdEncoding.EncodeToString(dockerfile)
 	fmt.Println(dockerfileB64)
 
-	client := NewOrDie()
 	req := &pb.DockerImageBuildReqResp{
 		BuildContext: dockerfile,
 		ImageBuildOptions: &mobypb.ImageBuildOptions{
 			Tags:           []string{"tangfeixiong/hello-world:netcat-http"},
+			NoCache:        true,
+			SuppressOutput: true,
+			Remove:         true,
+			ForceRemove:    true,
+			PullParent:     true,
+		},
+	}
+	resp, err := client.BuildImage(context.Background(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(string(resp.ImageBuildResponse.Body))
+}
+
+var (
+	gitMetadata []byte = []byte(`# ** metadata:git **
+#
+
+https://github.com/tangfeixiong/nta#:docs`)
+	gitMetadataB64 string = "IyAqKiBtZXRhZGF0YTpnaXQgKioKIwoKaHR0cHM6Ly9naXRodWIuY29tL3RhbmdmZWl4aW9uZy9udGEjOmRvY3M="
+)
+
+func TestImageBuildClientGit(t *testing.T) {
+	client := NewOrDie()
+
+	gitMetadataB64 = base64.StdEncoding.EncodeToString(gitMetadata)
+	fmt.Println(gitMetadataB64)
+
+	req := &pb.DockerImageBuildReqResp{
+		BuildContext: gitMetadata,
+		ImageBuildOptions: &mobypb.ImageBuildOptions{
+			Tags:           []string{"tangfeixiong/basedongofileserver"},
 			NoCache:        true,
 			SuppressOutput: true,
 			Remove:         true,

@@ -3,6 +3,10 @@ LABEL "maintainer"="tangfeixiong <tangfx128@gmail.com>" \
     "project"="https://github.com/tangfeixiong/go-to-docker" \
     "name"="msgo2docker" \
     "version"="0.2"
+
+# ca-certificates
+#apk add --update ca-certificates && rm -rf /var/cache/apk/*
+COPY etc/ssl/certs/ /etc/ssl/certs/
 	
 COPY bin/gotodocker /
 

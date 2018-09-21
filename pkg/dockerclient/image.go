@@ -8,13 +8,17 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/golang/glog"
 
 	"github.com/tangfeixiong/go-to-docker/pb"
 	mobypb "github.com/tangfeixiong/go-to-docker/pb/moby"
+	apitypes "github.com/tangfeixiong/go-to-docker/pkg/api"
+	manifestapi "github.com/tangfeixiong/go-to-docker/pkg/api/manifest"
 	"github.com/tangfeixiong/go-to-docker/pkg/filearchiver/tarball"
 	"github.com/tangfeixiong/go-to-docker/pkg/kubeletcopycat/dockershim/libdocker"
+	gitscm "github.com/tangfeixiong/go-to-docker/pkg/scm/git"
 )
 
 const (
@@ -215,7 +219,15 @@ func (cli *DockerClient) BuildImage(ctx context.Context, req *pb.DockerImageBuil
 	dockerfilePath := "Dockerfile"
 	buildMetadata := pb.NewImageBuildMetadata(req.BuildContext)
 	if buildMetadata.IsDockerfile() {
-		tmpdir, err := ioutil.TempDir(os.TempDir(), "dockerbuildupload")
+		//		profileHome := "dockerbuildsource"
+		//		sessionPrefix := "singledockerfilectx"
+		profileDir := filepath.Join(os.TempDir(), apitypes.DefaultProfileDir[1:], "dockerbuildsource")
+		err := os.MkdirAll(profileDir, os.ModePerm)
+		if err != nil && !os.IsNotExist(err) {
+			glog.Errorf("Unable to init dir: %v", err)
+			return resp, fmt.Errorf("unable to build docker image: %v", err)
+		}
+		tmpdir, err := ioutil.TempDir(profileDir, "buildcontext")
 		if err != nil {
 			glog.Errorf("Unable to build image: %v", err)
 			return resp, fmt.Errorf("unable to build docker image: %v", err)
@@ -240,6 +252,80 @@ func (cli *DockerClient) BuildImage(ctx context.Context, req *pb.DockerImageBuil
 		if err != nil {
 			glog.Errorf("Failed to build image: %v", err)
 			return resp, fmt.Errorf("failed to build docker image: %v", err)
+		}
+		defer buildresponse.Body.Close()
+		buf := &bytes.Buffer{}
+		_, err = io.Copy(buf, buildresponse.Body)
+		if err != nil {
+			glog.Errorf("Unexpected to retrieve build response: %v", err)
+			resp.StateCode = IMAGE_BUILD_NOT_RESPONSED
+			resp.StateMessage = fmt.Sprintf("Unexpected to retrieve build response: %v", err)
+		} else {
+			resp.ImageBuildResponse = &mobypb.ImageBuildResponse{
+				Body:   buf.Bytes(),
+				OsType: buildresponse.OSType,
+			}
+		}
+		return resp, nil
+	}
+
+	if url, ref, dir, ok := buildMetadata.AsGitReopsitory(); ok {
+		if len(dir) != 0 && (strings.Contains(dir, "..") || strings.Contains(dir, "../")) {
+			glog.Errorln("Illegal dir in git repository")
+			return resp, fmt.Errorf("illegal dir in git repository")
+		}
+		profileHome := "dockerbuildsource"
+		sessionPrefix := "gitrepo"
+		profileDir := filepath.Join(os.TempDir(), apitypes.DefaultProfileDir[1:], profileHome)
+		err := os.MkdirAll(profileDir, os.ModePerm)
+		if err != nil && !os.IsNotExist(err) {
+			glog.Errorf("Unable to init dir: %v", err)
+			return resp, fmt.Errorf("unable to build docker image: %v", err)
+		}
+		tmpdir, err := ioutil.TempDir(profileDir, sessionPrefix)
+		if err != nil {
+			glog.Errorf("Unable to build image while init dir for git: %v", err)
+			return resp, fmt.Errorf("unable to build docker image: %v", err)
+		}
+		gitclient, err := gitscm.New(gitscm.CloneOptsReferenceName(ref),
+			gitscm.CloneOptsSingleBranchOnly(true))
+		if err != nil {
+			glog.Errorf("Unable to establish git client:%v", err)
+			return resp, err
+		}
+		repoDirname := "cloned"
+		err = gitclient.Clone(url, filepath.Join(tmpdir, repoDirname))
+		if err != nil {
+			glog.Errorf("Failed to clone git repository: %v", err)
+			return resp, err
+		}
+
+		// TODO: define directive in metadata, as while dir consists of multi parts, includeDirInPath should know which one or whole
+		buildcontextDir := filepath.Join(tmpdir, repoDirname, dir)
+		imagedirCreate := dir
+		dockerfileDir := buildcontextDir
+		manifest := manifestapi.NewDockerfileManifest("", dockerfileDir)
+		dockerfilePath, err := manifest.WriteFileUsingGofileserverbasedTemplate(imagedirCreate, buildcontextDir, make(map[string][]string))
+		if err != nil {
+			glog.Errorf("Unable to build file server image: %v", err)
+			return resp, fmt.Errorf("unable to build file server image: %v", err)
+		}
+
+		tar = tarball.New()
+		buildcontextReader = tar.CreateTarStreamReader(buildcontextDir, false)
+		opts := req.ImageBuildOptions.ExportIntoDockerApiType()
+		opts.NoCache = true
+		opts.SuppressOutput = true
+		opts.Remove = true
+		opts.ForceRemove = true
+		opts.PullParent = true
+		opts.Dockerfile = filepath.Base(dockerfilePath)
+		cctx, cancel := context.WithCancel(ctx)
+		defer cancel()
+		buildresponse, err := cli.DockerApiClient.ImageBuild(cctx, buildcontextReader, opts)
+		if err != nil {
+			glog.Errorf("Failed to build file server image: %v", err)
+			return resp, fmt.Errorf("failed to build file server image: %v", err)
 		}
 		defer buildresponse.Body.Close()
 		buf := &bytes.Buffer{}

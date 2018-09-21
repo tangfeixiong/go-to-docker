@@ -1,6 +1,6 @@
 package api
 
 const (
-	DefaultUserProfileDir = ".go-to-docker"
-	DefaultGitReposHome   = "repos-git"
+	DefaultProfileDir   = ".go-to-docker"
+	DefaultGitReposHome = "repos-git"
 )

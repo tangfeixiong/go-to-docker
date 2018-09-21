@@ -1,9 +1,10 @@
-package gitscm // import "github.com/tangfeixiong/go-to-docker/pkg/scm/git
+package gitscm
+
+// import "github.com/tangfeixiong/go-to-docker/pkg/scm/git
 
 import (
 	"errors"
 	"io"
-	"os"
 
 	"github.com/tangfeixiong/go-to-docker/pkg/util/logging"
 )

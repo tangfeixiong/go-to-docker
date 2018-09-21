@@ -16,6 +16,7 @@ ENV DOCKER_API_VERSION='1.12' \
 # refer to https://wiki.alpinelinux.org/wiki/Intrusion_Detection_using_Snort
 RUN set -x \
     && install_Pkgs = " \
+	    ca-certificates \
         libpcap \
         #alpine-sdk 
         #mysql-dev 

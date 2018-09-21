@@ -37,8 +37,12 @@ func (m *ImageBuildMetadata) dockerfileDirectiveFROM() (string, string, bool) {
 	var err error = nil
 	var ok *bool = nil
 	for ndx = 0; ndx < len(m.content); ndx++ {
-		if m.content[ndx] == byte('\n') {
-			stop = ndx
+		if m.content[ndx] == byte('\n') || ndx+1 == len(m.content) {
+			if ndx+1 < len(m.content) {
+				stop = ndx
+			} else {
+				stop = ndx + 1
+			}
 			if start == stop {
 				start = ndx + 1
 				continue // blank line
@@ -200,8 +204,12 @@ func (m *ImageBuildMetadata) examineGitDescription() (string, string, string, bo
 	var err error = nil
 	var ok *bool = nil
 	for ndx = 0; ndx < len(m.content); ndx++ {
-		if m.content[ndx] == byte('\n') {
-			stop = ndx
+		if m.content[ndx] == byte('\n') || ndx+1 == len(m.content) {
+			if ndx+1 < len(m.content) {
+				stop = ndx
+			} else {
+				stop = ndx + 1
+			}
 			if start == stop {
 				start = ndx + 1
 				continue // empty line

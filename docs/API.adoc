@@ -167,7 +167,7 @@ CONTAINER ID        IMAGE               COMMAND             CREATED             
 
 == Docker Image
 
-=== Build
+=== Build single Dockerfile
 
 CLI curl
 ----
@@ -264,8 +264,68 @@ Accept: */*
 
 ----
 
+=== Build from Git repository
 
+CLI curl
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ ./runtests_curl.sh docker-image-build git
+{"build_context":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAjICoqIG1ldGFkYXRhOmdpdCAqKgojCgpodHRwczovL2dpdGh1Yi5jb20vdGFuZ2ZlaXhpb25nL250YSM6ZG9jcw==","image_build_options":{"tags":["tangfeixiong/basedongofileserver"],"suppress_output":true,"remote_context":"","no_cache":true,"remove":true,"force_remove":true,"pull_parent":true,"isolation":"","cpu_set_cpus":"","cpu_set_mems":"","cpu_shares":"0","cpu_quota":"0","cpu_period":"0","memory":"0","memory_swap":"0","cgroup_parent":"","network_mode":"","shm_size":"0","dockerfile":"","ulimits":[],"build_args":{},"auth_configs":{},"context":null,"labels":{},"squash":false,"cache_from":[],"security_opt":[],"extra_hosts":[],"target":"","session_id":"","platform":"","version":"","build_id":""},"image_build_response":{"body":"eyJzdHJlYW0iOiJzaGEyNTY6MThjZmYwMTNmOWZjZTFlMjBmZmY3M2FkODYyMDk5MWZjOWZiZTkwZjZmNWUwYmIyYTA1ZjgwOTAyZDI1MThkOFxuIn0NCg==","os_type":"linux"},"state_code":0,"state_message":""}
+----
 
+Built image
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ docker images tangfeixiong/basedongofileserver
+REPOSITORY                         TAG                 IMAGE ID            CREATED              SIZE
+tangfeixiong/basedongofileserver   latest              18cff013f9fc        About a minute ago   12.9 MB
+----
+
+Logs
+----
+I0921 06:46:45.022838       1 client.go:93] Start docker client with request timeout=1m59s
+[server2 serveReSTful] 2018/09/21 06:46:45 restful.go:85: Get the API using http://<host>/apidocs.json
+[server2 serveReSTful] 2018/09/21 06:46:45 restful.go:86: Open OpenAPI UI using http://<host>/apidocs/?url=http://<host>/apidocs.json
+https://github.com/tangfeixiong/nta#:docs
+"# ** metadata:git **\n#\n\nhttps://github.com/tangfeixiong/nta#:docs"
+https://github.com/tangfeixiong/nta#:docs
+url=https://github.com/tangfeixiong/nta ref= dir=docs
+W0921 06:46:57.438451       1 helper.go:454] Dockefile not specified
+I0921 06:46:57.441077       1 gogit.go:36] git clone https://github.com/tangfeixiong/nta /tmp/go-to-docker/dockerbuildsource/gitrepo275311061/cloned --recursive
+W0921 06:47:03.736973       1 dockerfile.go:88] None file or directory find
+commit 3c848c92c974f1a769c463ccc489a3a2dd342a94
+Author: tangfeixiong <tangfx128@gmail.com>
+Date:   Thu May 24 15:12:45 2018 -0700
+    use case: if dev in OS, service discovery or registry, services for app
+----
+
+* Test
+
+Server
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ docker run -ti --name test -p 43210:48080 tangfeixiong/basedongofileserver
+Listening at  :48080
+----
+
+Client
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ curl http://localhost:43210
+<pre>
+<a href="docs/">docs/</a>
+</pre>
+----
+
+and
+----
+[vagrant@kubedev-172-17-4-59 go-to-docker]$ curl http://localhost:43210/docs/
+<pre>
+<a href="Dockerfile.gofileserver-based">Dockerfile.gofileserver-based</a>
+<a href="networking-data-definition.md">networking-data-definition.md</a>
+<a href="nta-architect-1.png">nta-architect-1.png</a>
+<a href="nta-architect-2.png">nta-architect-2.png</a>
+<a href="nta-use-case-1.md">nta-use-case-1.md</a>
+<a href="nta-use-case-2.md">nta-use-case-2.md</a>
+<a href="poc.md">poc.md</a>
+</pre>
+----
 
 == V0.1
 

@@ -28,9 +28,7 @@ EXPOSE 48080
 	gitMetadata []byte = []byte(`# ** metadata:git **
 #
 
-https://github.com/tangfeixiong/nta#:docs
-#
-`)
+https://github.com/tangfeixiong/nta#:docs`)
 )
 
 func TestBuildMetadataDockerfile(t *testing.T) {
